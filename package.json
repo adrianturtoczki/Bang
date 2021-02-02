@@ -1,0 +1,19 @@
+{
+  "name": "bang",
+  "version": "1.0.0",
+  "description": "Javascript implementation of Bang: the Dice Game",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "^0.0.1-security",
+    "socket.io": "^3.0.5",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Adrian Turtoczki",
+  "license": "ISC"
+}
