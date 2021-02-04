@@ -6,9 +6,12 @@ const game = new gameClass();
 
 let playerLimit = 4; //limits number of players to 4 for now
 
+const Dice = require('./dice');
+
 game.setup(playerLimit);
 
-const express = require('express')
+const express = require('express');
+const { DH_UNABLE_TO_CHECK_GENERATOR } = require('constants');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
@@ -49,9 +52,10 @@ io.on('connection', (socket) => {
     io.sockets.emit("all_players_connected",game.players);
   }
 
-  //resolving dices
-  socket.on('resolve', (selections) => {
+  // ending a turn
+  socket.on('end_turn', (selections) => {
 
+    //resolving
     console.log('resolving '+player.name+"'s turn ..");
     for (let s of selections){
       if (s!=null){
@@ -82,12 +86,7 @@ io.on('connection', (socket) => {
 
     console.log(game.check_win_conditions(playerLimit));
 
-    io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
-  });
-
-  // ending a turn
-  socket.on('end_turn', () => {
-
+    //ending turn
     console.log(player.name+"'s turn ended");
     if (player.cur_turn){
       player.turn_end = true;
@@ -102,20 +101,20 @@ io.on('connection', (socket) => {
    }, 500);
   });
 
-  //dice rolls
+  //dice roll
   socket.on('roll', () => {
     console.log(player.name + ' rolled');
-    if (player.roll_num>0){
+    if (player.rolled===false){
 
       let roll_results = [];
       for (let i = 0; i < 5; i++){
-          roll_results.push(player.roll());
+          roll_results.push(new Dice(player.roll(),i));
       }
 
-      let dynamite_count = 0;
-      let gatling_count = 0;
+      let dynamite_dices = roll_results.filter(x=>x.type===1);
+      let gatling_dices = roll_results.filter(x=>x.type===5);
       for (let d of roll_results){
-        switch(d){
+        switch(d.type){
           case 0:
             player.arrows++;
             game.arrows_left--;
@@ -131,20 +130,15 @@ io.on('connection', (socket) => {
 
             break;
           case 1:
-            dynamite_count++;
-            break;
-          case 5:
-            gatling_count++;
+            d.rerolls_left = 0;
             break;
         }
       }
-      if (dynamite_count>=3){
-        player.roll_num = 0;
+      if (dynamite_dices.length>=3){
         player.life--;
-      } else {
-        player.roll_num--;
+        dynamite_dices.forEach(x=>x.ability_activated = true);
       }
-      if (gatling_count>=3){
+      if (gatling_dices.length>=3){
         game.arrows_left+=player.arrows;
         player.arrows = 0;
         for (let p of game.players){
@@ -153,13 +147,67 @@ io.on('connection', (socket) => {
             p.life--;
           }
         }
+        gatling_dices.forEach(x=>x.ability_activated = true);
       }
+
+      player.rolled = true;
 
       socket.emit('roll_results',roll_results);
 
       io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
 
     }
+  });
+
+  socket.on('reroll', (cur_dices,rerolled_dice_index) => {
+    console.log(player.name + ' rerolled');
+
+    let rerolled_dice = cur_dices[rerolled_dice_index];
+
+      rerolled_dice.type = player.roll();
+
+      rerolled_dice.rerolls_left--;
+
+      let dynamite_dices = cur_dices.filter(x=>x.type===1&&x.ability_activated === false);
+      let gatling_dices = cur_dices.filter(x=>x.type===5&&x.ability_activated === false);
+
+      if (rerolled_dice.type===0){
+        player.arrows++;
+        game.arrows_left--;
+
+        //check if no arrows are left
+        if (game.arrows_left<=0){
+          for (let p of game.players){
+            p.arrows = 0;
+            p.life--;
+          }
+          game.arrows_left = 9;
+        }
+      }
+      else if (rerolled_dice.type==1){
+        rerolled_dice.rerolls_left = 0;
+      }
+
+      if (dynamite_dices.length>=3){
+        player.life--;
+        dynamite_dices.forEach(x=>x.ability_activated = true);
+      }
+      if (gatling_dices.length>=3){
+        game.arrows_left+=player.arrows;
+        player.arrows = 0;
+        for (let p of game.players){
+          if (p!=player){
+            console.log("other players:",p);
+            p.life--;
+          }
+        }
+        gatling_dices.forEach(x=>x.ability_activated = true);
+      }
+
+      socket.emit('roll_results',cur_dices);
+
+      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
+
   });
 
 

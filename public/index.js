@@ -14,9 +14,9 @@ var socket = io();
 
       let selections = [];
 
-      let current_dices = [];
-
       let players_ar = [];
+
+      let cur_dices = [];
 
       let players_alive;
 
@@ -45,9 +45,8 @@ var socket = io();
 
         document.getElementById('player_health_number').textContent='Your health: '+player.life;
         document.getElementById('player_arrow_number').textContent='Your arrows: '+player.arrows;
-        document.getElementById('roll_count').textContent='Rolls left: '+(player.roll_num);
 
-        if (player.cur_turn===true&&player.roll_num>0){
+        if (player.cur_turn===true&&player.rolled===false){
           document.getElementById("roll").style.display = "block";
         } else {
           document.getElementById("roll").style.display = "none";
@@ -79,41 +78,14 @@ var socket = io();
       socket.on('players_data_setup', ([players,index,arrows_left]) => {
         playerIndex = index;
         player = players[index];
+
         cur_player_data(player);
 
         document.getElementById('player_name').textContent='Your name: '+player.name;
 
-        //set image based on role
-        switch(player.role){
-          case 'sheriff':
-            document.getElementById('player_role_image').src = 'images/r_sheriff.jpg';
-            break;
-          case 'renegade':
-            document.getElementById('player_role_image').src = 'images/r_renegade.jpg';
-            break;
-          case 'outlaw':
-            document.getElementById('player_role_image').src = 'images/r_outlaw.jpg';
-            break;
-          case 'deputy':
-            document.getElementById('player_role_image').src = 'images/r_deputy.jpg';
-            break;
-        }
+        document.getElementById('player_role_image').src = 'images/r_'+player.role+'.jpg';
 
-        //set image based on character
-        switch(player.character){
-          case 'suzy_lafayette':
-            document.getElementById('player_character_image').src = 'images/c_suzy_lafayette.jpg';
-            break;
-          case 'black_jack':
-            document.getElementById('player_character_image').src = 'images/c_black_jack.jpg';
-            break;
-          case 'lucky_duke':
-            document.getElementById('player_character_image').src = 'images/c_lucky_duke.jpg';
-            break;
-          case 'willy_the_kid':
-            document.getElementById('player_character_image').src = 'images/c_willy_the_kid.jpg';
-            break;
-        }
+        document.getElementById('player_character_image').src = 'images/c_'+player.character+'.jpg';
 
         document.getElementById('other_players').innerHTML='';
       for (let p of players){
@@ -137,13 +109,16 @@ var socket = io();
         });
 
       socket.on('roll_results', (roll_results) => {
-      draw_dice(roll_results);
+        cur_dices = roll_results;
+        draw_dice(roll_results);
         });
 
-      function select_player(dice_type,dice_number,player_index){
+      function select_player(dice_index,player_index){
+        let dice = cur_dices[dice_index];
+        console.log(dice);
         document.getElementById("resolve_dropdown").classList.toggle("show");
-        console.log("select_player "+dice_type+","+dice_number+","+player_index);
-        selections[dice_number] = [dice_type,player_index];
+        console.log("select_player "+dice.index+","+player_index);
+        selections[dice.index] = [dice.type,player_index];
 
         print_selections(selections);
       }
@@ -171,107 +146,112 @@ var socket = io();
         document.getElementById('selections').textContent = 'Your selections: '+prettier_selection; //TODO: make it more aesthetic, like : Shoot Player 1, Heal Player 2
       }
   
-      function dice_dropdown(dice_type,dice_number) {
+      function dice_dropdown(dice_index) {
         let resolve_dropdown_div = document.getElementById('resolve_dropdown');
         resolve_dropdown_div.innerHTML='';
 
-        //reroll
-        var reroll_button = document.createElement('p');
-        if (players_ar[playerIndex].roll_num>0){
-          reroll_button.appendChild(document.createTextNode("Reroll ("+players_ar[playerIndex].roll_num+" left)"));
+        let dice = cur_dices[dice_index];
+
+        if (dice.rerolls_left>0){
+          //reroll
+          var reroll_button = document.createElement('p');
+          //todo
+          reroll_button.appendChild(document.createTextNode("Reroll ("+dice.rerolls_left+" left)")); //todo insert here
           reroll_button.addEventListener('click',function(){
-            console.log("roll button clicked");
-            socket.emit('roll');
-          });
-          resolve_dropdown_div.appendChild(reroll_button);
+            document.getElementById("resolve_dropdown").classList.toggle("show");
+            console.log("reroll button clicked for "+[dice.type,dice.index]);
+            socket.emit('reroll',cur_dices,dice.index);
+            });
+            resolve_dropdown_div.appendChild(reroll_button);
           }
-        //players the player can effect with the dice
-        if (dice_type===2||dice_type===3||dice_type===4){
-          var p_name = document.createElement('p');
-          var n_name = document.createElement('p');
 
-          if (dice_type===2||(dice_type===3&&players_alive<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
-            console.log(playerIndex,players_ar.length,players_ar,players_ar[playerIndex+1]);
-            var prev_player = playerIndex == 0 ? players_ar[players_ar.length-1] : players_ar[playerIndex-1];
-            var next_player = playerIndex == players_ar.length-1 ? players_ar[0] : players_ar[playerIndex+1];
+          //players the player can effect with the dice
+          if (dice.type===2||dice.type===3||dice.type===4){
+            var p_name = document.createElement('p');
+            var n_name = document.createElement('p');
 
-            p_name.appendChild(document.createTextNode(prev_player.name));
-            n_name.appendChild(document.createTextNode(next_player.name));
+              //shoot players 1 people away
+            if (dice.type===2||(dice.type===3&&players_alive<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
+              console.log(playerIndex,players_ar.length,players_ar,players_ar[playerIndex+1]);
+              var prev_player = playerIndex == 0 ? players_ar[players_ar.length-1] : players_ar[playerIndex-1];
+              var next_player = playerIndex == players_ar.length-1 ? players_ar[0] : players_ar[playerIndex+1];
 
-            p_name.setAttribute('onclick','select_player('+dice_type+','+dice_number+','+prev_player.index+')');
-            n_name.setAttribute('onclick','select_player('+dice_type+','+dice_number+','+next_player.index+')');
+              p_name.appendChild(document.createTextNode(prev_player.name));
+              n_name.appendChild(document.createTextNode(next_player.name));
 
-            resolve_dropdown_div.appendChild(n_name);
+              p_name.setAttribute('onclick','select_player('+dice.index+','+prev_player.index+')');
+              n_name.setAttribute('onclick','select_player('+dice.index+','+next_player.index+')');
 
-          } else if (dice_type===3){
-            if (playerIndex == 0){
-              var prev_player = players_ar[players_ar.length-2];
-            } else if (playerIndex == 1){
-              var prev_player = players_ar[players_ar.length-1];
-            } else {
-              var prev_player = players_ar[playerIndex-2];
+              resolve_dropdown_div.appendChild(n_name);
+
+              //shoot players 2 people away
+            } else if (dice.type===3){
+              if (playerIndex == 0){
+                var prev_player = players_ar[players_ar.length-2];
+              } else if (playerIndex == 1){
+                var prev_player = players_ar[players_ar.length-1];
+              } else {
+                var prev_player = players_ar[playerIndex-2];
+              }
+              if (playerIndex + 1 == players_ar.length-1){
+                var next_player = players_ar[0];
+              } else if (playerIndex == players_ar.length-1){
+                var next_player = players_ar[1];
+              } else {
+                var next_player = players_ar[playerIndex+2];
+              }
+
+              console.log([prev_player,next_player]);
+
+              p_name.appendChild(document.createTextNode(prev_player.name));
+              n_name.appendChild(document.createTextNode(next_player.name));
+
+              p_name.setAttribute('onclick','select_player('+dice.index+','+prev_player.index+')');
+              n_name.setAttribute('onclick','select_player('+dice.index+','+next_player.index+')'); 
+
+              resolve_dropdown_div.appendChild(n_name);
+
+            } else if (dice.type===4){
+
+              for (let p of players_ar){
+                var b_name = document.createElement('p');
+                b_name.appendChild(document.createTextNode(p.name));
+                b_name.setAttribute('onclick','select_player('+dice.index+','+p.index+')');
+                resolve_dropdown_div.appendChild(b_name);
+              }
+
             }
-            if (playerIndex + 1 == players_ar.length-1){
-              var next_player = players_ar[0];
-            } else if (playerIndex == players_ar.length-1){
-              var next_player = players_ar[1];
-            } else {
-              var next_player = players_ar[playerIndex+2];
-            }
+            resolve_dropdown_div.appendChild(p_name);
 
-            console.log([prev_player,next_player]);
-
-            p_name.appendChild(document.createTextNode(prev_player.name));
-            n_name.appendChild(document.createTextNode(next_player.name));
-
-            p_name.setAttribute('onclick','select_player('+dice_type+','+dice_number+','+prev_player.index+')');
-            n_name.setAttribute('onclick','select_player('+dice_type+','+dice_number+','+next_player.index+')'); 
-
-            resolve_dropdown_div.appendChild(n_name);
-
-          } else if (dice_type===4){
-
-            for (let p of players_ar){
-              var b_name = document.createElement('p');
-              b_name.appendChild(document.createTextNode(p.name));
-              b_name.setAttribute('onclick','select_player('+dice_type+','+dice_number+','+p.index+')');
-              resolve_dropdown_div.appendChild(b_name);
-            }
 
           }
-          resolve_dropdown_div.appendChild(p_name);
-
           document.getElementById("resolve_dropdown").classList.toggle("show");
-        }
       }
 
       function draw_dice(dices){
-        d1.src = null;
-        d2.src = null;
-        d3.src = null;
-        d4.src = null;  
-        d5.src = null;
+        d1.src,d2.src,d3.src,d4.src,d5.src = null,null,null,null,null;
         for (let i = 0; i<5;i++){
+          let cur_dice = dices[i];
           switch(i){
             case 0:
-              d1.src = 'images/d'+(dices[i]+1)+'.png';
-              d1.setAttribute('onclick',`dice_dropdown(${dices[i]},${i})`);
+              d1.src = 'images/d'+(cur_dice.type+1)+'.png';
+              d1.setAttribute('onclick',`dice_dropdown(${i})`);
               break;
             case 1:
-              d2.src = 'images/d'+(dices[i]+1)+'.png';
-              d2.setAttribute('onclick',`dice_dropdown(${dices[i]},${i})`);
+              d2.src = 'images/d'+(cur_dice.type+1)+'.png';
+              d2.setAttribute('onclick',`dice_dropdown(${i})`);
               break;
             case 2:
-              d3.src = 'images/d'+(dices[i]+1)+'.png';
-              d3.setAttribute('onclick',`dice_dropdown(${dices[i]},${i})`);
+              d3.src = 'images/d'+(cur_dice.type+1)+'.png';
+              d3.setAttribute('onclick',`dice_dropdown(${i})`);
               break;
             case 3:
-              d4.src = 'images/d'+(dices[i]+1)+'.png';
-              d4.setAttribute('onclick',`dice_dropdown(${dices[i]},${i})`);
+              d4.src = 'images/d'+(cur_dice.type+1)+'.png';
+              d4.setAttribute('onclick',`dice_dropdown(${i})`);
               break;
             case 4:
-              d5.src = 'images/d'+(dices[i]+1)+'.png';
-              d5.setAttribute('onclick',`dice_dropdown(${dices[i]},${i})`);
+              d5.src = 'images/d'+(cur_dice.type+1)+'.png';
+              d5.setAttribute('onclick',`dice_dropdown(${i})`);
               break;
           }
         }
@@ -283,18 +263,12 @@ var socket = io();
         console.log("roll button clicked");
         socket.emit('roll');
       });
-      document.getElementById('resolve_button').addEventListener('click',function(){
-        console.log("resolve button clicked");
-        socket.emit('resolve',selections);
-
-        selections = [];
-        print_selections(selections);
-      });
       document.getElementById('end_turn_button').addEventListener('click',function(){
         console.log("end turn button clicked");
-        socket.emit('end_turn');
+        socket.emit('end_turn',selections);
         selections = [];
         print_selections(selections);
+        cur_dices = [];
       });
 
       //TODO: fix        ;hides dropdown after clicking outside

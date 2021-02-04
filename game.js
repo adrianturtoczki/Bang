@@ -1,3 +1,5 @@
+const Player = require('./player');
+
 class Game {
     constructor(){
         this.players = [];
@@ -29,7 +31,7 @@ class Game {
                         console.log(p);
                         p.cur_turn = false;
                         p.turn_end = false;
-                        p.roll_num = 3;
+                        p.rolled = false;
                         this.turn_count++;
                         console.log(this.turn_count)
                     });
@@ -96,31 +98,6 @@ class Game {
             return
         }
 
-    }
-}
-
-class Player {
-    constructor(name,role,life,character){
-
-        this.index = -1;
-
-        this.name = name;
-        this.role = role;
-        this.life = life;
-        if (this.role==='sheriff'){
-            this.life = life+=2;
-        }
-        this.character = character;
-        this.starting_life = this.life;
-        this.arrows = 0;
-
-        this.roll_num = 3;
-        this.cur_turn = false;
-        this.turn_end = false;
-
-    }
-    roll(){
-        return Math.floor(Math.random() * 6);
     }
 }
 
