@@ -12,15 +12,11 @@ var socket = io();
       document.getElementById('dices').appendChild(d4);
       document.getElementById('dices').appendChild(d5);
 
-      let selections = [];
-
-      let players_ar = [];
-
-      let cur_dices = [];
-
       let players_alive;
-
+      let selections = [];
+      let players_ar = [];
       let playerIndex = -1;
+      let player;
 
       socket.on('all_players_connected',(players)=>{
         document.getElementById('wait_screen').style.display = 'none';
@@ -62,9 +58,7 @@ var socket = io();
       socket.on('players_data_refresh',([players,arrows_left,p_alive])=>{
         players_ar = players;
         player = players_ar[playerIndex];
-
-        players_alive = p_alive;
-        console.log("data refresh called,"+players);
+        players_alive = p_alive;;
         cur_player_data(players[playerIndex]);
 
           //other players data
@@ -85,10 +79,8 @@ var socket = io();
         cur_player_data(player);
 
         document.getElementById('player_name').textContent='Your name: '+player.name;
-
         document.getElementById('player_role_image').src = 'images/r_'+player.role+'.jpg';
-        document.getElementById('player_character_image').src = 'images/c_'+player.character+'.jpg';
-
+        document.getElementById('player_character_image').src = 'images/c_'+player.character.name+'.jpg';
         document.getElementById('other_players').innerHTML='';
       for (let p of players){
           var p_div = document.createElement('div');
@@ -104,24 +96,19 @@ var socket = io();
           p_div.appendChild(p_arrows);
 
           document.getElementById('other_players').appendChild(p_div);
-
           document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
-
         }
         });
 
       socket.on('roll_results', (roll_results) => {
-        cur_dices = roll_results;
+        player.cur_dices = roll_results;
         draw_dice(roll_results);
         });
 
       function select_player(dice_index,player_index){
-        let dice = cur_dices[dice_index];
-        console.log(dice);
+        let dice = player.cur_dices[dice_index];
         document.getElementById("resolve_dropdown").classList.toggle("show");
-        console.log("select_player "+dice.index+","+player_index);
         selections[dice.index] = [dice.type,player_index];
-
         print_selections(selections);
       }
 
@@ -129,11 +116,8 @@ var socket = io();
 
         let prettier_selection = '';
 
-        console.log(selections);
-
         for (let s of selections){
           if (s!=null){
-            console.log(selections);
             if (s[0]===2||s[0]===3){
               prettier_selection+="Shoot ";
             } else if (s[0]===4){
@@ -152,7 +136,7 @@ var socket = io();
         let resolve_dropdown_div = document.getElementById('resolve_dropdown');
         resolve_dropdown_div.innerHTML='';
 
-        let dice = cur_dices[dice_index];
+        let dice = player.cur_dices[dice_index];
 
         if (dice.type!=1){
           document.getElementById("resolve_dropdown").classList.toggle("show");
@@ -178,7 +162,6 @@ var socket = io();
 
               //shoot players 1 people away
             if (dice.type===2||(dice.type===3&&players_alive<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
-              console.log(playerIndex,players_ar.length,players_ar,players_ar[playerIndex+1]);
               var prev_player = playerIndex == 0 ? players_ar[players_ar.length-1] : players_ar[playerIndex-1];
               var next_player = playerIndex == players_ar.length-1 ? players_ar[0] : players_ar[playerIndex+1];
 
@@ -192,23 +175,18 @@ var socket = io();
 
               //shoot players 2 people away
             } else if (dice.type===3){
-              if (playerIndex == 0){
-                var prev_player = players_ar[players_ar.length-2];
-              } else if (playerIndex == 1){
-                var prev_player = players_ar[players_ar.length-1];
+              if (playerIndex < 2){
+                var prev_player = players_ar[players_ar.length-2+playerIndex];
               } else {
                 var prev_player = players_ar[playerIndex-2];
               }
-              if (playerIndex + 1 == players_ar.length-1){
+              if (playerIndex == players_ar.length-2){
                 var next_player = players_ar[0];
               } else if (playerIndex == players_ar.length-1){
                 var next_player = players_ar[1];
               } else {
                 var next_player = players_ar[playerIndex+2];
               }
-
-              console.log([prev_player,next_player]);
-
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
 
@@ -272,7 +250,7 @@ var socket = io();
         socket.emit('end_turn',selections);
         selections = [];
         print_selections(selections);
-        cur_dices = [];
+        player.cur_dices = [];
       });
 
       //TODO: fix        ;hides dropdown after clicking outside

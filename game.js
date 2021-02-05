@@ -1,4 +1,5 @@
 const Player = require('./player');
+const Character = require('./character');
 
 class Game {
     constructor(){
@@ -44,21 +45,33 @@ class Game {
     }
 
 
-    setup(playerNumber){
+    setup(player_number,player_names){
         this.players = [];
-        let player1 = new Player("Player 1",'sheriff',8,"suzy_lafayette");
-        let player2 = new Player("Player 2",'renegade',8,"black_jack");
-        let player3 = new Player("Player 3",'outlaw',8,"lucky_duke");
-        let player4 = new Player("Player 4",'outlaw',8,"willy_the_kid");
+        switch (player_number){
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                break;
+        }
+        let player1 = new Player("Player 1",'sheriff',new Character("suzy_lafayette"));
+        let player2 = new Player("Player 2",'renegade',new Character("black_jack"));
+        let player3 = new Player("Player 3",'outlaw',new Character("lucky_duke"));
+        let player4 = new Player("Player 4",'outlaw',new Character("willy_the_kid"));
         this.players.push(player1);
         this.players.push(player2);
         this.players.push(player3);
         this.players.push(player4);
 
-        this.players_alive = playerNumber;
+        this.players_alive = player_number;
     }
 
-    check_win_conditions(playerNumber){
+    check_win_conditions(player_number){
         //TODO: only works for 4 players for now
         let sheriff_alive = 1;
         let deputies_alive = 0;
@@ -101,7 +114,5 @@ class Game {
 
     }
 }
-
-//TODO: character class, with life, action
 
 module.exports = Game;

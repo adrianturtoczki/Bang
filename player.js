@@ -1,15 +1,15 @@
 class Player {
-    constructor(name,role,life,character){
+    constructor(name,role,character){
 
         this.index = -1;
 
         this.name = name;
         this.role = role;
-        this.life = life;
-        if (this.role==='sheriff'){
-            this.life = life+=2;
-        }
         this.character = character;
+        this.life = character.life;
+        if (this.role==='sheriff'){
+            this.life = this.life+=2;
+        }
         this.starting_life = this.life;
         this.arrows = 0;
 
