@@ -47,36 +47,71 @@ class Game {
 
     setup(player_number,player_names){
         this.players = [];
+        let roles;
+        let characters = ["bart_cassidy","paul_regret","black_jack","pedro_ramirez","calamity_janet","rose_doolan","el_gringo","sid_ketchum","jesse_jones","slab_the_killer","jourdonnais","suzy_lafayette","kit_carlson","vulture_sam","lucky_duke","willy_the_kid"];
         switch (player_number){
             case 4:
+                roles = ["sheriff","renegade","outlaw","outlaw"];
                 break;
             case 5:
+                roles = ["sheriff","renegade","outlaw","outlaw","deputy"];
                 break;
             case 6:
+                roles = ["sheriff","renegade","outlaw","outlaw","outlaw","deputy"];
                 break;
             case 7:
+                roles = ["sheriff","renegade","outlaw","outlaw","outlaw","deputy","deputy"];
                 break;
             case 8:
+                roles = ["sheriff","renegade","renegade","outlaw","outlaw","outlaw","deputy","deputy"];
                 break;
         }
-        let player1 = new Player("Player 1",'sheriff',new Character("suzy_lafayette"));
-        let player2 = new Player("Player 2",'renegade',new Character("black_jack"));
-        let player3 = new Player("Player 3",'outlaw',new Character("lucky_duke"));
-        let player4 = new Player("Player 4",'outlaw',new Character("willy_the_kid"));
-        this.players.push(player1);
-        this.players.push(player2);
-        this.players.push(player3);
-        this.players.push(player4);
 
+        for(var i = 0;i<player_number;i++){
+            let p_role = roles.splice(Math.floor(Math.random()*roles.length), 1)[0];
+            let p_char = new Character(characters.splice(Math.floor(Math.random()*characters.length), 1)[0]);
+            this.players.push(new Player(player_names[i],p_role,p_char));
+          }
         this.players_alive = player_number;
     }
 
     check_win_conditions(player_number){
-        //TODO: only works for 4 players for now
-        let sheriff_alive = 1;
-        let deputies_alive = 0;
-        let renegades_alive = 1;
-        let outlaws_alive = 2;
+        let sheriff_alive;
+        let deputies_alive;
+        let renegades_alive;
+        let outlaws_alive;
+        switch(player_number){
+            case 4:
+                sheriff_alive = 1;
+                deputies_alive = 0;
+                renegades_alive = 1;
+                outlaws_alive = 2;
+                break;
+            case 5:
+                sheriff_alive = 1;
+                deputies_alive = 1;
+                renegades_alive = 1;
+                outlaws_alive = 2;
+                break;
+            case 6:
+                sheriff_alive = 1;
+                deputies_alive = 1;
+                renegades_alive = 1;
+                outlaws_alive = 3;
+                break;
+            case 7:
+                sheriff_alive = 1;
+                deputies_alive = 2;
+                renegades_alive = 1;
+                outlaws_alive = 3;
+                break;
+            case 8:
+                sheriff_alive = 1;
+                deputies_alive = 2;
+                renegades_alive = 2;
+                outlaws_alive = 3;
+                break;
+        }
         for (let p of this.players){
             if (p.life===0){
                 this.players_alive--;
@@ -96,15 +131,15 @@ class Game {
                 }
             }
         }
-        if (sheriff_alive===1&&renegades_alive===0&&outlaws_alive===0){
+        if (sheriff_alive===1&&renegades_alive<=0&&outlaws_alive<=0){
             this.end = true;
             return "sheriff";
         }
-        else if (sheriff_alive===0&&deputies_alive===0&&outlaws_alive>0){
+        else if (sheriff_alive<=0&&deputies_alive<=0&&outlaws_alive>0){
             this.end=true;
             return "outlaw";
         }
-        else if (renegades_alive>1&&sheriff_alive===0&&deputies_alive===0&&outlaws_alive===0){
+        else if (renegades_alive>1&&sheriff_alive<=0&&deputies_alive<=0&&outlaws_alive<=0){
             this.end=true;
             return "renegade";
         }

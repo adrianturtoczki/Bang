@@ -102,6 +102,7 @@ var socket = io();
 
       socket.on('roll_results', (roll_results) => {
         player.cur_dices = roll_results;
+        //todo: reset after new turn
         draw_dice(roll_results);
         });
 
@@ -130,6 +131,7 @@ var socket = io();
 
 
         document.getElementById('selections').textContent = 'Your selections: '+prettier_selection;
+        //todo: reset selections button
       }
   
       function dice_dropdown(dice_index) {

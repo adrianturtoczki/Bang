@@ -4,11 +4,11 @@ const Game = require('./game');
 
 const game = new Game();
 
-let playerLimit = 4; //limits number of players to 4 for now
+let player_limit = 4; //limits number of players to 4 for now
 
 const Dice = require('./dice');
 
-game.setup(playerLimit);
+game.setup(player_limit,["Player 1","Player 2","Player 3","Player 4"]);
 
 const express = require('express');
 const { DH_UNABLE_TO_CHECK_GENERATOR } = require('constants');
@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
   
-const connections = new Array(playerLimit).fill(null);
+const connections = new Array(player_limit).fill(null);
 
 io.on('connection', (socket) => {
 
@@ -84,7 +84,7 @@ io.on('connection', (socket) => {
       }
     }
 
-    console.log(game.check_win_conditions(playerLimit));
+    console.log(game.check_win_conditions(player_limit));
 
     //ending turn
     console.log(player.name+"'s turn ended");
