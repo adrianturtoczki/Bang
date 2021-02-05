@@ -8,7 +8,9 @@ let player_limit = 4; //limits number of players to 4 for now
 
 const Dice = require('./dice');
 
-game.setup(player_limit,["Player 1","Player 2","Player 3","Player 4"]);
+let test_names = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8"];
+
+game.setup(player_limit,test_names.slice(0,player_limit));
 
 const express = require('express');
 const { DH_UNABLE_TO_CHECK_GENERATOR } = require('constants');
@@ -42,7 +44,7 @@ io.on('connection', (socket) => {
   player.index = playerIndex;
   console.log(player.name+' connected');
 
-  io.sockets.emit('turn_and_round',[game.players[game.turn_count].name,game.round_count]);
+  io.sockets.emit('current_turn',[game.players[game.turn_count].name]);
   socket.emit('players_data_setup',[game.players,playerIndex,game.arrows_left]);//todo: hide other players' role
   connections[playerIndex] = socket;
 
@@ -97,7 +99,7 @@ io.on('connection', (socket) => {
     setTimeout(() => { //TODO: not ideal, would be better without timeout
       console.log("ending turn .. ");
       io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players.alive]); //todo: hide other players' role
-      io.sockets.emit('turn_and_round',[game.players[game.turn_count].name,game.round_count]);
+      io.sockets.emit('current_turn',game.players[game.turn_count]);
    }, 500);
   });
 

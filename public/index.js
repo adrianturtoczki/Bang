@@ -31,8 +31,7 @@ var socket = io();
         document.getElementById('game').classList.toggle('game_wait');
       });
 
-      socket.on('turn_and_round',([turn_name,round])=>{
-        document.getElementById('cur_round').textContent='Current round: '+round;
+      socket.on('current_turn',(turn_name)=>{
         document.getElementById('cur_turn').textContent='Current turn: '+turn_name;
         });
 
@@ -88,13 +87,16 @@ var socket = io();
           var p_name = document.createElement('p');
           var p_life = document.createElement('p');
           var p_arrows = document.createElement('p');
-          p_name.appendChild(document.createTextNode(p.name));
+          var p_char = document.createElement('img');
+          p.role === "sheriff" ? p_name.appendChild(document.createTextNode(p.name+" (sheriff)")) : p_name.appendChild(document.createTextNode(p.name));
           p_life.appendChild(document.createTextNode(p.name+"'s life: "+p.life));
           p_arrows.appendChild(document.createTextNode(p.name+"'s arrows: "+p.arrows));
+          p_char.src = 'images/c_'+p.character.name+'.jpg';
 
           p_div.appendChild(p_name);
           p_div.appendChild(p_life);
           p_div.appendChild(p_arrows);
+          p_div.appendChild(p_char);
 
           document.getElementById('other_players').appendChild(p_div);
           document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
@@ -103,7 +105,6 @@ var socket = io();
 
       socket.on('roll_results', (roll_results) => {
         player.cur_dices = roll_results;
-        //todo: reset after new turn
         draw_dice(roll_results);
         });
 
@@ -115,9 +116,7 @@ var socket = io();
       }
 
       function print_selections(selections){
-
         let prettier_selection = '';
-
         for (let s of selections){
           if (s!=null){
             if (s[0]===2||s[0]===3){
@@ -136,7 +135,6 @@ var socket = io();
       function dice_dropdown(dice_index) {
         let resolve_dropdown_div = document.getElementById('resolve_dropdown');
         resolve_dropdown_div.innerHTML='';
-
         let dice = player.cur_dices[dice_index];
 
         if (dice.type!=1){
@@ -203,10 +201,8 @@ var socket = io();
                 b_name.setAttribute('onclick','select_player('+dice.index+','+p.index+')');
                 resolve_dropdown_div.appendChild(b_name);
               }
-
             }
             resolve_dropdown_div.appendChild(p_name);
-
           }
       }
 
