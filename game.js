@@ -32,6 +32,7 @@ class Game {
                         p.cur_turn = false;
                         p.turn_end = false;
                         p.rolled = false;
+                        p.cur_dices = [];
                         this.turn_count++;
                         console.log(this.turn_count)
                     });

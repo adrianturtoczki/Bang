@@ -60,6 +60,9 @@ var socket = io();
 
 
       socket.on('players_data_refresh',([players,arrows_left,p_alive])=>{
+        players_ar = players;
+        player = players_ar[playerIndex];
+
         players_alive = p_alive;
         console.log("data refresh called,"+players);
         cur_player_data(players[playerIndex]);
@@ -84,7 +87,6 @@ var socket = io();
         document.getElementById('player_name').textContent='Your name: '+player.name;
 
         document.getElementById('player_role_image').src = 'images/r_'+player.role+'.jpg';
-
         document.getElementById('player_character_image').src = 'images/c_'+player.character+'.jpg';
 
         document.getElementById('other_players').innerHTML='';
@@ -143,7 +145,7 @@ var socket = io();
         }
 
 
-        document.getElementById('selections').textContent = 'Your selections: '+prettier_selection; //TODO: make it more aesthetic, like : Shoot Player 1, Heal Player 2
+        document.getElementById('selections').textContent = 'Your selections: '+prettier_selection;
       }
   
       function dice_dropdown(dice_index) {
@@ -152,15 +154,19 @@ var socket = io();
 
         let dice = cur_dices[dice_index];
 
+        if (dice.type!=1){
+          document.getElementById("resolve_dropdown").classList.toggle("show");
+        }
+
         if (dice.rerolls_left>0){
           //reroll
           var reroll_button = document.createElement('p');
           //todo
-          reroll_button.appendChild(document.createTextNode("Reroll ("+dice.rerolls_left+" left)")); //todo insert here
+          reroll_button.appendChild(document.createTextNode("Reroll ("+dice.rerolls_left+" left)"));
           reroll_button.addEventListener('click',function(){
             document.getElementById("resolve_dropdown").classList.toggle("show");
             console.log("reroll button clicked for "+[dice.type,dice.index]);
-            socket.emit('reroll',cur_dices,dice.index);
+            socket.emit('reroll',dice.index);
             });
             resolve_dropdown_div.appendChild(reroll_button);
           }
@@ -223,9 +229,7 @@ var socket = io();
             }
             resolve_dropdown_div.appendChild(p_name);
 
-
           }
-          document.getElementById("resolve_dropdown").classList.toggle("show");
       }
 
       function draw_dice(dices){

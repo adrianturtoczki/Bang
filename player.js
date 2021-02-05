@@ -14,6 +14,7 @@ class Player {
         this.arrows = 0;
 
         this.rolled=false;
+        this.cur_dices = [];
         this.cur_turn = false;
         this.turn_end = false;
 

@@ -1,8 +1,8 @@
 'use strict';
 
-const gameClass = require('./game');
+const Game = require('./game');
 
-const game = new gameClass();
+const game = new Game();
 
 let playerLimit = 4; //limits number of players to 4 for now
 
@@ -137,6 +137,7 @@ io.on('connection', (socket) => {
       if (dynamite_dices.length>=3){
         player.life--;
         dynamite_dices.forEach(x=>x.ability_activated = true);
+        roll_results.forEach(x=>x.rerolls_left = 0);
       }
       if (gatling_dices.length>=3){
         game.arrows_left+=player.arrows;
@@ -152,24 +153,26 @@ io.on('connection', (socket) => {
 
       player.rolled = true;
 
-      socket.emit('roll_results',roll_results);
+      player.cur_dices = roll_results;
+
+      socket.emit('roll_results',player.cur_dices);
 
       io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
 
     }
   });
 
-  socket.on('reroll', (cur_dices,rerolled_dice_index) => {
+  socket.on('reroll', (rerolled_dice_index) => {
     console.log(player.name + ' rerolled');
 
-    let rerolled_dice = cur_dices[rerolled_dice_index];
+    let rerolled_dice = player.cur_dices[rerolled_dice_index];
 
       rerolled_dice.type = player.roll();
 
       rerolled_dice.rerolls_left--;
 
-      let dynamite_dices = cur_dices.filter(x=>x.type===1&&x.ability_activated === false);
-      let gatling_dices = cur_dices.filter(x=>x.type===5&&x.ability_activated === false);
+      let dynamite_dices = player.cur_dices.filter(x=>x.type===1&&x.ability_activated === false);
+      let gatling_dices = player.cur_dices.filter(x=>x.type===5&&x.ability_activated === false);
 
       if (rerolled_dice.type===0){
         player.arrows++;
@@ -191,6 +194,7 @@ io.on('connection', (socket) => {
       if (dynamite_dices.length>=3){
         player.life--;
         dynamite_dices.forEach(x=>x.ability_activated = true);
+        player.cur_dices.forEach(x=>x.rerolls_left = 0);
       }
       if (gatling_dices.length>=3){
         game.arrows_left+=player.arrows;
@@ -204,7 +208,7 @@ io.on('connection', (socket) => {
         gatling_dices.forEach(x=>x.ability_activated = true);
       }
 
-      socket.emit('roll_results',cur_dices);
+      socket.emit('roll_results',player.cur_dices);
 
       io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
 
