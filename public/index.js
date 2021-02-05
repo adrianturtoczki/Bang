@@ -43,6 +43,7 @@ var socket = io();
         document.getElementById('player_arrow_number').textContent='Your arrows: '+player.arrows;
 
         if (player.cur_turn===true&&player.rolled===false){
+          document.getElementById('dices').style.display = 'none';
           document.getElementById("roll").style.display = "block";
         } else {
           document.getElementById("roll").style.display = "none";
@@ -58,7 +59,7 @@ var socket = io();
       socket.on('players_data_refresh',([players,arrows_left,p_alive])=>{
         players_ar = players;
         player = players_ar[playerIndex];
-        players_alive = p_alive;;
+        players_alive = p_alive;
         cur_player_data(players[playerIndex]);
 
           //other players data
@@ -124,14 +125,12 @@ var socket = io();
             } else if (s[0]===4){
               prettier_selection+="Heal ";
             }
-            prettier_selection+=players_ar[s[1]].name;
-            prettier_selection+=';';
+            prettier_selection+=players_ar[s[1]].name+';';
           }
         }
 
 
         document.getElementById('selections').textContent = 'Your selections: '+prettier_selection;
-        //todo: reset selections button
       }
   
       function dice_dropdown(dice_index) {
@@ -147,7 +146,6 @@ var socket = io();
         if (dice.rerolls_left>0){
           //reroll
           var reroll_button = document.createElement('p');
-          //todo
           reroll_button.appendChild(document.createTextNode("Reroll ("+dice.rerolls_left+" left)"));
           reroll_button.addEventListener('click',function(){
             document.getElementById("resolve_dropdown").classList.toggle("show");
@@ -213,7 +211,7 @@ var socket = io();
       }
 
       function draw_dice(dices){
-        d1.src,d2.src,d3.src,d4.src,d5.src = null,null,null,null,null;
+        document.getElementById('dices').style.display = 'block';
         for (let i = 0; i<5;i++){
           let cur_dice = dices[i];
           switch(i){
@@ -254,12 +252,10 @@ var socket = io();
         print_selections(selections);
         player.cur_dices = [];
       });
+      document.getElementById('reset_selections_button').addEventListener('click',function(){
+        console.log("reset selections button clicked");
+        selections = [];
+        print_selections(selections);
+      });
 
-      //TODO: fix        ;hides dropdown after clicking outside
-      window.onclick = function(event) {
-        if (event.target.matches('.dropdown')) {
-          console.log("clicking outside dropdown");
-        }
-      }
-
-    
+      //TODO: hide dropdown after clicking outside

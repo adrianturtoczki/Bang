@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
   console.log(player.name+' connected');
 
   io.sockets.emit('turn_and_round',[game.players[game.turn_count].name,game.round_count]);
-  socket.emit('players_data_setup',[game.players,playerIndex,game.arrows_left]);
+  socket.emit('players_data_setup',[game.players,playerIndex,game.arrows_left]);//todo: hide other players' role
   connections[playerIndex] = socket;
 
   //hides game until all players are connected
@@ -96,7 +96,7 @@ io.on('connection', (socket) => {
 
     setTimeout(() => { //TODO: not ideal, would be better without timeout
       console.log("ending turn .. ");
-      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players.alive]); 
+      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players.alive]); //todo: hide other players' role
       io.sockets.emit('turn_and_round',[game.players[game.turn_count].name,game.round_count]);
    }, 500);
   });
@@ -157,7 +157,7 @@ io.on('connection', (socket) => {
 
       socket.emit('roll_results',player.cur_dices);
 
-      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
+      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);//todo: hide other players' role
 
     }
   });
@@ -210,7 +210,7 @@ io.on('connection', (socket) => {
 
       socket.emit('roll_results',player.cur_dices);
 
-      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
+      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);//todo: hide other players' role
 
   });
 
