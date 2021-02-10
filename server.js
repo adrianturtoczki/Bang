@@ -122,7 +122,7 @@ io.on('connection', (socket) => {
             break;
           //beer
           case 4:
-            if (selected_player.life<=selected_player.starting_life){
+            if (selected_player.life<selected_player.starting_life){
               selected_player.life++;
             }
             break;
@@ -183,7 +183,7 @@ io.on('connection', (socket) => {
       for (let i = 0; i < 5; i++){
         let cur_dice = new Dice(player.roll(),i)
         roll_results.push(cur_dice);
-        if (cur_dice.type === 0 ||cur_dice.type === 1 ||cur_dice.type === 4 || cur_dice.type === 5){ //add all non-arrows to selections
+        if (cur_dice.type === 0 ||cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1,2
           player.selections[i] = cur_dice.type;
           } else {
             player.selections[i] = null;
@@ -229,7 +229,7 @@ io.on('connection', (socket) => {
 
       rerolled_dice.type = player.roll();
 
-      if (player.selections[rerolled_dice_index] === 0 || player.selections[rerolled_dice_index] === 1 ||player.selections[rerolled_dice_index] === 4 ||player.selections[rerolled_dice_index] === 5){
+      if (rerolled_dice.type === 0 || rerolled_dice.type === 1 ||rerolled_dice.type === 5){
         player.selections[rerolled_dice_index] = rerolled_dice.type;
       } else {
         player.selections[rerolled_dice_index] = null;

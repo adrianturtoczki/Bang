@@ -100,13 +100,18 @@ let socket = io();
           document.getElementById('other_players').appendChild(p_div);
           document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
         }
+
+        console.log(player.cur_dices);
+        if (player.rolled&&player.cur_dices!=[]){
+          draw_dice(player.cur_dices);
+        }
+
         });
 
       socket.on('roll_results', ([roll_result,selections]) => {
         player.cur_dices = roll_result;
         player.selections = selections;
 
-        console.log(player.cur_dices);
 
         draw_dice(player.cur_dices);
 
@@ -135,10 +140,9 @@ let socket = io();
       }
 
       function print_selections(selections){
-        console.log("teszt:",selections);
         let prettier_selection = '';
         for (let s of selections){
-          if (s!=null&&s!=0&&s!=1&&s!=4&&s!=5){
+          if (s!=null&&s!=0&&s!=1&&s!=5){
             if (s[0]===2||s[0]===3){
               prettier_selection+="Shoot ";
             } else if (s[0]===4){
@@ -221,6 +225,8 @@ let socket = io();
             }
             resolve_dropdown_div.appendChild(p_name);
           } else if (dice.type === 5){ //gatling
+
+            //todo finish
               console.log(player.cur_dices);
           }
       }
