@@ -15,6 +15,7 @@ class Player {
 
         this.rolled=false;
         this.cur_dices = [];
+        this.selections = [];
         this.cur_turn = false;
         this.turn_end = false;
 

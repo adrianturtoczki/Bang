@@ -1,4 +1,4 @@
-var socket = io();
+let socket = io();
 
       //setup
       let d1 = new Image();
@@ -13,7 +13,6 @@ var socket = io();
       document.getElementById('dices').appendChild(d5);
 
       let players_alive;
-      let selections = [];
       let players_ar = [];
       let playerIndex = -1;
       let player;
@@ -65,7 +64,7 @@ var socket = io();
           let p_data_divs = document.getElementById('other_players').children;
           for (let i = 0; i < p_data_divs.length; i++){
             let p = players[i];
-            p_data_divs[i].children[0].textContent=p.name;
+            p.role === "sheriff" ? p_data_divs[i].children[0].textContent=p.name+" (sheriff)" : p_data_divs[i].children[0].textContent=p.name;
             p_data_divs[i].children[1].textContent=p.name+"'s life: "+p.life;
             p_data_divs[i].children[2].textContent=p.name+"'s arrows: "+p.arrows;
             }
@@ -83,11 +82,11 @@ var socket = io();
         document.getElementById('player_character_image').src = 'images/c_'+player.character.name+'.jpg';
         document.getElementById('other_players').innerHTML='';
       for (let p of players){
-          var p_div = document.createElement('div');
-          var p_name = document.createElement('p');
-          var p_life = document.createElement('p');
-          var p_arrows = document.createElement('p');
-          var p_char = document.createElement('img');
+          let p_div = document.createElement('div');
+          let p_name = document.createElement('p');
+          let p_life = document.createElement('p');
+          let p_arrows = document.createElement('p');
+          let p_char = document.createElement('img');
           p.role === "sheriff" ? p_name.appendChild(document.createTextNode(p.name+" (sheriff)")) : p_name.appendChild(document.createTextNode(p.name));
           p_life.appendChild(document.createTextNode(p.name+"'s life: "+p.life));
           p_arrows.appendChild(document.createTextNode(p.name+"'s arrows: "+p.arrows));
@@ -103,22 +102,43 @@ var socket = io();
         }
         });
 
-      socket.on('roll_results', (roll_results) => {
-        player.cur_dices = roll_results;
-        draw_dice(roll_results);
+      socket.on('roll_results', ([roll_result,selections]) => {
+        player.cur_dices = roll_result;
+        player.selections = selections;
+
+        console.log(player.cur_dices);
+
+        draw_dice(player.cur_dices);
+
+        check_selections(selections);
         });
 
-      function select_player(dice_index,player_index){
+      socket.on('game_end', (winner) => {
+        window.location.href = window.location.hostname;
+      });
+
+      function check_selections(selections){
+        if (selections.filter(x=>x!=null).length===5){
+          document.getElementById('end_turn_button').disabled = false;
+        } else {
+          document.getElementById('end_turn_button').disabled = true;
+        }
+      }
+
+      function select_target(dice_index,player_index){
         let dice = player.cur_dices[dice_index];
         document.getElementById("resolve_dropdown").classList.toggle("show");
-        selections[dice.index] = [dice.type,player_index];
-        print_selections(selections);
+        player.selections[dice.index] = [dice.type,player_index];
+        print_selections(player.selections);
+
+        check_selections(player.selections);
       }
 
       function print_selections(selections){
+        console.log("teszt:",selections);
         let prettier_selection = '';
         for (let s of selections){
-          if (s!=null){
+          if (s!=null&&s!=0&&s!=1&&s!=4&&s!=5){
             if (s[0]===2||s[0]===3){
               prettier_selection+="Shoot ";
             } else if (s[0]===4){
@@ -140,10 +160,9 @@ var socket = io();
         if (dice.type!=1){
           document.getElementById("resolve_dropdown").classList.toggle("show");
         }
-
         if (dice.rerolls_left>0){
           //reroll
-          var reroll_button = document.createElement('p');
+          let reroll_button = document.createElement('p');
           reroll_button.appendChild(document.createTextNode("Reroll ("+dice.rerolls_left+" left)"));
           reroll_button.addEventListener('click',function(){
             document.getElementById("resolve_dropdown").classList.toggle("show");
@@ -155,84 +174,70 @@ var socket = io();
 
           //players the player can effect with the dice
           if (dice.type===2||dice.type===3||dice.type===4){
-            var p_name = document.createElement('p');
-            var n_name = document.createElement('p');
+            let prev_player,next_player;
+            let p_name = document.createElement('p');
+            let n_name = document.createElement('p');
 
               //shoot players 1 people away
             if (dice.type===2||(dice.type===3&&players_alive<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
-              var prev_player = playerIndex == 0 ? players_ar[players_ar.length-1] : players_ar[playerIndex-1];
-              var next_player = playerIndex == players_ar.length-1 ? players_ar[0] : players_ar[playerIndex+1];
+              prev_player = playerIndex == 0 ? players_ar[players_ar.length-1] : players_ar[playerIndex-1];
+              next_player = playerIndex == players_ar.length-1 ? players_ar[0] : players_ar[playerIndex+1];
 
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
-
-              p_name.setAttribute('onclick','select_player('+dice.index+','+prev_player.index+')');
-              n_name.setAttribute('onclick','select_player('+dice.index+','+next_player.index+')');
-
+              p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
+              n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')');
               resolve_dropdown_div.appendChild(n_name);
 
               //shoot players 2 people away
-            } else if (dice.type===3){
+            } else if (dice.type===3){ //arrow2
               if (playerIndex < 2){
-                var prev_player = players_ar[players_ar.length-2+playerIndex];
+                prev_player = players_ar[players_ar.length-2+playerIndex];
               } else {
-                var prev_player = players_ar[playerIndex-2];
+                prev_player = players_ar[playerIndex-2];
               }
               if (playerIndex == players_ar.length-2){
-                var next_player = players_ar[0];
+                next_player = players_ar[0];
               } else if (playerIndex == players_ar.length-1){
-                var next_player = players_ar[1];
+                next_player = players_ar[1];
               } else {
-                var next_player = players_ar[playerIndex+2];
+                next_player = players_ar[playerIndex+2];
               }
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
-
-              p_name.setAttribute('onclick','select_player('+dice.index+','+prev_player.index+')');
-              n_name.setAttribute('onclick','select_player('+dice.index+','+next_player.index+')'); 
+              p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
+              n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')'); 
 
               resolve_dropdown_div.appendChild(n_name);
 
-            } else if (dice.type===4){
+            } else if (dice.type===4){ //beer
 
               for (let p of players_ar){
-                var b_name = document.createElement('p');
+                let b_name = document.createElement('p');
                 b_name.appendChild(document.createTextNode(p.name));
-                b_name.setAttribute('onclick','select_player('+dice.index+','+p.index+')');
+                b_name.setAttribute('onclick','select_target('+dice.index+','+p.index+')');
                 resolve_dropdown_div.appendChild(b_name);
               }
             }
             resolve_dropdown_div.appendChild(p_name);
+          } else if (dice.type === 5){ //gatling
+              console.log(player.cur_dices);
           }
       }
 
       function draw_dice(dices){
+        console.log(dices);
         document.getElementById('dices').style.display = 'block';
-        for (let i = 0; i<5;i++){
-          let cur_dice = dices[i];
-          switch(i){
-            case 0:
-              d1.src = 'images/d'+(cur_dice.type+1)+'.png';
-              d1.setAttribute('onclick',`dice_dropdown(${i})`);
-              break;
-            case 1:
-              d2.src = 'images/d'+(cur_dice.type+1)+'.png';
-              d2.setAttribute('onclick',`dice_dropdown(${i})`);
-              break;
-            case 2:
-              d3.src = 'images/d'+(cur_dice.type+1)+'.png';
-              d3.setAttribute('onclick',`dice_dropdown(${i})`);
-              break;
-            case 3:
-              d4.src = 'images/d'+(cur_dice.type+1)+'.png';
-              d4.setAttribute('onclick',`dice_dropdown(${i})`);
-              break;
-            case 4:
-              d5.src = 'images/d'+(cur_dice.type+1)+'.png';
-              d5.setAttribute('onclick',`dice_dropdown(${i})`);
-              break;
-          }
-        }
+            d1.src = 'images/d'+(dices[0].type+1)+'.png';
+            d1.setAttribute('onclick',`dice_dropdown(0)`);
+            d2.src = 'images/d'+(dices[1].type+1)+'.png';
+            d2.setAttribute('onclick',`dice_dropdown(1)`);
+            d3.src = 'images/d'+(dices[2].type+1)+'.png';
+            d3.setAttribute('onclick',`dice_dropdown(2)`);
+            d4.src = 'images/d'+(dices[3].type+1)+'.png';
+            d4.setAttribute('onclick',`dice_dropdown(3)`);
+            d5.src = 'images/d'+(dices[4].type+1)+'.png';
+            d5.setAttribute('onclick',`dice_dropdown(4)`);
       }
 
       //event listeners
@@ -243,15 +248,20 @@ var socket = io();
       });
       document.getElementById('end_turn_button').addEventListener('click',function(){
         console.log("end turn button clicked");
-        socket.emit('end_turn',selections);
-        selections = [];
-        print_selections(selections);
+        socket.emit('end_turn',player.selections);
+        player.selections = [];
+        print_selections(player.selections);
         player.cur_dices = [];
+        document.getElementById('end_turn_button').disabled = true;
       });
       document.getElementById('reset_selections_button').addEventListener('click',function(){
         console.log("reset selections button clicked");
-        selections = [];
-        print_selections(selections);
+        for (let i = 0; i<player.selections.length;i++){
+          if (player.selections[i] != 0 && player.selections[i] != 1 && player.selections[i] != 4 && player.selections[i] != 5){ //add all non-arrows to selections
+            player.selections[i] = null;
+            }
+        }
+        print_selections(player.selections);
       });
 
       //TODO: hide dropdown after clicking outside

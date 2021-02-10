@@ -3,6 +3,7 @@ const Character = require('./character');
 
 class Game {
     constructor(){
+        this.started = false;
         this.players = [];
         this.end = false;
         this.round_count = 1;
@@ -21,6 +22,7 @@ class Game {
       }
 
     async run(){
+        this.started = true;
         while (this.end!=true){
             for (let p of this.players){
                 p.cur_turn = true;
@@ -34,6 +36,7 @@ class Game {
                         p.turn_end = false;
                         p.rolled = false;
                         p.cur_dices = [];
+                        p.selections = [];
                         this.turn_count++;
                         console.log(this.turn_count)
                     });
@@ -42,6 +45,7 @@ class Game {
             this.turn_count = 0;
             this.round_count++;
         }
+        this.started = false;
     }
 
 
