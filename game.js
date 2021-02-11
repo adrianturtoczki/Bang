@@ -25,9 +25,8 @@ class Game {
         this.started = true;
         while (this.end!=true){
             for (let p of this.players){
-                p.cur_turn = true;
-                //console.log(p);
                 if (p.life>0){
+                    p.cur_turn = true;
                     console.log(p.name+"'s round");
                     await this.waitFor(_ => p.turn_end === true).then(_ => {
                         console.log(p.name+"'s turn over!");

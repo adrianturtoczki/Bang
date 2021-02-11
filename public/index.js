@@ -119,7 +119,8 @@ let socket = io();
         });
 
       socket.on('game_end', (winner) => {
-        window.location.href = window.location.hostname;
+        alert(winner+'s won!');
+        window.location.href = '/';
       });
 
       function check_selections(selections){
@@ -176,6 +177,9 @@ let socket = io();
             resolve_dropdown_div.appendChild(reroll_button);
           }
 
+          let alive_players = players_ar.filter(x=>x.life>0);
+          console.log(alive_players);
+
           //players the player can effect with the dice
           if (dice.type===2||dice.type===3||dice.type===4){
             let prev_player,next_player;
@@ -183,10 +187,9 @@ let socket = io();
             let n_name = document.createElement('p');
 
               //shoot players 1 people away
-            if (dice.type===2||(dice.type===3&&players_alive<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
-              prev_player = playerIndex == 0 ? players_ar[players_ar.length-1] : players_ar[playerIndex-1];
-              next_player = playerIndex == players_ar.length-1 ? players_ar[0] : players_ar[playerIndex+1];
-
+            if (dice.type===2||(dice.type===3&&alive_players.length<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
+              prev_player = playerIndex == 0 ? alive_players[alive_players.length-1] : alive_players[playerIndex-1];
+              next_player = playerIndex == alive_players.length-1 ? alive_players[0] : alive_players[playerIndex+1];
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
               p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
@@ -196,16 +199,16 @@ let socket = io();
               //shoot players 2 people away
             } else if (dice.type===3){ //arrow2
               if (playerIndex < 2){
-                prev_player = players_ar[players_ar.length-2+playerIndex];
+                prev_player = alive_players[alive_players.length-2+playerIndex];
               } else {
-                prev_player = players_ar[playerIndex-2];
+                prev_player = alive_players[playerIndex-2];
               }
               if (playerIndex == players_ar.length-2){
-                next_player = players_ar[0];
+                next_player = alive_players[0];
               } else if (playerIndex == players_ar.length-1){
-                next_player = players_ar[1];
+                next_player = alive_players[1];
               } else {
-                next_player = players_ar[playerIndex+2];
+                next_player = alive_players[playerIndex+2];
               }
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
@@ -216,7 +219,7 @@ let socket = io();
 
             } else if (dice.type===4){ //beer
 
-              for (let p of players_ar){
+              for (let p of alive_players){
                 let b_name = document.createElement('p');
                 b_name.appendChild(document.createTextNode(p.name));
                 b_name.setAttribute('onclick','select_target('+dice.index+','+p.index+')');
