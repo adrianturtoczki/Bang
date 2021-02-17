@@ -17,22 +17,16 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+const config = require('./config.js');
 const path = require('path');
 
-app.use(express.static(__dirname+'/public'));
-app.use(express.urlencoded({
-  extended: true
-}))
-
-http.listen(3000, () => console.log('server started'));
-
-console.log(__dirname);
-
-app.get('/', (req, res) => {
+app.use(express.static('public'));
+var router = express.Router();
+router.get('/', (req, res) => {
   console.log('/');
   res.sendFile(path.join(__dirname + '/public/setup.html'));
 });
-app.post('/game', (req, res) => {
+router.post('/game', (req, res) => {
   console.log('/game');
   console.log(req.body);
   if (player_names.length<player_limit){
@@ -42,9 +36,18 @@ app.post('/game', (req, res) => {
 });
 
 //todo remove, for debug
-app.get('/game', (req, res) => {
+router.get('/game', (req, res) => {
   res.sendFile(path.join(__dirname + '/public/game.html'));
 });
+
+app.use(config.baseUrl,router);
+app.use(express.urlencoded({
+  extended: true
+}))
+
+http.listen(8080, () => console.log('server started'));
+
+console.log(__dirname);
   
 function waitFor(conditionFunction) {
 
@@ -68,6 +71,7 @@ const connections = new Array(player_limit).fill(null);
 
 io.on('connection', (socket) => {
 
+  console.log("connected!");
   //setup
   let playerIndex = -1;
   for (let i in connections){
@@ -84,8 +88,6 @@ io.on('connection', (socket) => {
 
   waitFor(x=>player_names.length===player_limit).then(x=>{
     player = game.players[playerIndex];
-    console.log(player);
-    console.log(game);
     player.index = playerIndex;
     console.log(player.name+' connected');
     io.sockets.emit('current_turn',game.players[game.turn_count].name);
@@ -110,23 +112,10 @@ io.on('connection', (socket) => {
         let dice_type = s[0];
         let selected_player = game.players[s[1]];
         console.log(dice_type,selected_player);
-  
-        switch(dice_type){ //dice behavior
-          //arrow1
-          case 2:
-            selected_player.life--;
-            break;
-          //arrow2
-          case 3:
-            selected_player.life--;
-            break;
-          //beer
-          case 4:
-            if (selected_player.life<selected_player.starting_life){
-              selected_player.life++;
-            }
-            break;
-              
+        if (dice_type===2||dice_type===3){
+          selected_player.life--;
+        } else if (dice_type===4&&selected_player.life<selected_player.starting_life){
+          selected_player.life++;
         }
       }
     }

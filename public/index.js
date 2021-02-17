@@ -194,6 +194,7 @@ let socket = io();
               n_name.appendChild(document.createTextNode(next_player.name));
               p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
               n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')');
+              resolve_dropdown_div.appendChild(p_name);
               resolve_dropdown_div.appendChild(n_name);
 
               //shoot players 2 people away
@@ -215,7 +216,10 @@ let socket = io();
               p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
               n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')'); 
 
-              resolve_dropdown_div.appendChild(n_name);
+              resolve_dropdown_div.appendChild(p_name);
+              if (prev_player!=next_player){
+                resolve_dropdown_div.appendChild(n_name);
+              }
 
             } else if (dice.type===4){ //beer
 
@@ -226,7 +230,6 @@ let socket = io();
                 resolve_dropdown_div.appendChild(b_name);
               }
             }
-            resolve_dropdown_div.appendChild(p_name);
           } else if (dice.type === 5){ //gatling
 
             //todo finish
@@ -237,15 +240,15 @@ let socket = io();
       function draw_dice(dices){
         console.log(dices);
         document.getElementById('dices').style.display = 'block';
-            d1.src = 'images/d'+(dices[0].type+1)+'.png';
+            d1.src = 'images/d'+(dices[0].type)+'.png';
             d1.setAttribute('onclick',`dice_dropdown(0)`);
-            d2.src = 'images/d'+(dices[1].type+1)+'.png';
+            d2.src = 'images/d'+(dices[1].type)+'.png';
             d2.setAttribute('onclick',`dice_dropdown(1)`);
-            d3.src = 'images/d'+(dices[2].type+1)+'.png';
+            d3.src = 'images/d'+(dices[2].type)+'.png';
             d3.setAttribute('onclick',`dice_dropdown(2)`);
-            d4.src = 'images/d'+(dices[3].type+1)+'.png';
+            d4.src = 'images/d'+(dices[3].type)+'.png';
             d4.setAttribute('onclick',`dice_dropdown(3)`);
-            d5.src = 'images/d'+(dices[4].type+1)+'.png';
+            d5.src = 'images/d'+(dices[4].type)+'.png';
             d5.setAttribute('onclick',`dice_dropdown(4)`);
       }
 
