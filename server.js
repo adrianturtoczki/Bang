@@ -104,8 +104,22 @@ io.on('connection', (socket) => {
   // ending a turn
   socket.on('end_turn', (selections) => {
 
+    let alive_players = game.players.filter(x=>x.life>0);
+
     //resolving
     console.log('resolving '+player.name+"'s turn ..");
+
+    //character check: suzy lafayette
+    if (player.name==='suzy_lafayette'&&selections.filter(x=>x[0]===2||x[0]===3).length === 0){
+      player.life+=2;
+    }
+    //character check: el gringo
+    if (selections.some(x=>(x===2||x===3)&&game.players[x[1]].name==='el_gringo')){
+        player.arrows++;
+        game.arrows_left--;
+        check_arrows();
+    }
+
     for (let s of selections){
       if (s!=null){
         console.log("resolving " +s+ " ..");
@@ -115,20 +129,34 @@ io.on('connection', (socket) => {
         if (dice_type===2||dice_type===3){
           selected_player.life--;
         } else if (dice_type===4&&selected_player.life<selected_player.starting_life){
-          selected_player.life++;
+          //character check: jesse jones
+          if (selected_player.name==='jesse_jones'&&selected_player===player&&selected_player.life<=4){
+            selected_player.life+=2;
+          } else {
+            selected_player.life++;
+          }
         }
       }
     }
+
     let gatling_dices = selections.filter(x=>x===5);
-    if (gatling_dices.length>=3){
+    //character check: willy the kid
+    if (gatling_dices.length>=3||(gatling_dices.length===2&&player.name==='willy_the_kid')){
       game.arrows_left+=player.arrows;
       player.arrows = 0;
-      for (let p of game.players){
-        if (p!=player){
-          console.log("other players:",p);
+      for (let p of alive_players){
+        //character check: paul regret
+        if (p!=player&&p.name!='paul_regret'){
           p.life--;
         }
       }
+    }
+
+    let killed_players = alive_players.filter(x=>x.life<=0) //return killed player's arrows back
+    for (let p of killed_players){
+     game.arrows_left+=p.arrows;
+     p.arrows = 0;
+     p.life = 0;
     }
 
     let winner = game.check_win_conditions(player_limit)
@@ -156,8 +184,13 @@ io.on('connection', (socket) => {
   function check_arrows(){
     if (game.arrows_left<=0){
       for (let p of game.players){
+        //character check: jourdonnais
+        if (p.character.name!='jourdonnais'){
+          p.life-=p.arrows;
+        } else {
+          p.life--;
+        }
         p.arrows = 0;
-        p.life--;
       }
       game.arrows_left = 9;
     }

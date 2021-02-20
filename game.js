@@ -36,10 +36,10 @@ class Game {
                         p.rolled = false;
                         p.cur_dices = [];
                         p.selections = [];
-                        this.turn_count++;
                         console.log(this.turn_count)
                     });
                 }
+                this.turn_count++;
             }
             this.turn_count = 0;
             this.round_count++;
@@ -51,7 +51,9 @@ class Game {
     setup(player_number,player_names){
         this.players = [];
         let roles;
-        let characters = ["bart_cassidy","paul_regret","black_jack","pedro_ramirez","calamity_janet","rose_doolan","el_gringo","sid_ketchum","jesse_jones","slab_the_killer","jourdonnais","suzy_lafayette","kit_carlson","vulture_sam","lucky_duke","willy_the_kid"];
+        //todo: rest of the characters
+        //let characters = ["bart_cassidy","paul_regret","black_jack","pedro_ramirez","calamity_janet","rose_doolan","el_gringo","sid_ketchum","jesse_jones","slab_the_killer","jourdonnais","suzy_lafayette","kit_carlson","vulture_sam","lucky_duke","willy_the_kid"];
+        let characters = ["paul_regret","rose_doolan","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid"];
         switch (player_number){
             case 4:
                 roles = ["sheriff","renegade","outlaw","outlaw"];

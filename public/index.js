@@ -83,6 +83,7 @@ let socket = io();
         document.getElementById('other_players').innerHTML='';
       for (let p of players){
           let p_div = document.createElement('div');
+          p_div.id=p.index;
           let p_name = document.createElement('p');
           let p_life = document.createElement('p');
           let p_arrows = document.createElement('p');
@@ -101,7 +102,6 @@ let socket = io();
           document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
         }
 
-        console.log(player.cur_dices);
         if (player.rolled&&player.cur_dices!=[]){
           draw_dice(player.cur_dices);
         }
@@ -178,7 +178,6 @@ let socket = io();
           }
 
           let alive_players = players_ar.filter(x=>x.life>0);
-          console.log(alive_players);
 
           //players the player can effect with the dice
           if (dice.type===2||dice.type===3||dice.type===4){
@@ -186,10 +185,12 @@ let socket = io();
             let p_name = document.createElement('p');
             let n_name = document.createElement('p');
 
+            let alive_index = alive_players.findIndex(x=>x===player);
+
               //shoot players 1 people away
             if (dice.type===2||(dice.type===3&&alive_players.length<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
-              prev_player = playerIndex == 0 ? alive_players[alive_players.length-1] : alive_players[playerIndex-1];
-              next_player = playerIndex == alive_players.length-1 ? alive_players[0] : alive_players[playerIndex+1];
+              prev_player = alive_index == 0 ? alive_players[alive_players.length-1] : alive_players[alive_index-1];
+              next_player = alive_index == alive_players.length-1 ? alive_players[0] : alive_players[alive_index+1];
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
               p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
@@ -199,17 +200,17 @@ let socket = io();
 
               //shoot players 2 people away
             } else if (dice.type===3){ //arrow2
-              if (playerIndex < 2){
-                prev_player = alive_players[alive_players.length-2+playerIndex];
+              if (alive_index < 2){
+                prev_player = alive_players[alive_players.length-2+alive_index];
               } else {
-                prev_player = alive_players[playerIndex-2];
+                prev_player = alive_players[alive_index-2];
               }
-              if (playerIndex == players_ar.length-2){
+              if (alive_index == players_ar.length-2){
                 next_player = alive_players[0];
-              } else if (playerIndex == players_ar.length-1){
+              } else if (alive_index == players_ar.length-1){
                 next_player = alive_players[1];
               } else {
-                next_player = alive_players[playerIndex+2];
+                next_player = alive_players[alive_index+2];
               }
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
@@ -230,15 +231,10 @@ let socket = io();
                 resolve_dropdown_div.appendChild(b_name);
               }
             }
-          } else if (dice.type === 5){ //gatling
-
-            //todo finish
-              console.log(player.cur_dices);
-          }
+          } //todo maybe gatling?
       }
 
       function draw_dice(dices){
-        console.log(dices);
         document.getElementById('dices').style.display = 'block';
             d1.src = 'images/d'+(dices[0].type)+'.png';
             d1.setAttribute('onclick',`dice_dropdown(0)`);
