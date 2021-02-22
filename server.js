@@ -9,8 +9,8 @@ let player_limit = 4; //limits number of players to 4 for now
 const Dice = require('./dice');
 
 
-//let player_names = []; //todo: delete comment when finished, debug
-let player_names = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8"].slice(0,player_limit);
+let player_names = []; //todo: delete comment when finished, debug
+//let player_names = ["Player 1","Player 2","Player 3","Player 4","Player 5","Player 6","Player 7","Player 8"].slice(0,player_limit);
 
 const express = require('express');
 const app = express();
@@ -20,8 +20,12 @@ const io = require('socket.io')(http);
 const config = require('./config.js');
 const path = require('path');
 
-app.use(express.static('public'));
 var router = express.Router();
+app.use(express.static('public'));
+app.use(express.urlencoded({
+  extended: true
+}))
+
 router.get('/', (req, res) => {
   console.log('/');
   res.sendFile(path.join(__dirname + '/public/setup.html'));
@@ -41,9 +45,6 @@ router.get('/game', (req, res) => {
 });
 
 app.use(config.baseUrl,router);
-app.use(express.urlencoded({
-  extended: true
-}))
 
 http.listen(8080, () => console.log('server started'));
 
@@ -88,7 +89,7 @@ io.on('connection', (socket) => {
 
   let player_role;
 
-  waitFor(x=>player_names.length===player_limit).then(x=>{
+  waitFor(x=>game.started).then(x=>{
     player = game.players[playerIndex];
     player.index = playerIndex;
     player_role = game.roles[playerIndex];

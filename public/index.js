@@ -230,7 +230,7 @@ let socket = io();
                 resolve_dropdown_div.appendChild(b_name);
               }
             }
-          } //todo maybe gatling?
+          } //todo maybe gatling? or separate button
       }
 
 
@@ -239,8 +239,13 @@ let socket = io();
         for (let i = 0; i < 5;i++){
           dice_elements[i].src = 'images/d'+(dices[i].type)+'.png';
           dice_elements[i].setAttribute('onclick',`dice_dropdown(${i})`);
+          if (dices[i].ability_activated) {
+            dice_elements[i].style.opacity=0.4;
+        } else {
+          dice_elements[i].style.opacity=1;
         }
       }
+    }
 
       //event listeners
 
