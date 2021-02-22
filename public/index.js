@@ -6,6 +6,7 @@ let socket = io();
       let d3 = new Image();
       let d4 = new Image();
       let d5 = new Image();
+      let dice_elements = [d1,d2,d3,d4,d5];
       document.getElementById('dices').appendChild(d1);
       document.getElementById('dices').appendChild(d2);
       document.getElementById('dices').appendChild(d3);
@@ -15,6 +16,7 @@ let socket = io();
       let players_alive;
       let players_ar = [];
       let playerIndex = -1;
+      let player_role;
       let player;
 
       socket.on('all_players_connected',(players)=>{
@@ -64,21 +66,22 @@ let socket = io();
           let p_data_divs = document.getElementById('other_players').children;
           for (let i = 0; i < p_data_divs.length; i++){
             let p = players[i];
-            p.role === "sheriff" ? p_data_divs[i].children[0].textContent=p.name+" (sheriff)" : p_data_divs[i].children[0].textContent=p.name;
+            p.sheriff ? p_data_divs[i].children[0].textContent=p.name+" (sheriff)" : p_data_divs[i].children[0].textContent=p.name;
             p_data_divs[i].children[1].textContent=p.name+"'s life: "+p.life;
             p_data_divs[i].children[2].textContent=p.name+"'s arrows: "+p.arrows;
             }
           document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
         });
 
-      socket.on('players_data_setup', ([players,index,arrows_left]) => {
+      socket.on('players_data_setup', ([players,index,role,arrows_left]) => {
         playerIndex = index;
+        player_role = role;
         player = players[index];
 
         cur_player_data(player);
 
         document.getElementById('player_name').textContent='Your name: '+player.name;
-        document.getElementById('player_role_image').src = 'images/r_'+player.role+'.jpg';
+        document.getElementById('player_role_image').src = 'images/r_'+player_role+'.jpg';
         document.getElementById('player_character_image').src = 'images/c_'+player.character.name+'.jpg';
         document.getElementById('other_players').innerHTML='';
       for (let p of players){
@@ -88,7 +91,7 @@ let socket = io();
           let p_life = document.createElement('p');
           let p_arrows = document.createElement('p');
           let p_char = document.createElement('img');
-          p.role === "sheriff" ? p_name.appendChild(document.createTextNode(p.name+" (sheriff)")) : p_name.appendChild(document.createTextNode(p.name));
+          p.sheriff ? p_name.appendChild(document.createTextNode(p.name+" (sheriff)")) : p_name.appendChild(document.createTextNode(p.name));
           p_life.appendChild(document.createTextNode(p.name+"'s life: "+p.life));
           p_arrows.appendChild(document.createTextNode(p.name+"'s arrows: "+p.arrows));
           p_char.src = 'images/c_'+p.character.name+'.jpg';
@@ -173,6 +176,8 @@ let socket = io();
             document.getElementById("resolve_dropdown").classList.toggle("show");
             console.log("reroll button clicked for "+[dice.type,dice.index]);
             socket.emit('reroll',dice.index);
+            player.selections = [];
+            print_selections(player.selections);
             });
             resolve_dropdown_div.appendChild(reroll_button);
           }
@@ -187,30 +192,24 @@ let socket = io();
 
             let alive_index = alive_players.findIndex(x=>x===player);
 
-              //shoot players 1 people away
-            if (dice.type===2||(dice.type===3&&alive_players.length<=3)){ //arrow1 if arrow1, or if there are only 2-3 players left with arrow2
-              prev_player = alive_index == 0 ? alive_players[alive_players.length-1] : alive_players[alive_index-1];
-              next_player = alive_index == alive_players.length-1 ? alive_players[0] : alive_players[alive_index+1];
-              p_name.appendChild(document.createTextNode(prev_player.name));
-              n_name.appendChild(document.createTextNode(next_player.name));
-              p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
-              n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')');
-              resolve_dropdown_div.appendChild(p_name);
-              resolve_dropdown_div.appendChild(n_name);
-
-              //shoot players 2 people away
-            } else if (dice.type===3){ //arrow2
-              if (alive_index < 2){
-                prev_player = alive_players[alive_players.length-2+alive_index];
-              } else {
-                prev_player = alive_players[alive_index-2];
+            let shooting_distance;
+            if (dice.type===2||(dice.type===3&&alive_players.length<=3)){
+              shooting_distance = 1;
+              } else if (dice.type===3){
+                shooting_distance = 2;
               }
-              if (alive_index == players_ar.length-2){
-                next_player = alive_players[0];
-              } else if (alive_index == players_ar.length-1){
-                next_player = alive_players[1];
+
+
+            if (dice.type===2||dice.type===3){ //arrow2
+              if (alive_index < shooting_distance){
+                prev_player = alive_players[alive_index-shooting_distance+alive_players.length];
               } else {
-                next_player = alive_players[alive_index+2];
+                prev_player = alive_players[alive_index-shooting_distance];
+              }
+              if (alive_index >= alive_players.length-shooting_distance){
+                next_player = alive_players[alive_index+shooting_distance-alive_players.length];
+              }  else {
+                next_player = alive_players[alive_index+shooting_distance];
               }
               p_name.appendChild(document.createTextNode(prev_player.name));
               n_name.appendChild(document.createTextNode(next_player.name));
@@ -234,18 +233,13 @@ let socket = io();
           } //todo maybe gatling?
       }
 
+
       function draw_dice(dices){
         document.getElementById('dices').style.display = 'block';
-            d1.src = 'images/d'+(dices[0].type)+'.png';
-            d1.setAttribute('onclick',`dice_dropdown(0)`);
-            d2.src = 'images/d'+(dices[1].type)+'.png';
-            d2.setAttribute('onclick',`dice_dropdown(1)`);
-            d3.src = 'images/d'+(dices[2].type)+'.png';
-            d3.setAttribute('onclick',`dice_dropdown(2)`);
-            d4.src = 'images/d'+(dices[3].type)+'.png';
-            d4.setAttribute('onclick',`dice_dropdown(3)`);
-            d5.src = 'images/d'+(dices[4].type)+'.png';
-            d5.setAttribute('onclick',`dice_dropdown(4)`);
+        for (let i = 0; i < 5;i++){
+          dice_elements[i].src = 'images/d'+(dices[i].type)+'.png';
+          dice_elements[i].setAttribute('onclick',`dice_dropdown(${i})`);
+        }
       }
 
       //event listeners

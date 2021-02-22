@@ -86,12 +86,15 @@ io.on('connection', (socket) => {
 
   let player;
 
+  let player_role;
+
   waitFor(x=>player_names.length===player_limit).then(x=>{
     player = game.players[playerIndex];
     player.index = playerIndex;
+    player_role = game.roles[playerIndex];
     console.log(player.name+' connected');
     io.sockets.emit('current_turn',game.players[game.turn_count].name);
-    socket.emit('players_data_setup',[game.players,playerIndex,game.arrows_left]);//todo: hide other players' role
+    socket.emit('players_data_setup',[game.players,playerIndex,player_role,game.arrows_left]);
   
   });
 
@@ -114,10 +117,10 @@ io.on('connection', (socket) => {
       player.life+=2;
     }
     //character check: el gringo
-    if (selections.some(x=>(x===2||x===3)&&game.players[x[1]].name==='el_gringo')){
+    if (selections.some(x=>(x!=0&&x!=1&&x!=3&&x!=4&&x!=5)&&(x[0]===2||x[0]===3)&&game.players[x[1]].character.name==='el_gringo')){
         player.arrows++;
         game.arrows_left--;
-        check_arrows();
+        check_arrows_left();
     }
 
     for (let s of selections){
@@ -141,12 +144,13 @@ io.on('connection', (socket) => {
 
     let gatling_dices = selections.filter(x=>x===5);
     //character check: willy the kid
-    if (gatling_dices.length>=3||(gatling_dices.length===2&&player.name==='willy_the_kid')){
+    console.log("teszt: "+gatling_dices.length+" : "+player.character.name);
+    if (gatling_dices.length>=3||(gatling_dices.length===2&&player.character.name==='willy_the_kid')){
       game.arrows_left+=player.arrows;
       player.arrows = 0;
       for (let p of alive_players){
         //character check: paul regret
-        if (p!=player&&p.name!='paul_regret'){
+        if (p!=player&&p.character.name!='paul_regret'){
           p.life--;
         }
       }
@@ -170,18 +174,17 @@ io.on('connection', (socket) => {
     if (player.cur_turn){
       player.turn_end = true;
     }
-    console.log([game.players,game.turn_count]);
     
 
     setTimeout(() => { //TODO: not ideal, would be better without timeout
       console.log("ending turn .. ");
-      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players.alive]); //todo: hide other players' role
+      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players.alive]);
       io.sockets.emit('current_turn',game.players[game.turn_count].name);
    }, 500);
   });
 
   //check if no arrows are left
-  function check_arrows(){
+  function check_arrows_left(){
     if (game.arrows_left<=0){
       for (let p of game.players){
         //character check: jourdonnais
@@ -198,7 +201,6 @@ io.on('connection', (socket) => {
 
   //dice roll
   socket.on('roll', () => {
-    console.log(player.name + ' rolled');
     if (player.rolled===false){
 
       let roll_results = [];
@@ -214,17 +216,15 @@ io.on('connection', (socket) => {
 
       let dynamite_dices = roll_results.filter(x=>x.type===1);
       for (let d of roll_results){
-        switch(d.type){
-          case 0:
-            player.arrows++;
-            game.arrows_left--;
 
-            check_arrows();
-
-            break;
-          case 1:
-            d.rerolls_left = 0;
-            break;
+        if (d.type===0){
+          player.arrows++;
+          game.arrows_left--;
+  
+          check_arrows_left();
+        }
+        else if (d.type==1){
+          d.rerolls_left = 0;
         }
       }
       if (dynamite_dices.length>=3){
@@ -234,22 +234,23 @@ io.on('connection', (socket) => {
       }
 
       player.rolled = true;
+      console.log(player.name + ' rolled: '+ roll_results.map(x=>x.type));
 
       player.cur_dices = roll_results;
 
       socket.emit('roll_results',[player.cur_dices,player.selections]);
 
-      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);//todo: hide other players' role
+      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
 
     }
   });
 
   socket.on('reroll', (rerolled_dice_index) => {
-    console.log(player.name + ' rerolled');
 
     let rerolled_dice = player.cur_dices[rerolled_dice_index];
 
       rerolled_dice.type = player.roll();
+      console.log(player.name + ' rerolled: '+ rerolled_dice.type);
 
       if (rerolled_dice.type === 0 || rerolled_dice.type === 1 ||rerolled_dice.type === 5){
         player.selections[rerolled_dice_index] = rerolled_dice.type;
@@ -265,7 +266,7 @@ io.on('connection', (socket) => {
         player.arrows++;
         game.arrows_left--;
 
-        check_arrows();
+        check_arrows_left();
       }
       else if (rerolled_dice.type==1){
         rerolled_dice.rerolls_left = 0;
@@ -279,7 +280,7 @@ io.on('connection', (socket) => {
 
       socket.emit('roll_results',[player.cur_dices,player.selections]);
 
-      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);//todo: hide other players' role
+      io.sockets.emit('players_data_refresh',[game.players,game.arrows_left,game.players_alive]);
 
   });
 

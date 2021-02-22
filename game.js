@@ -5,6 +5,7 @@ class Game {
     constructor(){
         this.started = false;
         this.players = [];
+        this.roles = []; //separated from players so they don't get sent to everyone
         this.end = false;
         this.round_count = 1;
         this.turn_count = 0;
@@ -50,30 +51,14 @@ class Game {
 
     setup(player_number,player_names){
         this.players = [];
-        let roles;
         //todo: rest of the characters
         //let characters = ["bart_cassidy","paul_regret","black_jack","pedro_ramirez","calamity_janet","rose_doolan","el_gringo","sid_ketchum","jesse_jones","slab_the_killer","jourdonnais","suzy_lafayette","kit_carlson","vulture_sam","lucky_duke","willy_the_kid"];
-        let characters = ["paul_regret","rose_doolan","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid"];
-        switch (player_number){
-            case 4:
-                roles = ["sheriff","renegade","outlaw","outlaw"];
-                break;
-            case 5:
-                roles = ["sheriff","renegade","outlaw","outlaw","deputy"];
-                break;
-            case 6:
-                roles = ["sheriff","renegade","outlaw","outlaw","outlaw","deputy"];
-                break;
-            case 7:
-                roles = ["sheriff","renegade","outlaw","outlaw","outlaw","deputy","deputy"];
-                break;
-            case 8:
-                roles = ["sheriff","renegade","renegade","outlaw","outlaw","outlaw","deputy","deputy"];
-                break;
-        }
+        let characters = ["paul_regret","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid"];
+        let role_ar = ["sheriff","renegade","outlaw","outlaw","deputy","outlaw","deputy","renegade"].slice(0,player_number);
 
         for(var i = 0;i<player_number;i++){
-            let p_role = roles.splice(Math.floor(Math.random()*roles.length), 1)[0];
+            let p_role = role_ar[i];
+            this.roles.push(p_role);
             let p_char = new Character(characters.splice(Math.floor(Math.random()*characters.length), 1)[0]);
             this.players.push(new Player(player_names[i],p_role,p_char));
           }
@@ -120,7 +105,7 @@ class Game {
         for (let p of this.players){
             if (p.life===0){
                 this.players_alive--;
-                switch(p.role){
+                switch(this.roles[p.index]){
                     case "sheriff":
                         sheriff_alive--;
                         break;

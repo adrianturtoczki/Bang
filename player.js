@@ -4,10 +4,10 @@ class Player {
         this.index = -1;
 
         this.name = name;
-        this.role = role;
         this.character = character;
         this.life = character.life;
-        if (this.role==='sheriff'){
+        if (role==='sheriff'){
+            this.sheriff = true;
             this.life = this.life+=2;
         }
         this.starting_life = this.life;
