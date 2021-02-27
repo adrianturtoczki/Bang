@@ -4,6 +4,7 @@
   "description": "Javascript implementation of Bang: the Dice Game",
   "main": "server.js",
   "dependencies": {
+    "circular-json": "^0.5.9",
     "express": "^4.17.1",
     "http": "^0.0.1-security",
     "socket.io": "^3.0.5",

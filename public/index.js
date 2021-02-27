@@ -1,5 +1,8 @@
 let socket = io();
 
+      var urlParams = new URLSearchParams(window.location.search);
+      socket.emit('setup',urlParams.get('room'));
+
       //setup
       let d1 = new Image();
       let d2 = new Image();

@@ -8,10 +8,16 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <form action="/game" method="POST">
-        <input type="text" placeholder="Enter name" name="player_name" required/>
-        <input type="submit" />
-    </form>
+    <div id="rooms">
+    </div>
+
+    <div>
+        <form action="/create_room" method="POST">
+            <p>Create room</p>
+            <input type="text" placeholder="Enter player name" name="player_name" required/>
+            <input type="submit" />
+        </form>
+    </div>
     <script type="text/javascript" src="setup.js"></script>
 </body>
 </html>
