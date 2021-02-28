@@ -49,6 +49,25 @@ router.get('/rooms', (req, res) => {
   res.send(CircularJSON.stringify(rooms));
 });
 
+router.post('/create_room', (req, res) => {
+  console.log(req.body);
+  //todo check if already exists
+  rooms.push({name:req.body.room_name,player_limit:parseInt(req.body.player_limit),players_left:parseInt(req.body.player_limit-1),player_names:[],connections:[]});
+  rooms[rooms.length-1].player_names.push(req.body.player_name);
+  rooms[rooms.length-1].game = new Game();
+  rooms[rooms.length-1].connections = new Array(rooms[rooms.length-1].player_limit).fill(null);
+
+  //waits for all players to connect then starts the game
+  waitFor(x=>rooms[rooms.length-1].player_names.length===rooms[rooms.length-1].player_limit).then(x=>{
+    console.log("game started");
+    console.log(rooms[rooms.length-1].player_names);
+    rooms[rooms.length-1].game.setup(rooms[rooms.length-1].player_limit,rooms[rooms.length-1].player_names);
+    rooms[rooms.length-1].game.run();
+  });
+
+  res.redirect('/game.html?room='+req.body.room_name); //todo fix, doesnt work
+});
+
 app.use(config.baseUrl,router);
 
 http.listen(8080, () => console.log('server started'));
@@ -65,7 +84,7 @@ function waitFor(conditionFunction) {
   return new Promise(poll);
 }
 
-//starting the game
+//debug, starting the game for the default rooms
 for (let room of rooms){
   waitFor(x=>room.player_names.length===room.player_limit).then(x=>{
     console.log("game started");
@@ -99,6 +118,7 @@ io.on('connection', (socket) => {
       //hides cur_room.game until all players are connected
   if (cur_room.connections.every(function(i) { return i !== null; })){
     console.log("All players connected!");
+    console.log(cur_room.game.players);
     io.sockets.emit("all_players_connected",cur_room.game.players);
   }
     });
@@ -113,9 +133,8 @@ io.on('connection', (socket) => {
     player.index = playerIndex;
     player_role = cur_room.game.roles[playerIndex];
     console.log(player.name+' connected');
-    io.to('room1').emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
+    io.to(cur_room.name).emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
     socket.emit('players_data_setup',[cur_room.game.players,playerIndex,player_role,cur_room.game.arrows_left]);
-  
   });
 
   // ending a turn
@@ -177,10 +196,10 @@ io.on('connection', (socket) => {
      p.life = 0;
     }
 
-    let winner = cur_room.game.check_win_conditions(room.player_limit)
+    let winner = cur_room.game.check_win_conditions(cur_room.player_limit)
     console.log(winner);
     if (winner){
-      io.to('room1').emit('game_end',winner);
+      io.to(cur_room.name).emit('game_end',winner);
     }
 
     //ending turn
@@ -192,8 +211,8 @@ io.on('connection', (socket) => {
 
     setTimeout(() => { //TODO: not ideal, would be better without timeout
       console.log("ending turn .. ");
-      io.to('room1').emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players.alive]);
-      io.to('room1').emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
+      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players.alive]);
+      io.to(cur_room.name).emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
    }, 500);
   });
 
@@ -254,7 +273,7 @@ io.on('connection', (socket) => {
 
       socket.emit('roll_results',[player.cur_dices,player.selections]);
 
-      io.to('room1').emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
+      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
 
     }
   });
@@ -294,7 +313,7 @@ io.on('connection', (socket) => {
 
       socket.emit('roll_results',[player.cur_dices,player.selections]);
 
-      io.to('room1').emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
+      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
 
   });
 
@@ -303,7 +322,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', (socket) => {
     //console.log(player.name + ' disconnected');
     cur_room.connections[playerIndex] = null;
-    io.to('room1').emit("a_player_disconnected");
+    io.to(cur_room.name).emit("a_player_disconnected");
   });
 
 
