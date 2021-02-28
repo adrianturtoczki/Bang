@@ -200,6 +200,7 @@ io.on('connection', (socket) => {
     console.log(winner);
     if (winner){
       io.to(cur_room.name).emit('game_end',winner);
+      rooms.splice(rooms.indexOf(cur_room),1);
     }
 
     //ending turn
