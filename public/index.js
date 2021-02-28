@@ -2,7 +2,7 @@ let socket = io();
 
       var urlParams = new URLSearchParams(window.location.search);
       socket.emit('setup',urlParams.get('room'));
-
+      
       //setup
       let d1 = new Image();
       let d2 = new Image();
@@ -22,22 +22,30 @@ let socket = io();
       let player_role;
       let player;
 
-      socket.on('all_players_connected',(players)=>{
+      socket.on('all_players_connected',all_players_connected);
+      socket.on('a_player_disconnected',a_player_disconnected);
+      socket.on('current_turn',current_turn);
+      socket.on('players_data_setup', players_data_setup);
+      socket.on('players_data_refresh',players_data_refresh);
+      socket.on('roll_results',roll_results);
+      socket.on('game_end', game_end);
+
+      function all_players_connected(players){
         document.getElementById('wait_screen').style.display = 'none';
         document.getElementById('game').classList.toggle('game_wait');
         
         players_ar = players;
         players_alive = players_ar.length;
-      });
+      }
 
-      socket.on('a_player_disconnected',()=>{
+      function a_player_disconnected(){
         document.getElementById('wait_screen').style.display = 'block';
         document.getElementById('game').classList.toggle('game_wait');
-      });
+      }
 
-      socket.on('current_turn',(turn_name)=>{
+      function current_turn(turn_name){
         document.getElementById('cur_turn').textContent='Current turn: '+turn_name;
-        });
+      }
 
       function cur_player_data(player) {
         //player data
@@ -58,25 +66,7 @@ let socket = io();
           }
         }
 
-
-      socket.on('players_data_refresh',([players,arrows_left,p_alive])=>{
-        players_ar = players;
-        player = players_ar[playerIndex];
-        players_alive = p_alive;
-        cur_player_data(players[playerIndex]);
-
-          //other players data
-          let p_data_divs = document.getElementById('other_players').children;
-          for (let i = 0; i < p_data_divs.length; i++){
-            let p = players[i];
-            p.sheriff ? p_data_divs[i].children[0].textContent=p.name+" (sheriff)" : p_data_divs[i].children[0].textContent=p.name;
-            p_data_divs[i].children[1].textContent=p.name+"'s life: "+p.life;
-            p_data_divs[i].children[2].textContent=p.name+"'s arrows: "+p.arrows;
-            }
-          document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
-        });
-
-      socket.on('players_data_setup', ([players,index,role,arrows_left]) => {
+      function players_data_setup([players,index,role,arrows_left]){
         playerIndex = index;
         player_role = role;
         player = players[index];
@@ -111,10 +101,26 @@ let socket = io();
         if (player.rolled&&player.cur_dices!=[]){
           draw_dice(player.cur_dices);
         }
+      }
 
-        });
+      function players_data_refresh([players,arrows_left,p_alive]){
+        players_ar = players;
+        player = players_ar[playerIndex];
+        players_alive = p_alive;
+        cur_player_data(players[playerIndex]);
 
-      socket.on('roll_results', ([roll_result,selections]) => {
+          //other players data
+          let p_data_divs = document.getElementById('other_players').children;
+          for (let i = 0; i < p_data_divs.length; i++){
+            let p = players[i];
+            p.sheriff ? p_data_divs[i].children[0].textContent=p.name+" (sheriff)" : p_data_divs[i].children[0].textContent=p.name;
+            p_data_divs[i].children[1].textContent=p.name+"'s life: "+p.life;
+            p_data_divs[i].children[2].textContent=p.name+"'s arrows: "+p.arrows;
+            }
+          document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
+      }
+
+      function roll_results([roll_result,selections]){
         player.cur_dices = roll_result;
         player.selections = selections;
 
@@ -122,12 +128,13 @@ let socket = io();
         draw_dice(player.cur_dices);
 
         check_selections(selections);
-        });
+      }
 
-      socket.on('game_end', (winner) => {
+      function game_end(winner){
         alert(winner+'s won!');
         window.location.href = '/';
-      });
+      }
+
 
       function check_selections(selections){
         if (selections.filter(x=>x!=null).length===5){

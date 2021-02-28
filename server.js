@@ -96,10 +96,16 @@ for (let room of rooms){
 
 io.on('connection', (socket) => {
 
+  socket.on('end_turn', end_turn);
+  socket.on('setup',setup);
+  socket.on('roll', roll);
+  socket.on('reroll', reroll);
+  socket.on('disconnect', disconnect);
+
   let cur_room;
   let playerIndex = -1;
 
-  socket.on('setup',(room_name)=>{
+  function setup(room_name){
     console.log(rooms);
     console.log(rooms.find(x=>x.name===room_name));
     cur_room = rooms.find(x=>x.name===room_name);
@@ -121,7 +127,7 @@ io.on('connection', (socket) => {
     console.log(cur_room.game.players);
     io.sockets.emit("all_players_connected",cur_room.game.players);
   }
-    });
+  }
 
   console.log("connected!");
 
@@ -138,8 +144,7 @@ io.on('connection', (socket) => {
   });
 
   // ending a turn
-  socket.on('end_turn', (selections) => {
-
+  function end_turn(selections){
     let alive_players = cur_room.game.players.filter(x=>x.life>0);
 
     //resolving
@@ -215,7 +220,7 @@ io.on('connection', (socket) => {
       io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players.alive]);
       io.to(cur_room.name).emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
    }, 500);
-  });
+  }
 
   //check if no arrows are left
   function check_arrows_left(){
@@ -234,7 +239,7 @@ io.on('connection', (socket) => {
   }
 
   //dice roll
-  socket.on('roll', () => {
+  function roll(){
     if (player.rolled===false){
 
       let roll_results = [];
@@ -277,54 +282,50 @@ io.on('connection', (socket) => {
       io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
 
     }
-  });
+  }
 
-  socket.on('reroll', (rerolled_dice_index) => {
-
+  function reroll(rerolled_dice_index){
     let rerolled_dice = player.cur_dices[rerolled_dice_index];
 
-      rerolled_dice.type = player.roll();
-      console.log(player.name + ' rerolled: '+ rerolled_dice.type);
+    rerolled_dice.type = player.roll();
+    console.log(player.name + ' rerolled: '+ rerolled_dice.type);
 
-      if (rerolled_dice.type === 0 || rerolled_dice.type === 1 ||rerolled_dice.type === 5){
-        player.selections[rerolled_dice_index] = rerolled_dice.type;
-      } else {
-        player.selections[rerolled_dice_index] = null;
-      }
+    if (rerolled_dice.type === 0 || rerolled_dice.type === 1 ||rerolled_dice.type === 5){
+      player.selections[rerolled_dice_index] = rerolled_dice.type;
+    } else {
+      player.selections[rerolled_dice_index] = null;
+    }
 
-      rerolled_dice.rerolls_left--;
+    rerolled_dice.rerolls_left--;
 
-      let dynamite_dices = player.cur_dices.filter(x=>x.type===1&&x.ability_activated === false);
+    let dynamite_dices = player.cur_dices.filter(x=>x.type===1&&x.ability_activated === false);
 
-      if (rerolled_dice.type===0){
-        player.arrows++;
-        cur_room.game.arrows_left--;
+    if (rerolled_dice.type===0){
+      player.arrows++;
+      cur_room.game.arrows_left--;
 
-        check_arrows_left();
-      }
-      else if (rerolled_dice.type==1){
-        rerolled_dice.rerolls_left = 0;
-      }
+      check_arrows_left();
+    }
+    else if (rerolled_dice.type==1){
+      rerolled_dice.rerolls_left = 0;
+    }
 
-      if (dynamite_dices.length>=3){
-        player.life--;
-        dynamite_dices.forEach(x=>x.ability_activated = true);
-        player.cur_dices.forEach(x=>x.rerolls_left = 0);
-      }
+    if (dynamite_dices.length>=3){
+      player.life--;
+      dynamite_dices.forEach(x=>x.ability_activated = true);
+      player.cur_dices.forEach(x=>x.rerolls_left = 0);
+    }
 
-      socket.emit('roll_results',[player.cur_dices,player.selections]);
+    socket.emit('roll_results',[player.cur_dices,player.selections]);
 
-      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
+    io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
 
-  });
-
+  }
 
   //disconnect
-  socket.on('disconnect', (socket) => {
+  function disconnect(socket){
     //console.log(player.name + ' disconnected');
     cur_room.connections[playerIndex] = null;
     io.to(cur_room.name).emit("a_player_disconnected");
-  });
-
-
+  }
 });
