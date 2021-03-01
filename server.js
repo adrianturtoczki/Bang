@@ -17,12 +17,7 @@ app.use(express.urlencoded({
 }))
 app.use(express.json());
 
-let rooms = [{name:'room1',player_limit:4,players_left:4,player_names:[],connections:[]},{name:'room2',player_limit:5,players_left:5,player_names:[],connections:[]}];
-
-rooms[0].game = new Game(); //debug
-rooms[1].game = new Game(); //debug
-rooms[0].connections = new Array(rooms[0].player_limit).fill(null);
-rooms[1].connections = new Array(rooms[1].player_limit).fill(null);
+let rooms = [];
 
 router.get('/', (req, res) => {
   console.log('/');
@@ -69,18 +64,13 @@ router.post('/create_room', (req, res) => {
 });
 
 app.use(config.baseUrl,router);
-
 http.listen(8080, () => console.log('server started'));
-
-console.log(__dirname);
   
 function waitFor(conditionFunction) {
-
   const poll = resolve => {
     if(conditionFunction()) resolve();
     else setTimeout(_ => poll(resolve), 500);
   }
-
   return new Promise(poll);
 }
 
@@ -104,6 +94,17 @@ io.on('connection', (socket) => {
 
   let cur_room;
   let playerIndex = -1;
+  let player;
+  let player_role;
+
+  waitFor(x=>cur_room&&cur_room.game.started).then(x=>{
+    player = cur_room.game.players[playerIndex];
+    player.index = playerIndex;
+    player_role = cur_room.game.roles[playerIndex];
+    console.log(player.name+' connected');
+    io.to(cur_room.name).emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
+    socket.emit('players_data_setup',[cur_room.game.players,playerIndex,player_role,cur_room.game.arrows_left]);
+  });
 
   function setup(room_name){
     console.log(rooms);
@@ -122,26 +123,12 @@ io.on('connection', (socket) => {
     cur_room.connections[playerIndex] = socket;
 
       //hides cur_room.game until all players are connected
-  if (cur_room.connections.every(function(i) { return i !== null; })){
-    console.log("All players connected!");
-    console.log(cur_room.game.players);
-    io.sockets.emit("all_players_connected",cur_room.game.players);
+    if (cur_room.connections.every(function(i) { return i !== null; })){
+      console.log("All players connected!");
+      console.log(cur_room.game.players);
+      io.sockets.emit("all_players_connected",cur_room.game.players);
+    }
   }
-  }
-
-  console.log("connected!");
-
-  let player;
-  let player_role;
-
-  waitFor(x=>cur_room&&cur_room.game.started).then(x=>{
-    player = cur_room.game.players[playerIndex];
-    player.index = playerIndex;
-    player_role = cur_room.game.roles[playerIndex];
-    console.log(player.name+' connected');
-    io.to(cur_room.name).emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
-    socket.emit('players_data_setup',[cur_room.game.players,playerIndex,player_role,cur_room.game.arrows_left]);
-  });
 
   // ending a turn
   function end_turn(selections){
@@ -324,8 +311,10 @@ io.on('connection', (socket) => {
 
   //disconnect
   function disconnect(socket){
-    //console.log(player.name + ' disconnected');
     cur_room.connections[playerIndex] = null;
     io.to(cur_room.name).emit("a_player_disconnected");
+    if (rooms.indexOf(cur_room)!=-1){
+      rooms.splice(rooms.indexOf(cur_room),1);
+    }
   }
 });

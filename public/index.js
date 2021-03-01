@@ -39,8 +39,8 @@ let socket = io();
       }
 
       function a_player_disconnected(){
-        document.getElementById('wait_screen').style.display = 'block';
-        document.getElementById('game').classList.toggle('game_wait');
+        alert('A player disconnected. Returning to menu.');
+        window.location.href = '/';
       }
 
       function current_turn(turn_name){
