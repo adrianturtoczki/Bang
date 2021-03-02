@@ -197,51 +197,65 @@ let socket = io();
           //players the player can effect with the dice
           if (dice.type===2||dice.type===3||dice.type===4){
             let prev_player,next_player;
-            let p_name = document.createElement('p');
-            let n_name = document.createElement('p');
 
             let alive_index = alive_players.findIndex(x=>x===player);
 
-            let shooting_distance;
+            let shooting_distances = [];
             if (dice.type===2||(dice.type===3&&alive_players.length<=3)){
-              shooting_distance = 1;
+              shooting_distances.push(1);
               } else if (dice.type===3){
-                shooting_distance = 2;
+                shooting_distances.push(2);
               }
-
-
-            if (dice.type===2||dice.type===3){ //arrow2
-              if (alive_index < shooting_distance){
-                prev_player = alive_players[alive_index-shooting_distance+alive_players.length];
-              } else {
-                prev_player = alive_players[alive_index-shooting_distance];
-              }
-              if (alive_index >= alive_players.length-shooting_distance){
-                next_player = alive_players[alive_index+shooting_distance-alive_players.length];
-              }  else {
-                next_player = alive_players[alive_index+shooting_distance];
-              }
-              p_name.appendChild(document.createTextNode(prev_player.name));
-              n_name.appendChild(document.createTextNode(next_player.name));
-              p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
-              n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')'); 
-
-              resolve_dropdown_div.appendChild(p_name);
-              if (prev_player!=next_player){
-                resolve_dropdown_div.appendChild(n_name);
-              }
-
-            } else if (dice.type===4){ //beer
-
-              for (let p of alive_players){
-                let b_name = document.createElement('p');
-                b_name.appendChild(document.createTextNode(p.name));
-                b_name.setAttribute('onclick','select_target('+dice.index+','+p.index+')');
-                resolve_dropdown_div.appendChild(b_name);
+              
+            //character check: calamity jane
+            if (player.character.name==="calamity_janet"){
+              if (shooting_distances[0]==1){
+                shooting_distances.push(2);
+              } else{
+                shooting_distances.push(1);
               }
             }
-          } //todo maybe gatling? or separate button
-      }
+            //character check: rose doolan
+            if (player.character.name==="rose_doolan"){
+              shooting_distances.push(shooting_distances[0]+1);
+            }
+
+            if (dice.type===2||dice.type===3){ //arrow2
+              for (let shooting_distance of shooting_distances){
+                let p_name = document.createElement('p');
+                let n_name = document.createElement('p');
+                console.log(shooting_distances)
+                if (alive_index < shooting_distance){
+                  prev_player = alive_players[alive_index-shooting_distance+alive_players.length];
+                } else {
+                  prev_player = alive_players[alive_index-shooting_distance];
+                }
+                if (alive_index >= alive_players.length-shooting_distance){
+                  next_player = alive_players[alive_index+shooting_distance-alive_players.length];
+                }  else {
+                  next_player = alive_players[alive_index+shooting_distance];
+                }
+                p_name.appendChild(document.createTextNode(prev_player.name));
+                n_name.appendChild(document.createTextNode(next_player.name));
+                p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
+                n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')'); 
+  
+                resolve_dropdown_div.appendChild(p_name);
+                if (prev_player!=next_player){
+                  resolve_dropdown_div.appendChild(n_name);
+                  }
+                }
+              } else if (dice.type===4){ //beer
+  
+                for (let p of alive_players){
+                  let b_name = document.createElement('p');
+                  b_name.appendChild(document.createTextNode(p.name));
+                  b_name.setAttribute('onclick','select_target('+dice.index+','+p.index+')');
+                  resolve_dropdown_div.appendChild(b_name);
+                }
+              }
+            }
+        }
 
 
       function draw_dice(dices){
@@ -282,3 +296,6 @@ let socket = io();
       });
 
       //TODO: hide dropdown after clicking outside
+
+      //todo fix: confirm dialog when leaving page
+      //window.onbeforeunload = function(){return 'Are you sure you want to quit?'};

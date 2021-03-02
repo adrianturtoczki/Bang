@@ -64,7 +64,7 @@ router.post('/create_room', (req, res) => {
 });
 
 app.use(config.baseUrl,router);
-http.listen(8080, () => console.log('server started'));
+http.listen(3000, () => console.log('server started'));
   
 function waitFor(conditionFunction) {
   const poll = resolve => {
