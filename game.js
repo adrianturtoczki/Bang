@@ -123,15 +123,15 @@ class Game {
         }
         if (sheriff_alive===1&&renegades_alive<=0&&outlaws_alive<=0){
             this.end = true;
-            return "sheriff";
+            return "seriff";
         }
         else if (sheriff_alive<=0&&deputies_alive<=0&&outlaws_alive>0){
             this.end=true;
-            return "outlaw";
+            return "banditák";
         }
         else if (renegades_alive>1&&sheriff_alive<=0&&deputies_alive<=0&&outlaws_alive<=0){
             this.end=true;
-            return "renegade";
+            return "renegát";
         }
         else{
             return

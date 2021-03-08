@@ -39,19 +39,19 @@ let socket = io();
       }
 
       function a_player_disconnected(){
-        alert('A player disconnected. Returning to menu.');
+        alert('Egy játékos  kilépett. Visszalépés a főoldalra.');
         window.location.href = '/';
       }
 
       function current_turn(turn_name){
-        document.getElementById('cur_turn').textContent='Current turn: '+turn_name;
+        document.getElementById('cur_turn').textContent='Jelenlegi kör: '+turn_name;
       }
 
       function cur_player_data(player) {
         //player data
 
-        document.getElementById('player_health_number').textContent='Your health: '+player.life;
-        document.getElementById('player_arrow_number').textContent='Your arrows: '+player.arrows;
+        document.getElementById('player_health_number').textContent='Élet: '+player.life;
+        document.getElementById('player_arrow_number').textContent='Nyíl: '+player.arrows;
 
         if (player.cur_turn===true&&player.rolled===false){
           document.getElementById('dices').style.display = 'none';
@@ -73,7 +73,7 @@ let socket = io();
 
         cur_player_data(player);
 
-        document.getElementById('player_name').textContent='Your name: '+player.name;
+        document.getElementById('player_name').textContent='Játékos: '+player.name;
         document.getElementById('player_role_image').src = 'images/r_'+player_role+'.jpg';
         document.getElementById('player_character_image').src = 'images/c_'+player.character.name+'.jpg';
         document.getElementById('other_players').innerHTML='';
@@ -84,10 +84,11 @@ let socket = io();
           let p_life = document.createElement('p');
           let p_arrows = document.createElement('p');
           let p_char = document.createElement('img');
-          p.sheriff ? p_name.appendChild(document.createTextNode(p.name+" (sheriff)")) : p_name.appendChild(document.createTextNode(p.name));
-          p_life.appendChild(document.createTextNode(p.name+"'s life: "+p.life));
-          p_arrows.appendChild(document.createTextNode(p.name+"'s arrows: "+p.arrows));
+          p.sheriff ? p_name.appendChild(document.createTextNode(p.name+" (seriff)")) : p_name.appendChild(document.createTextNode(p.name));
+          p_life.appendChild(document.createTextNode("élet: "+p.life));
+          p_arrows.appendChild(document.createTextNode("nyíl: "+p.arrows));
           p_char.src = 'images/c_'+p.character.name+'.jpg';
+          //todo implement role
 
           p_div.appendChild(p_name);
           p_div.appendChild(p_life);
@@ -95,7 +96,7 @@ let socket = io();
           p_div.appendChild(p_char);
 
           document.getElementById('other_players').appendChild(p_div);
-          document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
+          document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
         }
 
         if (player.rolled&&player.cur_dices!=[]){
@@ -113,11 +114,11 @@ let socket = io();
           let p_data_divs = document.getElementById('other_players').children;
           for (let i = 0; i < p_data_divs.length; i++){
             let p = players[i];
-            p.sheriff ? p_data_divs[i].children[0].textContent=p.name+" (sheriff)" : p_data_divs[i].children[0].textContent=p.name;
-            p_data_divs[i].children[1].textContent=p.name+"'s life: "+p.life;
-            p_data_divs[i].children[2].textContent=p.name+"'s arrows: "+p.arrows;
+            p.sheriff ? p_data_divs[i].children[0].textContent=p.name+" (seriff)" : p_data_divs[i].children[0].textContent=p.name;
+            p_data_divs[i].children[1].textContent="élet: "+p.life;
+            p_data_divs[i].children[2].textContent="nyíl: "+p.arrows;
             }
-          document.getElementById('arrows_left').textContent = 'Arrows left: '+arrows_left;
+          document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
       }
 
       function roll_results([roll_result,selections]){
@@ -131,7 +132,7 @@ let socket = io();
       }
 
       function game_end(winner){
-        alert(winner+'s won!');
+        alert('Nyert: '+winner);
         window.location.href = '/';
       }
 
@@ -158,9 +159,9 @@ let socket = io();
         for (let s of selections){
           if (s!=null&&s!=0&&s!=1&&s!=5){
             if (s[0]===2||s[0]===3){
-              prettier_selection+="Shoot ";
+              prettier_selection+="Célkereszt->";
             } else if (s[0]===4){
-              prettier_selection+="Heal ";
+              prettier_selection+="Sör ->";
             }
             prettier_selection+=players_ar[s[1]].name+';';
           }
@@ -181,7 +182,7 @@ let socket = io();
         if (dice.rerolls_left>0){
           //reroll
           let reroll_button = document.createElement('p');
-          reroll_button.appendChild(document.createTextNode("Reroll ("+dice.rerolls_left+" left)"));
+          reroll_button.appendChild(document.createTextNode("Újradobás ("+dice.rerolls_left+" maradt)"));
           reroll_button.addEventListener('click',function(){
             document.getElementById("resolve_dropdown").classList.toggle("show");
             console.log("reroll button clicked for "+[dice.type,dice.index]);

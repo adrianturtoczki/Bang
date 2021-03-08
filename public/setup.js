@@ -4,16 +4,18 @@ let room_div = document.getElementById("rooms");
 
 function get_name(room_name){
     let player_name = prompt();
-    fetch("/game", {
-        method: "POST", 
-        headers: {
-            'Content-Type': 'application/json'
-          },
-        body: JSON.stringify({player_name:player_name,room_name:room_name})
-      }).then(res => {
-        console.log("Request complete! response:", res);
-        window.location.href="/game.html?room="+room_name; //todo change later
-      });
+    if (player_name){
+        fetch("/game", {
+            method: "POST", 
+            headers: {
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify({player_name:player_name,room_name:room_name})
+          }).then(res => {
+            console.log("Request complete! response:", res);
+            window.location.href="/game.html?room="+room_name; //todo change later
+          });
+    }
 }
 
 setInterval(x => get_rooms(), 1000);

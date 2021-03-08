@@ -35,11 +35,6 @@ router.post('/game', (req, res) => {
   res.sendFile(path.join(__dirname + '/public/game.html')); //todo fix, doesnt work
 });
 
-//todo remove, for debug
-router.get('/game', (req, res) => {
-  res.sendFile(path.join(__dirname + '/public/game.html'));
-});
-
 router.get('/rooms', (req, res) => {
   res.send(CircularJSON.stringify(rooms));
 });
@@ -47,24 +42,29 @@ router.get('/rooms', (req, res) => {
 router.post('/create_room', (req, res) => {
   console.log(req.body);
   //todo check if already exists
-  rooms.push({name:req.body.room_name,player_limit:parseInt(req.body.player_limit),players_left:parseInt(req.body.player_limit-1),player_names:[],connections:[]});
-  rooms[rooms.length-1].player_names.push(req.body.player_name);
-  rooms[rooms.length-1].game = new Game();
-  rooms[rooms.length-1].connections = new Array(rooms[rooms.length-1].player_limit).fill(null);
-
-  //waits for all players to connect then starts the game
-  waitFor(x=>rooms[rooms.length-1].player_names.length===rooms[rooms.length-1].player_limit).then(x=>{
-    console.log("game started");
-    console.log(rooms[rooms.length-1].player_names);
-    rooms[rooms.length-1].game.setup(rooms[rooms.length-1].player_limit,rooms[rooms.length-1].player_names);
-    rooms[rooms.length-1].game.run();
-  });
-
-  res.redirect('/game.html?room='+req.body.room_name); //todo fix, doesnt work
+  if (rooms.find(x=>x.name===req.body.room_name)){
+    //todo popup room already exists?
+    res.redirect('/');
+  } else {
+    rooms.push({name:req.body.room_name,player_limit:parseInt(req.body.player_limit),players_left:parseInt(req.body.player_limit-1),player_names:[],connections:[]});
+    rooms[rooms.length-1].player_names.push(req.body.player_name);
+    rooms[rooms.length-1].game = new Game();
+    rooms[rooms.length-1].connections = new Array(rooms[rooms.length-1].player_limit).fill(null);
+  
+    //waits for all players to connect then starts the game
+    waitFor(x=>rooms[rooms.length-1].player_names.length===rooms[rooms.length-1].player_limit).then(x=>{
+      console.log("game started");
+      console.log(rooms[rooms.length-1].player_names);
+      rooms[rooms.length-1].game.setup(rooms[rooms.length-1].player_limit,rooms[rooms.length-1].player_names);
+      rooms[rooms.length-1].game.run();
+    });
+  
+    res.redirect('/game.html?room='+req.body.room_name); //todo fix, doesnt work
+  }
 });
 
 app.use(config.baseUrl,router);
-http.listen(3000, () => console.log('server started'));
+http.listen(config.port, () => console.log('server started'));
   
 function waitFor(conditionFunction) {
   const poll = resolve => {
