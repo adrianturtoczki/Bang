@@ -26,9 +26,6 @@
     pointer-events: none;
   }
 
-  img {
-    max-width:200px;
-  }
 
   .player_row{
     display:flex;
@@ -38,6 +35,10 @@
   .player_column{
     flex: 33.33%;
     padding:5px;
+  }
+
+  .player_data{
+    display:flex;
   }
 
   #other_players{

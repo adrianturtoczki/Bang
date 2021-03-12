@@ -186,6 +186,7 @@ io.on('connection', (socket) => {
      cur_room.game.arrows_left+=p.arrows;
      p.arrows = 0;
      p.life = 0;
+     p.role = cur_room.game.roles[p.index];
     }
 
     let winner = cur_room.game.check_win_conditions(cur_room.player_limit)

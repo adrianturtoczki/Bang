@@ -7,8 +7,10 @@ class Player {
         this.character = character;
         this.life = character.life;
         if (role==='sheriff'){
-            this.sheriff = true;
+            this.role = 'sheriff';
             this.life = this.life+=2;
+        } else {
+            this.role = '';
         }
         this.starting_life = this.life;
         this.arrows = 0;

@@ -75,27 +75,50 @@ let socket = io();
 
         document.getElementById('player_name').textContent='Játékos: '+player.name;
         document.getElementById('player_role_image').src = 'images/r_'+player_role+'.jpg';
+        document.getElementById('player_role_image').style.maxWidth = '300px';
         document.getElementById('player_character_image').src = 'images/c_'+player.character.name+'.jpg';
+        document.getElementById('player_character_image').style.maxWidth = '300px';
         document.getElementById('other_players').innerHTML='';
       for (let p of players){
-          let p_div = document.createElement('div');
-          p_div.id=p.index;
-          let p_name = document.createElement('p');
-          let p_life = document.createElement('p');
-          let p_arrows = document.createElement('p');
-          let p_char = document.createElement('img');
-          p.sheriff ? p_name.appendChild(document.createTextNode(p.name+" (seriff)")) : p_name.appendChild(document.createTextNode(p.name));
-          p_life.appendChild(document.createTextNode("élet: "+p.life));
-          p_arrows.appendChild(document.createTextNode("nyíl: "+p.arrows));
-          p_char.src = 'images/c_'+p.character.name+'.jpg';
-          //todo implement role
+          if (p!=player){
+            let p_div = document.createElement('div');
+            p_div.classList.add("player_data");
+            let p_div_life_arrows_char = document.createElement('div');
+            let p_div_life_arrows = document.createElement('div');
+            let p_role_div = document.createElement('div');
+            p_div.id=p.name;
+            let p_name = document.createElement('h3');
+            let p_life = document.createElement('p');
+            let p_arrows = document.createElement('p');
+            let p_life_img = document.createElement('img');
+            let p_arrows_img = document.createElement('img');
+            let p_char = document.createElement('img');
+            p_char.style.maxWidth = '300px';
+            let p_role = document.createElement('img');
+            p_role.style.maxWidth = '300px';
+            p_name.appendChild(document.createTextNode(p.name));
+            p_life.appendChild(document.createTextNode("élet: "+p.life));
+            p_arrows.appendChild(document.createTextNode("nyíl: "+p.arrows));
+            p_char.src = 'images/c_'+p.character.name+'.jpg';
+            p_role.src= 'images/r_'+p.role+'.jpg';
+            p_arrows_img.src='images/arrow.png';
+            p_arrows_img.style.height="50px";
+            p_life_img.src='images/bullet.png';
+            p_life_img.style.height=p_arrows_img.style.height;
 
-          p_div.appendChild(p_name);
-          p_div.appendChild(p_life);
-          p_div.appendChild(p_arrows);
-          p_div.appendChild(p_char);
+            p_div_life_arrows.appendChild(p_name);
+            p_div_life_arrows.appendChild(p_life);
+            p_div_life_arrows.appendChild(p_arrows);
+            p_div_life_arrows.appendChild(p_life_img);
+            p_div_life_arrows.appendChild(p_arrows_img);
+            p_div_life_arrows_char.appendChild(p_div_life_arrows);
+            p_div_life_arrows_char.appendChild(p_char);
+            p_div.appendChild(p_div_life_arrows_char);
+            p_role_div.appendChild(p_role);
+            p_div.appendChild(p_role_div);
 
-          document.getElementById('other_players').appendChild(p_div);
+            document.getElementById('other_players').appendChild(p_div);
+            }
           document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
         }
 
@@ -112,11 +135,16 @@ let socket = io();
 
           //other players data
           let p_data_divs = document.getElementById('other_players').children;
-          for (let i = 0; i < p_data_divs.length; i++){
-            let p = players[i];
-            p.sheriff ? p_data_divs[i].children[0].textContent=p.name+" (seriff)" : p_data_divs[i].children[0].textContent=p.name;
-            p_data_divs[i].children[1].textContent="élet: "+p.life;
-            p_data_divs[i].children[2].textContent="nyíl: "+p.arrows;
+          for (let p of players_ar){
+            if (p.index!=playerIndex){
+              p_data_div = document.getElementById(p.name);
+              p_data_div.children[0].children[0].children[0].textContent=p.name;
+              p_data_div.children[0].children[0].children[1].textContent="élet: "+p.life;
+              p_data_div.children[0].children[0].children[2].textContent="nyíl: "+p.arrows;
+              p_data_div.children[0].children[1].src= 'images/c_'+p.character.name+'.jpg';
+              //todo refresh image when player dies
+              if (p.life<=0) p_data_div.children[1].children[0].src= 'images/r_'+p.role+'.jpg';
+              }
             }
           document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
       }
