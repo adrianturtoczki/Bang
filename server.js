@@ -2,6 +2,7 @@
 
 const Game = require('./game');
 const Dice = require('./dice');
+const Helper = require('./helper')
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -52,7 +53,7 @@ router.post('/create_room', (req, res) => {
     rooms[rooms.length-1].connections = new Array(rooms[rooms.length-1].player_limit).fill(null);
   
     //waits for all players to connect then starts the game
-    waitFor(x=>rooms[rooms.length-1].player_names.length===rooms[rooms.length-1].player_limit).then(x=>{
+    Helper.waitFor(x=>rooms[rooms.length-1].player_names.length===rooms[rooms.length-1].player_limit).then(x=>{
       console.log("game started");
       console.log(rooms[rooms.length-1].player_names);
       rooms[rooms.length-1].game.setup(rooms[rooms.length-1].player_limit,rooms[rooms.length-1].player_names);
@@ -65,18 +66,10 @@ router.post('/create_room', (req, res) => {
 
 app.use(config.baseUrl,router);
 http.listen(config.port, () => console.log('server started'));
-  
-function waitFor(conditionFunction) {
-  const poll = resolve => {
-    if(conditionFunction()) resolve();
-    else setTimeout(_ => poll(resolve), 500);
-  }
-  return new Promise(poll);
-}
 
 //debug, starting the game for the default rooms
 for (let room of rooms){
-  waitFor(x=>room.player_names.length===room.player_limit).then(x=>{
+  Helper.waitFor(x=>room.player_names.length===room.player_limit).then(x=>{
     console.log("game started");
     console.log(room.player_names);
     room.game.setup(room.player_limit,room.player_names);
@@ -97,7 +90,7 @@ io.on('connection', (socket) => {
   let player;
   let player_role;
 
-  waitFor(x=>cur_room&&cur_room.game.started).then(x=>{
+  Helper.waitFor(x=>cur_room&&cur_room.game.started).then(x=>{
     player = cur_room.game.players[playerIndex];
     player.index = playerIndex;
     player_role = cur_room.game.roles[playerIndex];

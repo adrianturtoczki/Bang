@@ -6,6 +6,15 @@
     <meta name="author" content="Adrian Turtoczki">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="style.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
 </head>
 <body>
 
@@ -21,45 +30,31 @@
         <p id='cur_turn'></p>
         <p id='arrows_left'>Arrows left:</p>
       </div>
-  
-<br>
 
       <div class='player_row'>
         <div>
-        <div class='player_data'>
-          <div>
-            <p id='player_name'></p>
-            <p id='player_health_number'>Élet:</p>
-            <p id='player_arrow_number'>Nyíl:</p>
-            <img id='player_character_image'>
-          </div>
-          <div>
-            <img id='player_role_image'>
-          </div>
-      
+          <div id="player">
+
           </div>
 
-        <div id='roll_div'>
-          <div id='dices'></div>
-          <button id="roll">dobás</button>
-    
-          <div class="dropdown">
-            <div id="resolve_dropdown" class="dropdown-content">
-              <a href="#">Link 1</a>
-              <a href="#">Link 2</a>
-              <a href="#">Link 3</a>
+          <div id='roll_div'>
+            <div id='dices'></div>
+            <button id="roll">dobás</button>
+      
+            <div class="dropdown">
+              <div id="resolve_dropdown" class="dropdown-content">
+                <a href="#">Link 1</a>
+                <a href="#">Link 2</a>
+                <a href="#">Link 3</a>
+              </div>
+              <p id='selections'>Választott műveletek:</p>
+              <button id="reset_selections_button">reset</button>
+              <button id="end_turn_button" disabled>Kör befejezése</button>
             </div>
-            <p id='selections'>Választott műveletek:</p>
-            <button id="reset_selections_button">reset</button>
-            <button id="end_turn_button" disabled>Kör befejezése</button>
           </div>
-        </div>
         
       </div>
-<br>
-
     </div>
-
     <hr>
 
     <div id="other_players">

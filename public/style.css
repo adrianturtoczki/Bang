@@ -29,7 +29,6 @@
 
   .player_row{
     display:flex;
-    width: 30%;
   }
 
   .player_column{
@@ -39,6 +38,7 @@
 
   .player_data{
     display:flex;
+    flex-wrap: wrap;
   }
 
   #other_players{
@@ -50,4 +50,23 @@
   #rooms{
     display:flex;
     flex-wrap: wrap;
+  }
+
+  .bullets_arrows_div{
+    display:flex;
+  }
+  .bullets_arrows_div p{
+    font-size: 30px;
+    margin:0;
+  }
+  .bullets_arrows_div img{
+    height:4em;
+    width:auto;
+  }
+
+  .role_img {
+    max-width: 230px;
+  }
+  .char_img {
+    max-width: 300px;
   }

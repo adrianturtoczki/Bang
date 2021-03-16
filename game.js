@@ -1,5 +1,6 @@
 const Player = require('./player');
 const Character = require('./character');
+const Helper = require('./helper');
 
 class Game {
     constructor(){
@@ -10,17 +11,8 @@ class Game {
         this.round_count = 1;
         this.turn_count = 0;
         this.arrows_left = 9;
+        this.log = [];
     }
-
-    waitFor(conditionFunction) {
-
-        const poll = resolve => {
-          if(conditionFunction()) resolve();
-          else setTimeout(_ => poll(resolve), 500);
-        }
-      
-        return new Promise(poll);
-      }
 
     async run(){
         this.started = true;
@@ -29,7 +21,7 @@ class Game {
                 if (p.life>0){
                     p.cur_turn = true;
                     console.log(p.name+"'s round");
-                    await this.waitFor(_ => p.turn_end === true).then(_ => {
+                    await Helper.waitFor(_ => p.turn_end === true).then(_ => {
                         console.log(p.name+"'s turn over!");
                         console.log(p);
                         p.cur_turn = false;
@@ -51,8 +43,6 @@ class Game {
 
     setup(player_number,player_names){
         this.players = [];
-        //todo: rest of the characters
-        //let characters = ["bart_cassidy","paul_regret","black_jack","pedro_ramirez","calamity_janet","rose_doolan","el_gringo","sid_ketchum","jesse_jones","slab_the_killer","jourdonnais","suzy_lafayette","kit_carlson","vulture_sam","lucky_duke","willy_the_kid"];
         let characters = ["paul_regret","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid","calamity_janet","rose_doolan"];
         let role_ar = ["sheriff","renegade","outlaw","outlaw","deputy","outlaw","deputy","renegade"].slice(0,player_number);
 

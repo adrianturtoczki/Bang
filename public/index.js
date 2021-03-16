@@ -50,8 +50,9 @@ let socket = io();
       function cur_player_data(player) {
         //player data
 
-        document.getElementById('player_health_number').textContent='Élet: '+player.life;
-        document.getElementById('player_arrow_number').textContent='Nyíl: '+player.arrows;
+
+        //document.getElementById('player_health_number').textContent=player.life;
+        //document.getElementById('player_arrow_number').textContent=player.arrows;
 
         if (player.cur_turn===true&&player.rolled===false){
           document.getElementById('dices').style.display = 'none';
@@ -66,39 +67,26 @@ let socket = io();
           }
         }
 
-      function players_data_setup([players,index,role,arrows_left]){
-        playerIndex = index;
-        player_role = role;
-        player = players[index];
-
-        cur_player_data(player);
-
-        document.getElementById('player_name').textContent='Játékos: '+player.name;
-        document.getElementById('player_role_image').src = 'images/r_'+player_role+'.jpg';
-        document.getElementById('player_role_image').style.maxWidth = '300px';
-        document.getElementById('player_character_image').src = 'images/c_'+player.character.name+'.jpg';
-        document.getElementById('player_character_image').style.maxWidth = '300px';
-        document.getElementById('other_players').innerHTML='';
-      for (let p of players){
-          if (p!=player){
-            let p_div = document.createElement('div');
+        function createPlayer(p,div_to_append){
+          let p_div = document.createElement('div');
             p_div.classList.add("player_data");
+            p_div.id=p.name;
+            let p_div_name = document.createElement('div');
             let p_div_life_arrows_char = document.createElement('div');
             let p_div_life_arrows = document.createElement('div');
             let p_role_div = document.createElement('div');
-            p_div.id=p.name;
             let p_name = document.createElement('h3');
             let p_life = document.createElement('p');
             let p_arrows = document.createElement('p');
             let p_life_img = document.createElement('img');
             let p_arrows_img = document.createElement('img');
             let p_char = document.createElement('img');
-            p_char.style.maxWidth = '300px';
+            p_char.classList.add("char_img");
             let p_role = document.createElement('img');
-            p_role.style.maxWidth = '300px';
+            p_role.classList.add("role_img");
             p_name.appendChild(document.createTextNode(p.name));
-            p_life.appendChild(document.createTextNode("élet: "+p.life));
-            p_arrows.appendChild(document.createTextNode("nyíl: "+p.arrows));
+            p_life.appendChild(document.createTextNode(p.life));
+            p_arrows.appendChild(document.createTextNode(p.arrows));
             p_char.src = 'images/c_'+p.character.name+'.jpg';
             p_role.src= 'images/r_'+p.role+'.jpg';
             p_arrows_img.src='images/arrow.png';
@@ -106,18 +94,34 @@ let socket = io();
             p_life_img.src='images/bullet.png';
             p_life_img.style.height=p_arrows_img.style.height;
 
-            p_div_life_arrows.appendChild(p_name);
+            p_div_name.appendChild(p_name);
             p_div_life_arrows.appendChild(p_life);
-            p_div_life_arrows.appendChild(p_arrows);
             p_div_life_arrows.appendChild(p_life_img);
+            p_div_life_arrows.appendChild(p_arrows);
             p_div_life_arrows.appendChild(p_arrows_img);
+            p_div_life_arrows.classList.add("bullets_arrows_div");
+            p_div_life_arrows_char.appendChild(p_div_name);
             p_div_life_arrows_char.appendChild(p_div_life_arrows);
             p_div_life_arrows_char.appendChild(p_char);
             p_div.appendChild(p_div_life_arrows_char);
             p_role_div.appendChild(p_role);
             p_div.appendChild(p_role_div);
+            div_to_append.appendChild(p_div);
+        }
 
-            document.getElementById('other_players').appendChild(p_div);
+      function players_data_setup([players,index,role,arrows_left]){
+        playerIndex = index;
+        player_role = role;
+        player = players[index];
+
+        cur_player_data(player);
+
+        createPlayer(player,document.getElementById("player"));
+
+        document.getElementById('other_players').innerHTML='';
+      for (let p of players){
+          if (p!=player){
+            createPlayer(p,document.getElementById('other_players'));
             }
           document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
         }
@@ -139,11 +143,10 @@ let socket = io();
             if (p.index!=playerIndex){
               p_data_div = document.getElementById(p.name);
               p_data_div.children[0].children[0].children[0].textContent=p.name;
-              p_data_div.children[0].children[0].children[1].textContent="élet: "+p.life;
-              p_data_div.children[0].children[0].children[2].textContent="nyíl: "+p.arrows;
+              p_data_div.children[0].children[1].children[0].textContent=p.life;
+              p_data_div.children[0].children[1].children[2].textContent=p.arrows;
               p_data_div.children[0].children[1].src= 'images/c_'+p.character.name+'.jpg';
-              //todo refresh image when player dies
-              if (p.life<=0) p_data_div.children[1].children[0].src= 'images/r_'+p.role+'.jpg';
+              if (p.life<=0) p_data_div.children[0].children[2].src= 'images/r_'+p.role+'.jpg';
               }
             }
           document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
@@ -155,8 +158,7 @@ let socket = io();
 
 
         draw_dice(player.cur_dices);
-
-        check_selections(selections);
+        check_selections(selections,document.getElementById('end_turn_button'));
       }
 
       function game_end(winner){
@@ -165,11 +167,11 @@ let socket = io();
       }
 
 
-      function check_selections(selections){
+      function check_selections(selections,end_turn_button){
         if (selections.filter(x=>x!=null).length===5){
-          document.getElementById('end_turn_button').disabled = false;
+          end_turn_button.disabled = false;
         } else {
-          document.getElementById('end_turn_button').disabled = true;
+          end_turn_button.disabled = true;
         }
       }
 
@@ -179,7 +181,7 @@ let socket = io();
         player.selections[dice.index] = [dice.type,player_index];
         print_selections(player.selections);
 
-        check_selections(player.selections);
+        check_selections(player.selections,document.getElementById('end_turn_button'));
       }
 
       function print_selections(selections){
