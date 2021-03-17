@@ -17,14 +17,21 @@
 
 </head>
 <body>
+    <h1>Bang! Kockajáték</h1>
+    <h3>Szobák</h3>
     <div id="rooms">
     </div>
 
     <div>
         <form action="/create_room" method="POST" id="create_room">
-            <p>Szoba létrehozása</p>
-            <input type="text" placeholder="Szoba neve" name="room_name" required/>
-            <input type="text" placeholder="Játékos neve" name="player_name" required/>
+            <h3>Szoba létrehozása</h3>
+            <label for="room_name">Szoba neve</label>
+            <input type="text" name="room_name" required/>
+            <br>
+            <label for="room_name">Játékos neve</label>
+            <input type="text" name="player_name" required/>
+            <br>
+            <label for="player_limit">Játékosok száma</label>
             <select id="player_limit" name="player_limit">
                 <option value="4">4</option>
                 <option value="5">5</option>
@@ -32,6 +39,7 @@
                 <option value="7">7</option>
                 <option value="8">8</option>
               </select>
+              <br>
             <input type="submit" />
         </form>
     </div>

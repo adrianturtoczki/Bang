@@ -24,24 +24,41 @@ router.get('/', (req, res) => {
   console.log('/');
   res.sendFile(path.join(__dirname + '/public/setup.html'));
 });
-router.post('/game', (req, res) => {
-  console.log('/game');
-  console.log(req.body);
-  let room = rooms.find(x=>x.name==req.body.room_name);
-  console.log(room);
-  if (room.player_names.length<room.player_limit){
-    room.player_names.push(req.body.player_name);
-    room.players_left--;
-  }
-  res.sendFile(path.join(__dirname + '/public/game.html')); //todo fix, doesnt work
-});
 
 router.get('/rooms', (req, res) => {
   res.send(CircularJSON.stringify(rooms));
 });
 
+router.get('/game', (req, res) => {
+  console.log("/game");
+  let room = rooms.find(x=>x.name==req.query.room);
+  console.log(room.game);
+  if (room.game.started==false){
+    res.sendFile(path.join(__dirname + '/public/game.html'));
+  } else {
+    res.sendFile(path.join(__dirname + '/public/setup.html'));
+  }
+});
+
+router.post('/join_room', (req, res) => {
+  console.log('/join_room');
+  let room = rooms.find(x=>x.name==req.body.room_name);
+  //checks if name already in room
+  console.log(req.body.player_name,room.player_names);
+  if (room.player_names.includes(req.body.player_name)){
+    console.log("error: name already in room!",req.body.player_name,room.player_names);
+    res.send({"accepted":"false"}); //todo fix
+  } else {
+    if (room.player_names.length<room.player_limit){
+      room.player_names.push(req.body.player_name);
+      room.players_left--;
+    }
+    res.send({"accepted":"true"});
+  }
+});
+
 router.post('/create_room', (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   if (rooms.find(x=>x.name===req.body.room_name)){
     //todo popup room already exists?
     res.redirect('/');
@@ -53,14 +70,14 @@ router.post('/create_room', (req, res) => {
     new_room.connections = new Array(new_room.player_limit).fill(null);
   
     //waits for all players to connect then starts the game
-    Helper.waitFor(x=>new_room.player_names.length===new_room.player_limit).then(x=>{
+    Helper.waitFor(x=>new_room.connections.every(function(i) { return i !== null; })).then(x=>{
       console.log("game started");
+      console.log(new_room);
       console.log(rooms[rooms.length-1].player_names);
       new_room.game.setup(new_room.player_limit,new_room.player_names);
       new_room.game.run();
     });
-  
-    res.redirect('/game.html?room='+req.body.room_name); //todo fix, doesnt work
+    res.redirect('/game?room='+req.body.room_name);
   }
 });
 
