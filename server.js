@@ -42,22 +42,22 @@ router.get('/rooms', (req, res) => {
 
 router.post('/create_room', (req, res) => {
   console.log(req.body);
-  //todo check if already exists
   if (rooms.find(x=>x.name===req.body.room_name)){
     //todo popup room already exists?
     res.redirect('/');
   } else {
-    rooms.push({name:req.body.room_name,player_limit:parseInt(req.body.player_limit),players_left:parseInt(req.body.player_limit-1),player_names:[],connections:[]});
-    rooms[rooms.length-1].player_names.push(req.body.player_name);
-    rooms[rooms.length-1].game = new Game();
-    rooms[rooms.length-1].connections = new Array(rooms[rooms.length-1].player_limit).fill(null);
+    let new_room = {name:req.body.room_name,player_limit:parseInt(req.body.player_limit),players_left:parseInt(req.body.player_limit-1),player_names:[],connections:[]};
+    rooms.push(new_room);
+    new_room.player_names.push(req.body.player_name);
+    new_room.game = new Game();
+    new_room.connections = new Array(new_room.player_limit).fill(null);
   
     //waits for all players to connect then starts the game
-    Helper.waitFor(x=>rooms[rooms.length-1].player_names.length===rooms[rooms.length-1].player_limit).then(x=>{
+    Helper.waitFor(x=>new_room.player_names.length===new_room.player_limit).then(x=>{
       console.log("game started");
       console.log(rooms[rooms.length-1].player_names);
-      rooms[rooms.length-1].game.setup(rooms[rooms.length-1].player_limit,rooms[rooms.length-1].player_names);
-      rooms[rooms.length-1].game.run();
+      new_room.game.setup(new_room.player_limit,new_room.player_names);
+      new_room.game.run();
     });
   
     res.redirect('/game.html?room='+req.body.room_name); //todo fix, doesnt work
@@ -66,16 +66,6 @@ router.post('/create_room', (req, res) => {
 
 app.use(config.baseUrl,router);
 http.listen(config.port, () => console.log('server started'));
-
-//debug, starting the game for the default rooms
-for (let room of rooms){
-  Helper.waitFor(x=>room.player_names.length===room.player_limit).then(x=>{
-    console.log("game started");
-    console.log(room.player_names);
-    room.game.setup(room.player_limit,room.player_names);
-    room.game.run();
-  });
-}
 
 io.on('connection', (socket) => {
 
@@ -96,7 +86,9 @@ io.on('connection', (socket) => {
     player_role = cur_room.game.roles[playerIndex];
     console.log(player.name+' connected');
     io.to(cur_room.name).emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
+    console.log("playerindex:",playerIndex,player.index);
     socket.emit('players_data_setup',[cur_room.game.players,playerIndex,player_role,cur_room.game.arrows_left]);
+    
   });
 
   function setup(room_name){
@@ -105,6 +97,7 @@ io.on('connection', (socket) => {
     cur_room = rooms.find(x=>x.name===room_name);
     socket.join(cur_room.name);
 
+    //todo check if playerindex always player.index
     for (let i in cur_room.connections){
       if (cur_room.connections[i] === null){
         playerIndex = parseInt(i);
@@ -112,15 +105,7 @@ io.on('connection', (socket) => {
       }
     }
     if (playerIndex == -1) return
-  
     cur_room.connections[playerIndex] = socket;
-
-      //hides cur_room.game until all players are connected
-    if (cur_room.connections.every(function(i) { return i !== null; })){
-      console.log("All players connected!");
-      console.log(cur_room.game.players);
-      io.sockets.emit("all_players_connected",cur_room.game.players);
-    }
   }
 
   // ending a turn
@@ -255,6 +240,7 @@ io.on('connection', (socket) => {
 
       player.rolled = true;
       console.log(player.name + ' rolled: '+ roll_results.map(x=>x.type));
+      cur_room.game.log.push(player.name + ' rolled: '+ roll_results.map(x=>x.type));
 
       player.cur_dices = roll_results;
 
@@ -270,6 +256,7 @@ io.on('connection', (socket) => {
 
     rerolled_dice.type = player.roll();
     console.log(player.name + ' rerolled: '+ rerolled_dice.type);
+    cur_room.game.log.push(player.name + ' rerolled: '+ rerolled_dice.type);
 
     if (rerolled_dice.type === 0 || rerolled_dice.type === 1 ||rerolled_dice.type === 5){
       player.selections[rerolled_dice_index] = rerolled_dice.type;

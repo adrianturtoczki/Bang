@@ -22,7 +22,6 @@ let socket = io();
       let player_role;
       let player;
 
-      socket.on('all_players_connected',all_players_connected);
       socket.on('a_player_disconnected',a_player_disconnected);
       socket.on('current_turn',current_turn);
       socket.on('players_data_setup', players_data_setup);
@@ -30,13 +29,6 @@ let socket = io();
       socket.on('roll_results',roll_results);
       socket.on('game_end', game_end);
 
-      function all_players_connected(players){
-        document.getElementById('wait_screen').style.display = 'none';
-        document.getElementById('game').classList.toggle('game_wait');
-        
-        players_ar = players;
-        players_alive = players_ar.length;
-      }
 
       function a_player_disconnected(){
         alert('Egy játékos  kilépett. Visszalépés a főoldalra.');
@@ -70,7 +62,7 @@ let socket = io();
         function createPlayer(p,div_to_append){
           let p_div = document.createElement('div');
             p_div.classList.add("player_data");
-            p_div.id=p.name;
+            p_div.id="player_"+p.name;
             let p_div_name = document.createElement('div');
             let p_div_life_arrows_char = document.createElement('div');
             let p_div_life_arrows = document.createElement('div');
@@ -110,6 +102,10 @@ let socket = io();
         }
 
       function players_data_setup([players,index,role,arrows_left]){
+
+        document.getElementById('wait_screen').style.display = 'none';
+        document.getElementById('game').classList.toggle('game_wait');
+
         playerIndex = index;
         player_role = role;
         player = players[index];
@@ -141,7 +137,7 @@ let socket = io();
           let p_data_divs = document.getElementById('other_players').children;
           for (let p of players_ar){
             if (p.index!=playerIndex){
-              p_data_div = document.getElementById(p.name);
+              p_data_div = document.getElementById("player_"+p.name);
               p_data_div.children[0].children[0].children[0].textContent=p.name;
               p_data_div.children[0].children[1].children[0].textContent=p.life;
               p_data_div.children[0].children[1].children[2].textContent=p.arrows;
@@ -179,12 +175,14 @@ let socket = io();
         let dice = player.cur_dices[dice_index];
         document.getElementById("resolve_dropdown").classList.toggle("show");
         player.selections[dice.index] = [dice.type,player_index];
-        print_selections(player.selections);
+        print_selections(player.selections,document.getElementById('selections'));
 
         check_selections(player.selections,document.getElementById('end_turn_button'));
       }
 
-      function print_selections(selections){
+      function print_selections(selections,selections_div){
+        console.log(selections);
+        console.log(players_ar);
         let prettier_selection = '';
         for (let s of selections){
           if (s!=null&&s!=0&&s!=1&&s!=5){
@@ -198,7 +196,7 @@ let socket = io();
         }
 
 
-        document.getElementById('selections').textContent = 'Your selections: '+prettier_selection;
+        selections_div.textContent = 'Your selections: '+prettier_selection;
       }
   
       function dice_dropdown(dice_index) {
@@ -218,7 +216,7 @@ let socket = io();
             console.log("reroll button clicked for "+[dice.type,dice.index]);
             socket.emit('reroll',dice.index);
             player.selections = [];
-            print_selections(player.selections);
+            print_selections(player.selections,document.getElementById('selections'));
             });
             resolve_dropdown_div.appendChild(reroll_button);
           }
@@ -312,7 +310,7 @@ let socket = io();
         console.log("end turn button clicked");
         socket.emit('end_turn',player.selections);
         player.selections = [];
-        print_selections(player.selections);
+        print_selections(player.selections,document.getElementById('selections'));
         player.cur_dices = [];
         document.getElementById('end_turn_button').disabled = true;
       });
@@ -323,8 +321,9 @@ let socket = io();
             player.selections[i] = null;
             }
         }
-        print_selections(player.selections);
+        print_selections(player.selections,document.getElementById('selections'));
       });
+
 
       //TODO: hide dropdown after clicking outside
 
