@@ -196,7 +196,7 @@ let socket = io();
         }
 
 
-        selections_div.textContent = 'Your selections: '+prettier_selection;
+        selections_div.textContent = 'Választott műveletek: '+prettier_selection;
       }
   
       function dice_dropdown(dice_index) {
