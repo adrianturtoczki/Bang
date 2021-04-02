@@ -7,8 +7,8 @@ class Room {
         this.players_left = players_left;
         this.player_names = player_names;
         this.connections = new Array(this.player_limit).fill(null);
-        for (let c of connections){
-            this.connections.push(c);
+        for (let i = 0; i < player_limit; i++){
+            this.connections[i] = connections[i];
         }
         this.game = new Game();
     }
