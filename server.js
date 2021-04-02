@@ -1,6 +1,7 @@
 'use strict';
 
 const Game = require('./game');
+const Room = require('./room');
 const Dice = require('./dice');
 const Helper = require('./helper')
 const express = require('express');
@@ -63,10 +64,9 @@ router.post('/create_room', (req, res) => {
     //todo popup room already exists?
     res.redirect('/');
   } else {
-    let new_room = {name:req.body.room_name,player_limit:parseInt(req.body.player_limit),players_left:parseInt(req.body.player_limit-1),player_names:[],connections:[]};
+    let new_room = new Room(req.body.room_name,parseInt(req.body.player_limit),parseInt(req.body.player_limit-1));
     rooms.push(new_room);
     new_room.player_names.push(req.body.player_name);
-    new_room.game = new Game();
     new_room.connections = new Array(new_room.player_limit).fill(null);
   
     //waits for all players to connect then starts the game
@@ -86,10 +86,11 @@ http.listen(config.port, () => console.log('server started'));
 
 io.on('connection', (socket) => {
 
-  socket.on('end_turn', end_turn);
   socket.on('setup',setup);
+  socket.on('end_turn', end_turn);
   socket.on('roll', roll);
   socket.on('reroll', reroll);
+  socket.on('send_message', send_message); //public, maybe implement private later
   socket.on('disconnect', disconnect);
 
   let cur_room;
@@ -200,7 +201,7 @@ io.on('connection', (socket) => {
 
     setTimeout(() => { //TODO: not ideal, would be better without timeout
       console.log("ending turn .. ");
-      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players.alive]);
+      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players.alive,cur_room.game.log]);
       io.to(cur_room.name).emit('current_turn',cur_room.game.players[cur_room.game.turn_count].name);
    }, 500);
   }
@@ -263,7 +264,7 @@ io.on('connection', (socket) => {
 
       socket.emit('roll_results',[player.cur_dices,player.selections]);
 
-      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
+      io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive,cur_room.game.log]);
 
     }
   }
@@ -286,6 +287,7 @@ io.on('connection', (socket) => {
     let dynamite_dices = player.cur_dices.filter(x=>x.type===1&&x.ability_activated === false);
 
     if (rerolled_dice.type===0){
+      cur_room.game.log.push(player.name+' gets an arrow.');
       player.arrows++;
       cur_room.game.arrows_left--;
 
@@ -296,6 +298,7 @@ io.on('connection', (socket) => {
     }
 
     if (dynamite_dices.length>=3){
+      cur_room.game.log.push(player.name + ' rolled 3 dynamites.');
       player.life--;
       dynamite_dices.forEach(x=>x.ability_activated = true);
       player.cur_dices.forEach(x=>x.rerolls_left = 0);
@@ -303,8 +306,14 @@ io.on('connection', (socket) => {
 
     socket.emit('roll_results',[player.cur_dices,player.selections]);
 
-    io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive]);
+    io.to(cur_room.name).emit('players_data_refresh',[cur_room.game.players,cur_room.game.arrows_left,cur_room.game.players_alive,cur_room.game.log]);
 
+  }
+
+  function send_message(m){
+    console.log(player+" sent message: "+m);
+    cur_room.game.chat.push(player.name+": "+m);
+    io.to(cur_room.name).emit('update_chat',cur_room.game.chat);
   }
 
   //disconnect

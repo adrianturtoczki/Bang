@@ -74,3 +74,26 @@
   #dices img {
     max-width:50px;
   }
+
+  #log{
+    border: 1px solid black;
+    overflow:auto;
+    width: 200px;
+    height: 320px;
+  }
+
+  #chat-div{
+    border: 1px solid black;
+    width: 200px;
+    height: 320px;
+    position:relative;
+  }
+
+  #chat{
+    overflow:auto;
+  }
+
+  #chat-input{
+    position: absolute; 
+    bottom: 0px; 
+  }

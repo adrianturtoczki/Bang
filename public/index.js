@@ -28,7 +28,19 @@ let socket = io();
       socket.on('players_data_refresh',players_data_refresh);
       socket.on('roll_results',roll_results);
       socket.on('game_end', game_end);
+      socket.on('update_chat',update_chat);
 
+      function update_chat(game_chat){
+          //printing chat
+          let chat_id = document.getElementById('chat');
+          chat_id.innerHTML = '';
+          console.log(game_chat)
+          for (let i = game_chat.length-1; i > 0; i--){
+            let p = document.createElement('p');
+            p.appendChild(document.createTextNode(game_chat[i]));
+            chat_id.appendChild(p);
+          }
+      }
 
       function a_player_disconnected(){
         alert('Egy játékos  kilépett. Visszalépés a főoldalra.');
@@ -127,7 +139,7 @@ let socket = io();
         }
       }
 
-      function players_data_refresh([players,arrows_left,p_alive]){
+      function players_data_refresh([players,arrows_left,p_alive,game_log]){
         players_ar = players;
         player = players_ar[playerIndex];
         players_alive = p_alive;
@@ -146,6 +158,17 @@ let socket = io();
               }
             }
           document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
+
+          //printing logs
+          let log_id = document.getElementById('log');
+          log_id.innerHTML = '';
+          console.log(game_log)
+          for (let i = game_log.length-1; i > 0; i--){
+            let p = document.createElement('p');
+            p.appendChild(document.createTextNode(game_log[i]));
+            log_id.appendChild(p);
+          }
+          
       }
 
       function roll_results([roll_result,selections]){
@@ -323,6 +346,11 @@ let socket = io();
         }
         print_selections(player.selections,document.getElementById('selections'));
       });
+      document.getElementById('chat-input').addEventListener('submit',function(event){
+        event.preventDefault();
+        socket.emit("send_message",document.getElementById('chat-input-text').value);
+      });
+
 
 
       //TODO: hide dropdown after clicking outside
