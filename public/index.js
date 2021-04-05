@@ -71,7 +71,7 @@ let socket = io();
           }
         }
 
-        function createPlayer(p,div_to_append){
+        function createPlayer(p,div_to_append,player_role){
           let p_div = document.createElement('div');
             p_div.classList.add("player_data");
             p_div.id="player_"+p.name;
@@ -92,7 +92,7 @@ let socket = io();
             p_life.appendChild(document.createTextNode(p.life));
             p_arrows.appendChild(document.createTextNode(p.arrows));
             p_char.src = 'images/c_'+p.character.name+'.jpg';
-            p_role.src= 'images/r_'+p.role+'.jpg';
+            p_role.src= 'images/r_'+player_role+'.jpg';
             p_arrows_img.src='images/arrow.png';
             p_arrows_img.style.height="50px";
             p_life_img.src='images/bullet.png';
@@ -124,12 +124,13 @@ let socket = io();
 
         cur_player_data(player);
 
-        createPlayer(player,document.getElementById("player"));
+        console.log(player_role);
+        createPlayer(player,document.getElementById("player"),player_role);
 
         document.getElementById('other_players').innerHTML='';
       for (let p of players){
           if (p!=player){
-            createPlayer(p,document.getElementById('other_players'));
+            createPlayer(p,document.getElementById('other_players'),p.role);
             }
           document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
         }

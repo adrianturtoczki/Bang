@@ -1,6 +1,6 @@
 const Player = require('./player');
 const Character = require('./character');
-const Helper = require('./helper');
+const {waitFor} = require('./helper');
 
 class Game {
     constructor(){
@@ -24,7 +24,7 @@ class Game {
                 if (p.life>0){
                     p.cur_turn = true;
                     console.log(p.name+"'s round");
-                    await Helper.waitFor(_ => p.turn_end === true).then(_ => {
+                    await waitFor(_ => p.turn_end === true).then(_ => {
                         console.log(p.name+"'s turn over!");
                         console.log(p);
                         p.cur_turn = false;
