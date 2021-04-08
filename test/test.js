@@ -28,8 +28,8 @@ describe("my awesome project", () => {
       });
 
       waitFor(x=>server.rooms[0].connections.every(function(i) { return i !== null; })).then(_ => {
-        server.rooms[0].game.setup(server.rooms[0].player_limit,server.rooms[0].player_names);
-        server.rooms[0].game.run();
+        room.game.setup(server.rooms[0].player_limit,server.rooms[0].player_names);
+        room.game.run();
         done();
     });
     });
@@ -51,12 +51,52 @@ describe("my awesome project", () => {
     expect(room.game.players.map(x=>x.name)).toEqual(["player 1","player 2","player 3", "player 4"]);
   })
 
-  test("send_message", (done) => {
+  test("check_arrows_left", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
-      expect(room.game.chat).toEqual([]);
-      clients[0].send_message("test");
-      expect(room.game.chat).toEqual(["player 1: test"]);
+      //check if arrows_left>0
+      clients[0].cur_room.arrows_left = 4;
+      clients[0].player.arrows = 5;
+      clients[0].check_arrows_left();
+      //sheriffs have +2 health
+      if (clients[0].player.role==="sheriff"){
+        expect(clients[0].player.life).toEqual(clients[0].player.character.life+2);
+      } else {
+        expect(clients[0].player.life).toEqual(clients[0].player.character.life);
+      }
+      expect(clients[0].player.arrows).toEqual(5);
+
+      clients[0].cur_room.arrows_left = 0;
+      clients[0].player.arrows = 1;
+      clients[0].check_arrows_left();
+      //sheriffs have +2 health
+      if (clients[0].player.role==="sheriff"){
+        expect(clients[0].player.life).toEqual(clients[0].player.character.life+1);
+      } else {
+        expect(clients[0].player.life).toEqual(clients[0].player.character.life-1);
+      }
+      expect(clients[0].player.arrows).toEqual(0);
       done();
     });
   });
+  test("roll", (done) => {
+    waitFor(x=>clients[0].player).then(x=>{
+      expect(clients[0].player.cur_dices).toEqual([]);
+      clients[0].roll();
+      expect(clients[0].player.cur_dices.length).toEqual(5);
+      //if player rolled an arrow or 3 dynamites, check if the effects work
+      //if (clients[0].player.cur_dices)
+      done();
+    });
+  });
+
+  test("reroll", (done) => {
+    waitFor(x=>clients[0].player).then(x=>{
+      clients[0].roll();
+      //if player rolled an arrow or 3 dynamites, check the effects at the initial roll
+      clients[0].reroll(0);
+      //check the reroll's effect
+      done();
+    });
+  });
+
 });
