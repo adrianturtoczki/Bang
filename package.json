@@ -16,7 +16,7 @@
     "jest": "^26.6.3"
   },
   "scripts": {
-    "test": "jest --verbose",
+    "test": "jest",
     "start": "node server.js"
   },
   "author": "Adrian Turtoczki",

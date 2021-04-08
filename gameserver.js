@@ -21,8 +21,13 @@ class GameServer{
       extended: true
     }))
     app.use(express.json());
+
+    this.clients = [];
     
     this.rooms = [];
+
+    this.http = http;
+    this.io = io;
     
     router.get('/', (req, res) => {
       console.log('/');
@@ -36,7 +41,7 @@ class GameServer{
     router.get('/game', (req, res) => {
       console.log("/game");
       let room = this.rooms.find(x=>x.name==req.query.room);
-      console.log(room.game);
+      //console.log(room.game);
       if (room.game.started==false){
         res.sendFile(path.join(__dirname + '/public/game.html'));
       } else {
@@ -48,7 +53,7 @@ class GameServer{
       console.log('/join_room');
       let room = this.rooms.find(x=>x.name==req.body.room_name);
       //checks if name already in room
-      console.log(req.body.player_name,room.player_names);
+      //console.log(req.body.player_name,room.player_names);
       if (room.player_names.includes(req.body.player_name)){
         console.log("error: name already in room!",req.body.player_name,room.player_names);
         res.send({"accepted":"false"}); //todo fix
@@ -75,8 +80,8 @@ class GameServer{
         //waits for all players to connect then starts the game
         waitFor(x=>new_room.connections.every(function(i) { return i !== null; })).then(x=>{
           console.log("game started");
-          console.log(new_room);
-          console.log(this.rooms[this.rooms.length-1].player_names);
+          //console.log(new_room);
+          //console.log(this.rooms[this.rooms.length-1].player_names);
           new_room.game.setup(new_room.player_limit,new_room.player_names);
           new_room.game.run();
         });
@@ -88,9 +93,9 @@ class GameServer{
     http.listen(config.port, () => console.log('server started'));
 
     io.on('connection', (socket) => {
-      console.log(this);
+      //console.log(this);
       let client = new GameClient(socket,io,this);
-  
+      //this.clients.push(client);
     });
   }
 }

@@ -5,8 +5,6 @@ const Dice = require('./dice');
 
 class GameClient{
     constructor(socket,io,server){
-        console.log(server);
-        console.log(server.rooms);
         this.socket = socket;
         this.io = io;
         this.server = server;
@@ -30,22 +28,11 @@ class GameClient{
         this.socket.on('disconnect', this.disconnect);
 
         waitFor(x=>this.cur_room&&this.cur_room.game.started).then(x=>{
-            this.player = this.cur_room.game.players[this.playerIndex];
-            this.player.index = this.playerIndex;
-            this.player_role = this.cur_room.game.roles[this.playerIndex];
-            console.log(this.player.name+' connected');
-            this.io.to(this.cur_room.name).emit('current_turn',this.cur_room.game.players[this.cur_room.game.turn_count].name);
-            console.log("playerIndex:",this.playerIndex,this.player.index);
-            console.log("player_role:",this.player_role);
-            this.socket.emit('players_data_setup',[this.cur_room.game.players,this.playerIndex,this.player_role,this.cur_room.game.arrows_left]);
-            
+            this.setup_all_connected();
           });
     }
     setup(room_name){
-        console.log("setup "+room_name);
-        console.log(this.server);
-        console.log(this.server.rooms);
-        console.log(this.server.rooms.find(x=>x.name===room_name));
+        //console.log("setup "+room_name);
         this.cur_room = this.server.rooms.find(x=>x.name===room_name);
         this.socket.join(this.cur_room.name);
     
@@ -59,13 +46,26 @@ class GameClient{
         if (this.playerIndex == -1) return
         this.cur_room.connections[this.playerIndex] = this.socket;
       }
+
+    setup_all_connected(){
+      //console.log("setup_all_connected");
+      this.player = this.cur_room.game.players[this.playerIndex];
+      this.player.index = this.playerIndex;
+      this.player_role = this.cur_room.game.roles[this.playerIndex];
+      //console.log(this.player.name+' connected');
+      this.io.to(this.cur_room.name).emit('current_turn',this.cur_room.game.players[this.cur_room.game.turn_count].name);
+      //console.log("playerIndex:",this.playerIndex,this.player.index);
+      //console.log("player_role:",this.player_role);
+      //console.log(this.cur_room.game.players,this.playerIndex);
+      this.socket.emit('players_data_setup',[this.cur_room.game.players,this.playerIndex,this.player_role,this.cur_room.game.arrows_left]);
+    }
     
     // ending a turn
     end_turn(selections){
       let alive_players = this.cur_room.game.players.filter(x=>x.life>0);
   
       //resolving
-      console.log('resolving '+this.player.name+"'s turn ..");
+      //console.log('resolving '+this.player.name+"'s turn ..");
   
       //character check: suzy lafayette
       if (this.player.name==='suzy_lafayette'&&selections.filter(x=>x[0]===2||x[0]===3).length === 0){
@@ -80,10 +80,10 @@ class GameClient{
   
       for (let s of selections){
         if (s!=null){
-          console.log("resolving " +s+ " ..");
+          //console.log("resolving " +s+ " ..");
           let dice_type = s[0];
           let selected_player = this.cur_room.game.players[s[1]];
-          console.log(dice_type,selected_player);
+          //console.log(dice_type,selected_player);
           if (dice_type===2||dice_type===3){
             selected_player.life--;
           } else if (dice_type===4&&selected_player.life<selected_player.starting_life){
@@ -99,7 +99,7 @@ class GameClient{
   
       let gatling_dices = selections.filter(x=>x===5);
       //character check: willy the kid
-      console.log("teszt: "+gatling_dices.length+" : "+this.player.character.name);
+      //console.log("teszt: "+gatling_dices.length+" : "+this.player.character.name);
       if (gatling_dices.length>=3||(gatling_dices.length===2&&this.player.character.name==='willy_the_kid')){
         this.cur_room.game.arrows_left+=this.player.arrows;
         this.player.arrows = 0;
@@ -245,7 +245,7 @@ class GameClient{
     }
     
     send_message(m){
-      console.log(this.player+" sent message: "+m);
+      console.log(this.player.name+" sent message: "+m);
       this.cur_room.game.chat.push(this.player.name+": "+m);
       this.io.to(this.cur_room.name).emit('update_chat',this.cur_room.game.chat);
     }
@@ -257,6 +257,7 @@ class GameClient{
       if (this.server.rooms.indexOf(this.cur_room)!=-1){
         this.server.rooms.splice(this.server.rooms.indexOf(this.cur_room),1);
       }
+      //this.server.clients.remove(this);
     }
 }
 
