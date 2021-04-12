@@ -27,7 +27,7 @@
   }
 
 
-  .player_row{
+  .playerRow{
     display:flex;
   }
 
@@ -41,7 +41,7 @@
     flex-wrap: wrap;
   }
 
-  #other_players{
+  #otherPlayers{
     display:flex;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -83,7 +83,7 @@
     height: 320px;
   }
 
-  #chat-div{
+  #chatDiv{
     border: 1px solid black;
     border-radius: 25px;
     width: 200px;
@@ -95,7 +95,7 @@
     overflow:auto;
   }
 
-  #chat-input{
+  #chatInput{
     position: absolute; 
     bottom: 0px; 
   }

@@ -53,13 +53,13 @@ class GameServer{
       console.log('/join_room');
       let room = this.rooms.find(x=>x.name==req.body.room_name);
       //checks if name already in room
-      //console.log(req.body.player_name,room.player_names);
-      if (room.player_names.includes(req.body.player_name)){
-        console.log("error: name already in room!",req.body.player_name,room.player_names);
+      //console.log(req.body.player_name,room.playerNames);
+      if (room.playerNames.includes(req.body.player_name)){
+        console.log("error: name already in room!",req.body.player_name,room.playerNames);
         res.send({"accepted":"false"}); //todo fix
       } else {
-        if (room.player_names.length<room.player_limit){
-          room.player_names.push(req.body.player_name);
+        if (room.playerNames.length<room.playerLimit){
+          room.playerNames.push(req.body.player_name);
           room.players_left--;
         }
         res.send({"accepted":"true"});
@@ -72,17 +72,14 @@ class GameServer{
         //todo popup room already exists?
         res.redirect('/');
       } else {
-        let new_room = new Room(req.body.room_name,parseInt(req.body.player_limit),parseInt(req.body.player_limit-1));
+        let new_room = new Room(req.body.room_name,parseInt(req.body.playerLimit),parseInt(req.body.playerLimit-1));
         this.rooms.push(new_room);
-        new_room.player_names.push(req.body.player_name);
-        new_room.connections = new Array(new_room.player_limit).fill(null);
+        new_room.addPlayer(req.body.player_name);
       
         //waits for all players to connect then starts the game
         waitFor(x=>new_room.connections.every(function(i) { return i !== null; })).then(x=>{
           console.log("game started");
-          //console.log(new_room);
-          //console.log(this.rooms[this.rooms.length-1].player_names);
-          new_room.game.setup(new_room.player_limit,new_room.player_names);
+          new_room.game.setup(new_room.playerLimit,new_room.playerNames);
           new_room.game.run();
         });
         res.redirect('/game?room='+req.body.room_name);
@@ -93,9 +90,7 @@ class GameServer{
     http.listen(config.port, () => console.log('server started'));
 
     io.on('connection', (socket) => {
-      //console.log(this);
       let client = new GameClient(socket,io,this);
-      //this.clients.push(client);
     });
   }
 }

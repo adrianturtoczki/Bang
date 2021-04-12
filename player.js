@@ -12,14 +12,14 @@ class Player {
         } else {
             this.role = '';
         }
-        this.starting_life = this.life;
+        this.startingLife = this.life;
         this.arrows = 0;
 
         this.rolled=false;
-        this.cur_dices = [];
+        this.curDices = [];
         this.selections = [];
-        this.cur_turn = false;
-        this.turn_end = false;
+        this.curTurn = false;
+        this.turnEnd = false;
 
     }
     roll(){

@@ -1,20 +1,27 @@
 const Game = require("./game");
 
 class Room {
-    constructor(room_name,player_limit,players_left,player_names=[],connections=[]){
+    constructor(room_name,playerLimit,players_left,playerNames=[],connections=[]){
         this.name = room_name;
-        this.player_limit = player_limit;
+        this.playerLimit = playerLimit;
         this.players_left = players_left;
-        this.player_names = player_names;
+        this.playerNames = playerNames;
         if (connections.length===0){
-            this.connections = new Array(this.player_limit).fill(null);
+            this.connections = new Array(this.playerLimit).fill(null);
         } else {
-            for (let i = 0; i < player_limit; i++){
+            for (let i = 0; i < playerLimit; i++){
                 this.connections[i] = connections[i];
             }
         }
         this.game = new Game();
     }
+
+    addPlayer(new_player_name){
+         if (this.playerNames.length<this.playerLimit){
+             this.playerNames.push(new_player_name);
+         }
+    }
+
 }
 
 module.exports = Room;

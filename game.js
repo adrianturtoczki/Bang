@@ -8,9 +8,9 @@ class Game {
         this.players = [];
         this.roles = []; //separated from players so they don't get sent to everyone
         this.end = false;
-        this.round_count = 1;
-        this.turn_count = 0;
-        this.arrows_left = 9;
+        this.roundCount = 1;
+        this.turnCount = 0;
+        this.arrowsLeft = 9;
         this.log = [];
         this.chat = [];
     }
@@ -22,107 +22,107 @@ class Game {
             for (let p of this.players){
                 this.log.push("New turn");
                 if (p.life>0){
-                    p.cur_turn = true;
+                    p.curTurn = true;
                     console.log(p.name+"'s round");
-                    await waitFor(_ => p.turn_end === true).then(_ => {
+                    await waitFor(_ => p.turnEnd === true).then(_ => {
                         console.log(p.name+"'s turn over!");
                         console.log(p);
-                        p.cur_turn = false;
-                        p.turn_end = false;
+                        p.curTurn = false;
+                        p.turnEnd = false;
                         p.rolled = false;
-                        p.cur_dices = [];
+                        p.curDices = [];
                         p.selections = [];
-                        console.log(this.turn_count)
+                        console.log(this.turnCount)
                     });
                 }
-                this.turn_count++;
+                this.turnCount++;
             }
-            this.turn_count = 0;
-            this.round_count++;
+            this.turnCount = 0;
+            this.roundCount++;
         }
         this.started = false;
     }
 
 
-    setup(player_number,player_names){
+    setup(playerNumber,playerNames){
         this.players = [];
         let characters = ["paul_regret","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid","calamity_janet","rose_doolan"];
-        let role_ar = ["sheriff","renegade","outlaw","outlaw","deputy","outlaw","deputy","renegade"].slice(0,player_number);
+        let roleAr = ["sheriff","renegade","outlaw","outlaw","deputy","outlaw","deputy","renegade"].slice(0,playerNumber);
 
-        for(var i = 0;i<player_number;i++){
-            let p_role = role_ar[i];
-            this.roles.push(p_role);
-            let p_char = new Character(characters.splice(Math.floor(Math.random()*characters.length), 1)[0]);
-            this.players.push(new Player(player_names[i],p_role,p_char));
+        for(var i = 0;i<playerNumber;i++){
+            let pRole = roleAr[i];
+            this.roles.push(pRole);
+            let pChar = new Character(characters.splice(Math.floor(Math.random()*characters.length), 1)[0]);
+            this.players.push(new Player(playerNames[i],pRole,pChar));
           }
-        this.players_alive = player_number;
+        this.playersAlive = playerNumber;
     }
 
-    check_win_conditions(player_number){
-        let sheriff_alive;
-        let deputies_alive;
-        let renegades_alive;
-        let outlaws_alive;
-        switch(player_number){
+    checkWinConditions(playerNumber){
+        let sheriffAlive;
+        let deputiesAlive;
+        let renegadesAlive;
+        let outlawsAlive;
+        switch(playerNumber){
             case 4:
-                sheriff_alive = 1;
-                deputies_alive = 0;
-                renegades_alive = 1;
-                outlaws_alive = 2;
+                sheriffAlive = 1;
+                deputiesAlive = 0;
+                renegadesAlive = 1;
+                outlawsAlive = 2;
                 break;
             case 5:
-                sheriff_alive = 1;
-                deputies_alive = 1;
-                renegades_alive = 1;
-                outlaws_alive = 2;
+                sheriffAlive = 1;
+                deputiesAlive = 1;
+                renegadesAlive = 1;
+                outlawsAlive = 2;
                 break;
             case 6:
-                sheriff_alive = 1;
-                deputies_alive = 1;
-                renegades_alive = 1;
-                outlaws_alive = 3;
+                sheriffAlive = 1;
+                deputiesAlive = 1;
+                renegadesAlive = 1;
+                outlawsAlive = 3;
                 break;
             case 7:
-                sheriff_alive = 1;
-                deputies_alive = 2;
-                renegades_alive = 1;
-                outlaws_alive = 3;
+                sheriffAlive = 1;
+                deputiesAlive = 2;
+                renegadesAlive = 1;
+                outlawsAlive = 3;
                 break;
             case 8:
-                sheriff_alive = 1;
-                deputies_alive = 2;
-                renegades_alive = 2;
-                outlaws_alive = 3;
+                sheriffAlive = 1;
+                deputiesAlive = 2;
+                renegadesAlive = 2;
+                outlawsAlive = 3;
                 break;
         }
         for (let p of this.players){
             if (p.life===0){
-                this.players_alive--;
+                this.playersAlive--;
                 switch(this.roles[p.index]){
                     case "sheriff":
-                        sheriff_alive--;
+                        sheriffAlive--;
                         break;
                     case "deputy":
-                        deputies_alive--;
+                        deputiesAlive--;
                         break;
                     case "renegade":
-                        renegades_alive--;
+                        renegadesAlive--;
                         break;
                     case "outlaw":
-                        outlaws_alive--;
+                        outlawsAlive--;
                         break;
                 }
             }
         }
-        if (sheriff_alive===1&&renegades_alive<=0&&outlaws_alive<=0){
+        if (sheriffAlive===1&&renegadesAlive<=0&&outlawsAlive<=0){
             this.end = true;
             return "seriff";
         }
-        else if (sheriff_alive<=0&&deputies_alive<=0&&outlaws_alive>0){
+        else if (sheriffAlive<=0&&deputiesAlive<=0&&outlawsAlive>0){
             this.end=true;
             return "banditák";
         }
-        else if (renegades_alive>1&&sheriff_alive<=0&&deputies_alive<=0&&outlaws_alive<=0){
+        else if (renegadesAlive>1&&sheriffAlive<=0&&deputiesAlive<=0&&outlawsAlive<=0){
             this.end=true;
             return "renegát";
         }

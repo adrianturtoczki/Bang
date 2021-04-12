@@ -16,18 +16,18 @@ let socket = io();
       document.getElementById('dices').appendChild(d4);
       document.getElementById('dices').appendChild(d5);
 
-      let players_alive;
-      let players_ar = [];
+      let playersAlive;
+      let playersAr = [];
       let playerIndex = -1;
-      let player_role;
+      let playerRole;
       let player;
 
       socket.on('a_player_disconnected',a_player_disconnected);
       socket.on('current_turn',current_turn);
       socket.on('players_data_setup', players_data_setup);
       socket.on('players_data_refresh',players_data_refresh);
-      socket.on('roll_results',roll_results);
-      socket.on('game_end', game_end);
+      socket.on('rollResults',rollResults);
+      socket.on('gameEnd', gameEnd);
       socket.on('update_chat',update_chat);
 
       function update_chat(game_chat){
@@ -48,7 +48,7 @@ let socket = io();
       }
 
       function current_turn(turn_name){
-        document.getElementById('cur_turn').textContent='Jelenlegi kör: '+turn_name;
+        document.getElementById('curTurn').textContent='Jelenlegi kör: '+turn_name;
       }
 
       function cur_player_data(player) {
@@ -58,41 +58,41 @@ let socket = io();
         //document.getElementById('player_health_number').textContent=player.life;
         //document.getElementById('player_arrow_number').textContent=player.arrows;
 
-        if (player.cur_turn===true&&player.rolled===false){
+        if (player.curTurn===true&&player.rolled===false){
           document.getElementById('dices').style.display = 'none';
           document.getElementById("roll").style.display = "block";
         } else {
           document.getElementById("roll").style.display = "none";
         }
-        if (player.cur_turn===true){
-          document.getElementById("roll_div").style.display = "block";
+        if (player.curTurn===true){
+          document.getElementById("rollDiv").style.display = "block";
         } else {
-          document.getElementById("roll_div").style.display = "none";
+          document.getElementById("rollDiv").style.display = "none";
           }
         }
 
-        function createPlayer(p,div_to_append,player_role){
+        function createPlayer(p,div_to_append,playerRole){
           let p_div = document.createElement('div');
             p_div.classList.add("player_data");
             p_div.id="player_"+p.name;
             let p_div_name = document.createElement('div');
             let p_div_life_arrows_char = document.createElement('div');
             let p_div_life_arrows = document.createElement('div');
-            let p_role_div = document.createElement('div');
+            let pRole_div = document.createElement('div');
             let p_name = document.createElement('h3');
             let p_life = document.createElement('p');
             let p_arrows = document.createElement('p');
             let p_life_img = document.createElement('img');
             let p_arrows_img = document.createElement('img');
-            let p_char = document.createElement('img');
-            p_char.classList.add("char_img");
-            let p_role = document.createElement('img');
-            p_role.classList.add("role_img");
+            let pChar = document.createElement('img');
+            pChar.classList.add("char_img");
+            let pRole = document.createElement('img');
+            pRole.classList.add("role_img");
             p_name.appendChild(document.createTextNode(p.name));
             p_life.appendChild(document.createTextNode(p.life));
             p_arrows.appendChild(document.createTextNode(p.arrows));
-            p_char.src = 'images/c_'+p.character.name+'.jpg';
-            p_role.src= 'images/r_'+player_role+'.jpg';
+            pChar.src = 'images/c_'+p.character.name+'.jpg';
+            pRole.src= 'images/r_'+playerRole+'.jpg';
             p_arrows_img.src='images/arrow.png';
             p_arrows_img.style.height="50px";
             p_life_img.src='images/bullet.png';
@@ -106,49 +106,49 @@ let socket = io();
             p_div_life_arrows.classList.add("bullets_arrows_div");
             p_div_life_arrows_char.appendChild(p_div_name);
             p_div_life_arrows_char.appendChild(p_div_life_arrows);
-            p_div_life_arrows_char.appendChild(p_char);
+            p_div_life_arrows_char.appendChild(pChar);
             p_div.appendChild(p_div_life_arrows_char);
-            p_role_div.appendChild(p_role);
-            p_div.appendChild(p_role_div);
+            pRole_div.appendChild(pRole);
+            p_div.appendChild(pRole_div);
             div_to_append.appendChild(p_div);
         }
 
-      function players_data_setup([players,index,role,arrows_left]){
+      function players_data_setup([players,index,role,arrowsLeft]){
 
         document.getElementById('wait_screen').style.display = 'none';
         document.getElementById('game').classList.toggle('game_wait');
 
         playerIndex = index;
-        player_role = role;
+        playerRole = role;
         player = players[index];
 
         cur_player_data(player);
 
-        console.log(player_role);
-        createPlayer(player,document.getElementById("player"),player_role);
+        console.log(playerRole);
+        createPlayer(player,document.getElementById("player"),playerRole);
 
-        document.getElementById('other_players').innerHTML='';
+        document.getElementById('otherPlayers').innerHTML='';
       for (let p of players){
           if (p!=player){
-            createPlayer(p,document.getElementById('other_players'),p.role);
+            createPlayer(p,document.getElementById('otherPlayers'),p.role);
             }
-          document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
+          document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
         }
 
-        if (player.rolled&&player.cur_dices!=[]){
-          draw_dice(player.cur_dices);
+        if (player.rolled&&player.curDices!=[]){
+          drawDice(player.curDices);
         }
       }
 
-      function players_data_refresh([players,arrows_left,p_alive,game_log]){
-        players_ar = players;
-        player = players_ar[playerIndex];
-        players_alive = p_alive;
+      function players_data_refresh([players,arrowsLeft,pAlive,game_log]){
+        playersAr = players;
+        player = playersAr[playerIndex];
+        playersAlive = pAlive;
         cur_player_data(players[playerIndex]);
 
           //other players data
-          let p_data_divs = document.getElementById('other_players').children;
-          for (let p of players_ar){
+          let p_data_divs = document.getElementById('otherPlayers').children;
+          for (let p of playersAr){
             if (p.index!=playerIndex){
               p_data_div = document.getElementById("player_"+p.name);
               p_data_div.children[0].children[0].children[0].textContent=p.name;
@@ -158,7 +158,7 @@ let socket = io();
               if (p.life<=0) p_data_div.children[0].children[2].src= 'images/r_'+p.role+'.jpg';
               }
             }
-          document.getElementById('arrows_left').textContent = 'Maradt '+arrows_left+' nyíl';
+          document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
 
           //printing logs
           let log_id = document.getElementById('log');
@@ -172,130 +172,130 @@ let socket = io();
           
       }
 
-      function roll_results([roll_result,selections]){
-        player.cur_dices = roll_result;
+      function rollResults([roll_result,selections]){
+        player.curDices = roll_result;
         player.selections = selections;
 
 
-        draw_dice(player.cur_dices);
-        check_selections(selections,document.getElementById('end_turn_button'));
+        drawDice(player.curDices);
+        checkSelections(selections,document.getElementById('endTurnButton'));
       }
 
-      function game_end(winner){
+      function gameEnd(winner){
         alert('Nyert: '+winner);
         window.location.href = '/';
       }
 
 
-      function check_selections(selections,end_turn_button){
+      function checkSelections(selections,endTurnButton){
         if (selections.filter(x=>x!=null).length===5){
-          end_turn_button.disabled = false;
+          endTurnButton.disabled = false;
         } else {
-          end_turn_button.disabled = true;
+          endTurnButton.disabled = true;
         }
       }
 
-      function select_target(dice_index,player_index){
-        let dice = player.cur_dices[dice_index];
-        document.getElementById("resolve_dropdown").classList.toggle("show");
-        player.selections[dice.index] = [dice.type,player_index];
+      function selectTarget(diceIndex,playerIndex){
+        let dice = player.curDices[diceIndex];
+        document.getElementById("resolveDropdown").classList.toggle("show");
+        player.selections[dice.index] = [dice.type,playerIndex];
         print_selections(player.selections,document.getElementById('selections'));
 
-        check_selections(player.selections,document.getElementById('end_turn_button'));
+        checkSelections(player.selections,document.getElementById('endTurnButton'));
       }
 
-      function print_selections(selections,selections_div){
+      function print_selections(selections,selectionsDiv){
         console.log(selections);
-        console.log(players_ar);
-        let prettier_selection = '';
+        console.log(playersAr);
+        let prettierSelection = '';
         for (let s of selections){
           if (s!=null&&s!=0&&s!=1&&s!=5){
             if (s[0]===2||s[0]===3){
-              prettier_selection+="Célkereszt->";
+              prettierSelection+="Célkereszt->";
             } else if (s[0]===4){
-              prettier_selection+="Sör ->";
+              prettierSelection+="Sör ->";
             }
-            prettier_selection+=players_ar[s[1]].name+';';
+            prettierSelection+=playersAr[s[1]].name+';';
           }
         }
 
 
-        selections_div.textContent = 'Választott műveletek: '+prettier_selection;
+        selectionsDiv.textContent = 'Választott műveletek: '+prettierSelection;
       }
   
-      function dice_dropdown(dice_index) {
-        let resolve_dropdown_div = document.getElementById('resolve_dropdown');
-        resolve_dropdown_div.innerHTML='';
-        let dice = player.cur_dices[dice_index];
+      function diceDropdown(diceIndex) {
+        let resolveDropdownDiv = document.getElementById('resolveDropdown');
+        resolveDropdownDiv.innerHTML='';
+        let dice = player.curDices[diceIndex];
 
         if (dice.type!=1){
-          document.getElementById("resolve_dropdown").classList.toggle("show");
+          document.getElementById("resolveDropdown").classList.toggle("show");
         }
-        if (dice.rerolls_left>0){
+        if (dice.rerollsLeft>0){
           //reroll
           let reroll_button = document.createElement('p');
-          reroll_button.appendChild(document.createTextNode("Újradobás ("+dice.rerolls_left+" maradt)"));
+          reroll_button.appendChild(document.createTextNode("Újradobás ("+dice.rerollsLeft+" maradt)"));
           reroll_button.addEventListener('click',function(){
-            document.getElementById("resolve_dropdown").classList.toggle("show");
+            document.getElementById("resolveDropdown").classList.toggle("show");
             console.log("reroll button clicked for "+[dice.type,dice.index]);
             socket.emit('reroll',dice.index);
             player.selections = [];
             print_selections(player.selections,document.getElementById('selections'));
             });
-            resolve_dropdown_div.appendChild(reroll_button);
+            resolveDropdownDiv.appendChild(reroll_button);
           }
 
-          let alive_players = players_ar.filter(x=>x.life>0);
+          let alive_players = playersAr.filter(x=>x.life>0);
 
           //players the player can effect with the dice
           if (dice.type===2||dice.type===3||dice.type===4){
-            let prev_player,next_player;
+            let prevPlayer,nextPlayer;
 
-            let alive_index = alive_players.findIndex(x=>x===player);
+            let aliveIndex = alive_players.findIndex(x=>x===player);
 
-            let shooting_distances = [];
+            let shootingDistances = [];
             if (dice.type===2||(dice.type===3&&alive_players.length<=3)){
-              shooting_distances.push(1);
+              shootingDistances.push(1);
               } else if (dice.type===3){
-                shooting_distances.push(2);
+                shootingDistances.push(2);
               }
               
             //character check: calamity jane
             if (player.character.name==="calamity_janet"){
-              if (shooting_distances[0]==1){
-                shooting_distances.push(2);
+              if (shootingDistances[0]==1){
+                shootingDistances.push(2);
               } else{
-                shooting_distances.push(1);
+                shootingDistances.push(1);
               }
             }
             //character check: rose doolan
             if (player.character.name==="rose_doolan"){
-              shooting_distances.push(shooting_distances[0]+1);
+              shootingDistances.push(shootingDistances[0]+1);
             }
 
             if (dice.type===2||dice.type===3){ //arrow2
-              for (let shooting_distance of shooting_distances){
+              for (let shootingDistance of shootingDistances){
                 let p_name = document.createElement('p');
                 let n_name = document.createElement('p');
-                console.log(shooting_distances)
-                if (alive_index < shooting_distance){
-                  prev_player = alive_players[alive_index-shooting_distance+alive_players.length];
+                console.log(shootingDistances)
+                if (aliveIndex < shootingDistance){
+                  prevPlayer = alive_players[aliveIndex-shootingDistance+alive_players.length];
                 } else {
-                  prev_player = alive_players[alive_index-shooting_distance];
+                  prevPlayer = alive_players[aliveIndex-shootingDistance];
                 }
-                if (alive_index >= alive_players.length-shooting_distance){
-                  next_player = alive_players[alive_index+shooting_distance-alive_players.length];
+                if (aliveIndex >= alive_players.length-shootingDistance){
+                  nextPlayer = alive_players[aliveIndex+shootingDistance-alive_players.length];
                 }  else {
-                  next_player = alive_players[alive_index+shooting_distance];
+                  nextPlayer = alive_players[aliveIndex+shootingDistance];
                 }
-                p_name.appendChild(document.createTextNode(prev_player.name));
-                n_name.appendChild(document.createTextNode(next_player.name));
-                p_name.setAttribute('onclick','select_target('+dice.index+','+prev_player.index+')');
-                n_name.setAttribute('onclick','select_target('+dice.index+','+next_player.index+')'); 
+                p_name.appendChild(document.createTextNode(prevPlayer.name));
+                n_name.appendChild(document.createTextNode(nextPlayer.name));
+                p_name.setAttribute('onclick','selectTarget('+dice.index+','+prevPlayer.index+')');
+                n_name.setAttribute('onclick','selectTarget('+dice.index+','+nextPlayer.index+')'); 
   
-                resolve_dropdown_div.appendChild(p_name);
-                if (prev_player!=next_player){
-                  resolve_dropdown_div.appendChild(n_name);
+                resolveDropdownDiv.appendChild(p_name);
+                if (prevPlayer!=nextPlayer){
+                  resolveDropdownDiv.appendChild(n_name);
                   }
                 }
               } else if (dice.type===4){ //beer
@@ -303,20 +303,20 @@ let socket = io();
                 for (let p of alive_players){
                   let b_name = document.createElement('p');
                   b_name.appendChild(document.createTextNode(p.name));
-                  b_name.setAttribute('onclick','select_target('+dice.index+','+p.index+')');
-                  resolve_dropdown_div.appendChild(b_name);
+                  b_name.setAttribute('onclick','selectTarget('+dice.index+','+p.index+')');
+                  resolveDropdownDiv.appendChild(b_name);
                 }
               }
             }
         }
 
 
-      function draw_dice(dices){
+      function drawDice(dices){
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
           dice_elements[i].src = 'images/d'+(dices[i].type)+'.png';
-          dice_elements[i].setAttribute('onclick',`dice_dropdown(${i})`);
-          if (dices[i].ability_activated) {
+          dice_elements[i].setAttribute('onclick',`diceDropdown(${i})`);
+          if (dices[i].abilityActivated) {
             dice_elements[i].style.opacity=0.4;
         } else {
           dice_elements[i].style.opacity=1;
@@ -330,15 +330,15 @@ let socket = io();
         console.log("roll button clicked");
         socket.emit('roll');
       });
-      document.getElementById('end_turn_button').addEventListener('click',function(){
+      document.getElementById('endTurnButton').addEventListener('click',function(){
         console.log("end turn button clicked");
-        socket.emit('end_turn',player.selections);
+        socket.emit('endTurn',player.selections);
         player.selections = [];
         print_selections(player.selections,document.getElementById('selections'));
-        player.cur_dices = [];
-        document.getElementById('end_turn_button').disabled = true;
+        player.curDices = [];
+        document.getElementById('endTurnButton').disabled = true;
       });
-      document.getElementById('reset_selections_button').addEventListener('click',function(){
+      document.getElementById('resetSelectionsButton').addEventListener('click',function(){
         console.log("reset selections button clicked");
         for (let i = 0; i<player.selections.length;i++){
           if (player.selections[i] != 0 && player.selections[i] != 1 && player.selections[i] != 4 && player.selections[i] != 5){ //add all non-arrows to selections
@@ -347,9 +347,9 @@ let socket = io();
         }
         print_selections(player.selections,document.getElementById('selections'));
       });
-      document.getElementById('chat-input').addEventListener('submit',function(event){
+      document.getElementById('chatInput').addEventListener('submit',function(event){
         event.preventDefault();
-        socket.emit("send_message",document.getElementById('chat-input-text').value);
+        socket.emit("send_message",document.getElementById('chatInputText').value);
       });
 
 

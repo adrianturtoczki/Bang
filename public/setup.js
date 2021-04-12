@@ -37,13 +37,13 @@ function get_rooms(){
             for (let room of rooms){
                 let r_name = document.createElement('p');
                 r_name.textContent = room.name;
-                let r_player_number = document.createElement('p');
-                r_player_number.textContent = room.player_limit; //todo change
+                let r_playerNumber = document.createElement('p');
+                r_playerNumber.textContent = room.playerLimit; //todo change
                 let r_players_left = document.createElement('p');
                 r_players_left.textContent = room.players_left //todo change;
                 let r_div = document.createElement('div');
                 r_div.appendChild(r_name);
-                r_div.appendChild(r_player_number);
+                r_div.appendChild(r_playerNumber);
                 r_div.appendChild(r_players_left);
                 if (room.players_left>0){
                     let r_join_button = document.createElement('button');

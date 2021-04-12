@@ -13,7 +13,7 @@ describe("my awesome project", () => {
     clients = [];
     const httpServer = createServer();
     io = new Server(httpServer);
-    room = new Room("test_room",4,0,player_names=["player 1","player 2","player 3", "player 4"]);
+    room = new Room("test_room",4,0,playerNames=["player 1","player 2","player 3", "player 4"]);
     server.rooms.push(room);
     httpServer.listen(() => {
       const port = httpServer.address().port;
@@ -28,7 +28,7 @@ describe("my awesome project", () => {
       });
 
       waitFor(x=>server.rooms[0].connections.every(function(i) { return i !== null; })).then(_ => {
-        room.game.setup(server.rooms[0].player_limit,server.rooms[0].player_names);
+        room.game.setup(server.rooms[0].playerLimit,server.rooms[0].playerNames);
         room.game.run();
         done();
     });
@@ -51,12 +51,12 @@ describe("my awesome project", () => {
     expect(room.game.players.map(x=>x.name)).toEqual(["player 1","player 2","player 3", "player 4"]);
   })
 
-  test("check_arrows_left", (done) => {
+  test("check_arrowsLeft", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
-      //check if arrows_left>0
-      clients[0].cur_room.arrows_left = 4;
+      //check if arrowsLeft>0
+      clients[0].curRoom.arrowsLeft = 4;
       clients[0].player.arrows = 5;
-      clients[0].check_arrows_left();
+      clients[0].check_arrowsLeft();
       //sheriffs have +2 health
       if (clients[0].player.role==="sheriff"){
         expect(clients[0].player.life).toEqual(clients[0].player.character.life+2);
@@ -65,9 +65,9 @@ describe("my awesome project", () => {
       }
       expect(clients[0].player.arrows).toEqual(5);
 
-      clients[0].cur_room.arrows_left = 0;
+      clients[0].curRoom.arrowsLeft = 0;
       clients[0].player.arrows = 1;
-      clients[0].check_arrows_left();
+      clients[0].check_arrowsLeft();
       //sheriffs have +2 health
       if (clients[0].player.role==="sheriff"){
         expect(clients[0].player.life).toEqual(clients[0].player.character.life+1);
@@ -80,11 +80,11 @@ describe("my awesome project", () => {
   });
   test("roll", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
-      expect(clients[0].player.cur_dices).toEqual([]);
+      expect(clients[0].player.curDices).toEqual([]);
       clients[0].roll();
-      expect(clients[0].player.cur_dices.length).toEqual(5);
+      expect(clients[0].player.curDices.length).toEqual(5);
       //if player rolled an arrow or 3 dynamites, check if the effects work
-      //if (clients[0].player.cur_dices)
+      //if (clients[0].player.curDices)
       done();
     });
   });
