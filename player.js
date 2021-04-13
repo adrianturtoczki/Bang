@@ -22,9 +22,6 @@ class Player {
         this.turnEnd = false;
 
     }
-    roll(){
-        return Math.floor(Math.random() * 6);
-    }
 }
 
 module.exports = Player;

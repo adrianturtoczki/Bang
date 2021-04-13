@@ -1,22 +1,22 @@
 let rooms;
-let room_div = document.getElementById("rooms");
+let roomDiv = document.getElementById("rooms");
 
 
-function get_name(room_name){
-    let player_name = prompt();
-    if (player_name){
+function getName(roomName){
+    let playerName = prompt();
+    if (playerName){
         fetch("/join_room", {
             method: "POST", 
             headers: {
                 'Content-Type': 'application/json'
               },
-            body: JSON.stringify({player_name:player_name,room_name:room_name})
+            body: JSON.stringify({playerName:playerName,roomName:roomName})
           }).then(res => res.json()).then(data=>{
               //if room goodc
               console.log(data.accepted);
               if (data.accepted=="true"){
                   console.log("ok");
-                  window.location.href="/game?room="+room_name;
+                  window.location.href="/game?room="+roomName;
               } else {
                   console.log("error: name already in room!");
               }
@@ -24,42 +24,42 @@ function get_name(room_name){
     }
 }
 
-setInterval(x => get_rooms(), 1000);
-function get_rooms(){
+setInterval(x => getRooms(), 1000);
+function getRooms(){
     fetch('/rooms').then(function(result){
         console.log(result);
         return result.json();
     }).then(function(r){
         rooms = r;
-        room_div.innerHTML = "";
+        roomDiv.innerHTML = "";
 
         if (rooms.length){
             for (let room of rooms){
-                let r_name = document.createElement('p');
-                r_name.textContent = room.name;
-                let r_playerNumber = document.createElement('p');
-                r_playerNumber.textContent = room.playerLimit; //todo change
-                let r_players_left = document.createElement('p');
-                r_players_left.textContent = room.players_left //todo change;
-                let r_div = document.createElement('div');
-                r_div.appendChild(r_name);
-                r_div.appendChild(r_playerNumber);
-                r_div.appendChild(r_players_left);
-                if (room.players_left>0){
-                    let r_join_button = document.createElement('button');
-                    r_join_button.textContent = "Join";
-                    r_join_button.addEventListener('click',function(){
-                        get_name(room.name);
+                let rName = document.createElement('p');
+                rName.textContent = room.name;
+                let rPlayerNumber = document.createElement('p');
+                rPlayerNumber.textContent = room.playerLimit; //todo change
+                let rPlayersLeft = document.createElement('p');
+                rPlayersLeft.textContent = room.playersLeft //todo change;
+                let rDiv = document.createElement('div');
+                rDiv.appendChild(rName);
+                rDiv.appendChild(rPlayerNumber);
+                rDiv.appendChild(rPlayersLeft);
+                if (room.playersLeft>0){
+                    let rJoinButton = document.createElement('button');
+                    rJoinButton.textContent = "Join";
+                    rJoinButton.addEventListener('click',function(){
+                        getName(room.name);
                         });
-                    r_div.appendChild(r_join_button);
+                    rDiv.appendChild(rJoinButton);
                 }
-                room_div.appendChild(r_div);
+                roomDiv.appendChild(rDiv);
             }
         } else {
-            room_div.innerHTML = "nincs jelenleg szoba."
+            roomDiv.innerHTML = "nincs jelenleg szoba."
         }
     
     
     });
 }
-get_rooms();
+getRooms();

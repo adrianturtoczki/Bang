@@ -1,11 +1,12 @@
 const Game = require("./game");
 
 class Room {
-    constructor(room_name,playerLimit,players_left,playerNames=[],connections=[]){
-        this.name = room_name;
+    constructor(roomName,playerLimit,playersLeft,playerNames=[],characters=[],connections=[]){
+        this.name = roomName;
         this.playerLimit = playerLimit;
-        this.players_left = players_left;
+        this.playersLeft = playersLeft;
         this.playerNames = playerNames;
+        this.characters = characters;
         if (connections.length===0){
             this.connections = new Array(this.playerLimit).fill(null);
         } else {
@@ -16,10 +17,21 @@ class Room {
         this.game = new Game();
     }
 
-    addPlayer(new_player_name){
+    addPlayer(newPlayerName,character=null){
          if (this.playerNames.length<this.playerLimit){
-             this.playerNames.push(new_player_name);
+             this.playerNames.push(newPlayerName);
          }
+         if (character){
+             this.game.characters.push()
+         }
+    }
+    allPlayersConnected(){
+        return this.connections.every(function(i) { return i !== null; })
+    }
+
+    start(){
+        this.game.setup(this.playerLimit,this.playerNames,this.characters);
+        this.game.run();
     }
 
 }

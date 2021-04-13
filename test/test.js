@@ -13,7 +13,7 @@ describe("my awesome project", () => {
     clients = [];
     const httpServer = createServer();
     io = new Server(httpServer);
-    room = new Room("test_room",4,0,playerNames=["player 1","player 2","player 3", "player 4"]);
+    room = new Room("test_room",4,0,playerNames=["player 1","player 2","player 3", "player 4"],characters=["bart_cassidy","black_jack","calamity_janet","el_gringo"]);
     server.rooms.push(room);
     httpServer.listen(() => {
       const port = httpServer.address().port;
@@ -27,9 +27,8 @@ describe("my awesome project", () => {
         clients.push(client);
       });
 
-      waitFor(x=>server.rooms[0].connections.every(function(i) { return i !== null; })).then(_ => {
-        room.game.setup(server.rooms[0].playerLimit,server.rooms[0].playerNames);
-        room.game.run();
+      waitFor(x=>room.allPlayersConnected()).then(_ => {
+        room.start();
         done();
     });
     });
@@ -51,12 +50,12 @@ describe("my awesome project", () => {
     expect(room.game.players.map(x=>x.name)).toEqual(["player 1","player 2","player 3", "player 4"]);
   })
 
-  test("check_arrowsLeft", (done) => {
+  test("checkArrowsLeft", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
       //check if arrowsLeft>0
       clients[0].curRoom.arrowsLeft = 4;
       clients[0].player.arrows = 5;
-      clients[0].check_arrowsLeft();
+      clients[0].checkArrowsLeft();
       //sheriffs have +2 health
       if (clients[0].player.role==="sheriff"){
         expect(clients[0].player.life).toEqual(clients[0].player.character.life+2);
@@ -65,9 +64,9 @@ describe("my awesome project", () => {
       }
       expect(clients[0].player.arrows).toEqual(5);
 
-      clients[0].curRoom.arrowsLeft = 0;
+      clients[0].curRoom.game.arrowsLeft = 0;
       clients[0].player.arrows = 1;
-      clients[0].check_arrowsLeft();
+      clients[0].checkArrowsLeft();
       //sheriffs have +2 health
       if (clients[0].player.role==="sheriff"){
         expect(clients[0].player.life).toEqual(clients[0].player.character.life+1);

@@ -51,38 +51,34 @@ class GameServer{
     
     router.post('/join_room', (req, res) => {
       console.log('/join_room');
-      let room = this.rooms.find(x=>x.name==req.body.room_name);
+      let room = this.rooms.find(x=>x.name==req.body.roomName);
       //checks if name already in room
-      //console.log(req.body.player_name,room.playerNames);
-      if (room.playerNames.includes(req.body.player_name)){
-        console.log("error: name already in room!",req.body.player_name,room.playerNames);
+      //console.log(req.body.playerName,room.playerNames);
+      if (room.playerNames.includes(req.body.playerName)){
+        console.log("error: name already in room!",req.body.playerName,room.playerNames);
         res.send({"accepted":"false"}); //todo fix
       } else {
-        if (room.playerNames.length<room.playerLimit){
-          room.playerNames.push(req.body.player_name);
-          room.players_left--;
-        }
+        room.addPlayer(req.body.playerName);
         res.send({"accepted":"true"});
       }
     });
     
     router.post('/create_room', (req, res) => {
       //console.log(req.body);
-      if (this.rooms.find(x=>x.name===req.body.room_name)){
+      if (this.rooms.find(x=>x.name===req.body.roomName)){
         //todo popup room already exists?
         res.redirect('/');
       } else {
-        let new_room = new Room(req.body.room_name,parseInt(req.body.playerLimit),parseInt(req.body.playerLimit-1));
+        let new_room = new Room(req.body.roomName,parseInt(req.body.playerLimit),parseInt(req.body.playerLimit-1));
+        new_room.addPlayer(req.body.playerName);
         this.rooms.push(new_room);
-        new_room.addPlayer(req.body.player_name);
       
         //waits for all players to connect then starts the game
-        waitFor(x=>new_room.connections.every(function(i) { return i !== null; })).then(x=>{
+        waitFor(x=>new_room.allPlayersConnected()).then(x=>{
           console.log("game started");
-          new_room.game.setup(new_room.playerLimit,new_room.playerNames);
-          new_room.game.run();
+          new_room.start();
         });
-        res.redirect('/game?room='+req.body.room_name);
+        res.redirect('/game?room='+req.body.roomName);
       }
     });
     

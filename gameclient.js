@@ -31,9 +31,9 @@ class GameClient{
             this.setupAllConnected();
           });
     }
-    setup(room_name){
-        //console.log("setup "+room_name);
-        this.curRoom = this.server.rooms.find(x=>x.name===room_name);
+    setup(roomName){
+        //console.log("setup "+roomName);
+        this.curRoom = this.server.rooms.find(x=>x.name===roomName);
         this.socket.join(this.curRoom.name);
     
         //todo check if playerIndex always player.index
@@ -54,9 +54,6 @@ class GameClient{
       this.player_role = this.curRoom.game.roles[this.playerIndex];
       //console.log(this.player.name+' connected');
       this.io.to(this.curRoom.name).emit('current_turn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
-      //console.log("playerIndex:",this.playerIndex,this.player.index);
-      //console.log("player_role:",this.player_role);
-      //console.log(this.curRoom.game.players,this.playerIndex);
       this.socket.emit('players_data_setup',[this.curRoom.game.players,this.playerIndex,this.player_role,this.curRoom.game.arrowsLeft]);
     }
     
@@ -99,7 +96,6 @@ class GameClient{
   
       let gatlingDices = selections.filter(x=>x===5);
       //character check: willy the kid
-      //console.log("teszt: "+gatlingDices.length+" : "+this.player.character.name);
       if (gatlingDices.length>=3||(gatlingDices.length===2&&this.player.character.name==='willy_the_kid')){
         this.curRoom.game.arrowsLeft+=this.player.arrows;
         this.player.arrows = 0;
@@ -162,7 +158,7 @@ class GameClient{
   
         let rollResults = [];
         for (let i = 0; i < 5; i++){
-          let cur_dice = new Dice(this.player.roll(),i)
+          let cur_dice = new Dice(i);
           rollResults.push(cur_dice);
           if (cur_dice.type === 0 ||cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1,2
             this.player.selections[i] = cur_dice.type;
@@ -206,7 +202,7 @@ class GameClient{
     reroll(rerolledDiceIndex){
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
   
-      rerolledDice.type = this.player.roll();
+      rerolledDice.roll();
       console.log(this.player.name + ' rerolled: '+ rerolledDice.type);
       this.curRoom.game.log.push(this.player.name + ' rerolled: '+ rerolledDice.type);
   
