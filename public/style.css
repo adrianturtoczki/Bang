@@ -52,22 +52,22 @@
     flex-wrap: wrap;
   }
 
-  .bullets_arrows_div{
+  .bulletsArrowsDiv{
     display:flex;
   }
-  .bullets_arrows_div p{
+  .bulletsArrowsDiv p{
     font-size: 30px;
     margin:0;
   }
-  .bullets_arrows_div img{
+  .bulletsArrowsDiv img{
     height:4em;
     width:auto;
   }
 
-  .role_img {
+  .roleImg {
     max-width: 230px;
   }
-  .char_img {
+  .charImg {
     max-width: 300px;
   }
 

@@ -53,13 +53,13 @@ class GameClient{
       this.player.index = this.playerIndex;
       this.player_role = this.curRoom.game.roles[this.playerIndex];
       //console.log(this.player.name+' connected');
-      this.io.to(this.curRoom.name).emit('current_turn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
-      this.socket.emit('players_data_setup',[this.curRoom.game.players,this.playerIndex,this.player_role,this.curRoom.game.arrowsLeft]);
+      this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
+      this.socket.emit('playersDataSetup',[this.curRoom.game.players,this.playerIndex,this.player_role,this.curRoom.game.arrowsLeft]);
     }
     
     // ending a turn
     endTurn(selections){
-      let alive_players = this.curRoom.game.players.filter(x=>x.life>0);
+      let alivePlayers = this.curRoom.game.players.filter(x=>x.life>0);
   
       //resolving
       //console.log('resolving '+this.player.name+"'s turn ..");
@@ -99,7 +99,7 @@ class GameClient{
       if (gatlingDices.length>=3||(gatlingDices.length===2&&this.player.character.name==='willy_the_kid')){
         this.curRoom.game.arrowsLeft+=this.player.arrows;
         this.player.arrows = 0;
-        for (let p of alive_players){
+        for (let p of alivePlayers){
           //character check: paul regret
           if (p!=this.player&&p.character.name!='paul_regret'){
             p.life--;
@@ -107,7 +107,7 @@ class GameClient{
         }
       }
   
-      let killedPlayers = alive_players.filter(x=>x.life<=0) //return killed this.player's arrows back
+      let killedPlayers = alivePlayers.filter(x=>x.life<=0) //return killed this.player's arrows back
       for (let p of killedPlayers){
         this.curRoom.game.arrowsLeft+=p.arrows;
         p.arrows = 0;
@@ -131,8 +131,8 @@ class GameClient{
   
       setTimeout(() => { //TODO: not ideal, would be better without timeout
         console.log("ending turn .. ");
-        this.io.to(this.curRoom.name).emit('players_data_refresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.players.alive,this.curRoom.game.log]);
-        this.io.to(this.curRoom.name).emit('current_turn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.players.alive,this.curRoom.game.log]);
+        this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
       }, 500);
     }
     
@@ -194,7 +194,7 @@ class GameClient{
   
         this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
   
-        this.io.to(this.curRoom.name).emit('players_data_refresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.log]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.log]);
   
       }
     }
@@ -236,20 +236,20 @@ class GameClient{
   
       this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
   
-      this.io.to(this.curRoom.name).emit('players_data_refresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.log]);
+      this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.log]);
   
     }
     
     sendMessage(m){
       console.log(this.player.name+" sent message: "+m);
       this.curRoom.game.chat.push(this.player.name+": "+m);
-      this.io.to(this.curRoom.name).emit('update_chat',this.curRoom.game.chat);
+      this.io.to(this.curRoom.name).emit('updateChat',this.curRoom.game.chat);
     }
     
     //disconnect
     disconnect(){
       this.curRoom.connections[this.playerIndex] = null;
-      this.io.to(this.curRoom.name).emit("a_player_disconnected");
+      this.io.to(this.curRoom.name).emit("aPlayerDisconnected");
       if (this.server.rooms.indexOf(this.curRoom)!=-1){
         this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom),1);
       }

@@ -9,7 +9,7 @@ let socket = io();
       let d3 = new Image();
       let d4 = new Image();
       let d5 = new Image();
-      let dice_elements = [d1,d2,d3,d4,d5];
+      let diceElements = [d1,d2,d3,d4,d5];
       document.getElementById('dices').appendChild(d1);
       document.getElementById('dices').appendChild(d2);
       document.getElementById('dices').appendChild(d3);
@@ -22,36 +22,36 @@ let socket = io();
       let playerRole;
       let player;
 
-      socket.on('a_player_disconnected',a_player_disconnected);
-      socket.on('current_turn',current_turn);
-      socket.on('players_data_setup', players_data_setup);
-      socket.on('players_data_refresh',players_data_refresh);
+      socket.on('aPlayerDisconnected',aPlayerDisconnected);
+      socket.on('currentTurn',currentTurn);
+      socket.on('playersDataSetup', playersDataSetup);
+      socket.on('playersDataRefresh',playersDataRefresh);
       socket.on('rollResults',rollResults);
       socket.on('gameEnd', gameEnd);
-      socket.on('update_chat',update_chat);
+      socket.on('updateChat',updateChat);
 
-      function update_chat(game_chat){
+      function updateChat(gameChat){
           //printing chat
-          let chat_id = document.getElementById('chat');
-          chat_id.innerHTML = '';
-          console.log(game_chat)
-          for (let i = game_chat.length-1; i > 0; i--){
+          let chatId = document.getElementById('chat');
+          chatId.innerHTML = '';
+          console.log(gameChat)
+          for (let i = gameChat.length-1; i >= 0; i--){
             let p = document.createElement('p');
-            p.appendChild(document.createTextNode(game_chat[i]));
-            chat_id.appendChild(p);
+            p.appendChild(document.createTextNode(gameChat[i]));
+            chatId.appendChild(p);
           }
       }
 
-      function a_player_disconnected(){
+      function aPlayerDisconnected(){
         alert('Egy játékos  kilépett. Visszalépés a főoldalra.');
         window.location.href = '/';
       }
 
-      function current_turn(turn_name){
-        document.getElementById('curTurn').textContent='Jelenlegi kör: '+turn_name;
+      function currentTurn(turnName){
+        document.getElementById('curTurn').textContent='Jelenlegi kör: '+turnName;
       }
 
-      function cur_player_data(player) {
+      function curPlayerData(player) {
         //player data
 
 
@@ -71,49 +71,49 @@ let socket = io();
           }
         }
 
-        function createPlayer(p,div_to_append,playerRole){
-          let p_div = document.createElement('div');
-            p_div.classList.add("player_data");
-            p_div.id="player_"+p.name;
-            let p_div_name = document.createElement('div');
-            let p_div_life_arrows_char = document.createElement('div');
-            let p_div_life_arrows = document.createElement('div');
-            let pRole_div = document.createElement('div');
-            let p_name = document.createElement('h3');
-            let p_life = document.createElement('p');
-            let p_arrows = document.createElement('p');
-            let p_life_img = document.createElement('img');
-            let p_arrows_img = document.createElement('img');
+        function createPlayer(p,divToAppend,playerRole){
+          let pDiv = document.createElement('div');
+            pDiv.classList.add("player_data");
+            pDiv.id="player_"+p.name;
+            let pDivName = document.createElement('div');
+            let pDivLifeArrows_char = document.createElement('div');
+            let pDivLifeArrows = document.createElement('div');
+            let pRoleDiv = document.createElement('div');
+            let pName = document.createElement('h3');
+            let pLife = document.createElement('p');
+            let pArrows = document.createElement('p');
+            let pLifeImg = document.createElement('img');
+            let pArrowsImg = document.createElement('img');
             let pChar = document.createElement('img');
-            pChar.classList.add("char_img");
+            pChar.classList.add("charImg");
             let pRole = document.createElement('img');
-            pRole.classList.add("role_img");
-            p_name.appendChild(document.createTextNode(p.name));
-            p_life.appendChild(document.createTextNode(p.life));
-            p_arrows.appendChild(document.createTextNode(p.arrows));
+            pRole.classList.add("roleImg");
+            pName.appendChild(document.createTextNode(p.name));
+            pLife.appendChild(document.createTextNode(p.life));
+            pArrows.appendChild(document.createTextNode(p.arrows));
             pChar.src = 'images/c_'+p.character.name+'.jpg';
             pRole.src= 'images/r_'+playerRole+'.jpg';
-            p_arrows_img.src='images/arrow.png';
-            p_arrows_img.style.height="50px";
-            p_life_img.src='images/bullet.png';
-            p_life_img.style.height=p_arrows_img.style.height;
+            pArrowsImg.src='images/arrow.png';
+            pArrowsImg.style.height="50px";
+            pLifeImg.src='images/bullet.png';
+            pLifeImg.style.height=pArrowsImg.style.height;
 
-            p_div_name.appendChild(p_name);
-            p_div_life_arrows.appendChild(p_life);
-            p_div_life_arrows.appendChild(p_life_img);
-            p_div_life_arrows.appendChild(p_arrows);
-            p_div_life_arrows.appendChild(p_arrows_img);
-            p_div_life_arrows.classList.add("bullets_arrows_div");
-            p_div_life_arrows_char.appendChild(p_div_name);
-            p_div_life_arrows_char.appendChild(p_div_life_arrows);
-            p_div_life_arrows_char.appendChild(pChar);
-            p_div.appendChild(p_div_life_arrows_char);
-            pRole_div.appendChild(pRole);
-            p_div.appendChild(pRole_div);
-            div_to_append.appendChild(p_div);
+            pDivName.appendChild(pName);
+            pDivLifeArrows.appendChild(pLife);
+            pDivLifeArrows.appendChild(pLifeImg);
+            pDivLifeArrows.appendChild(pArrows);
+            pDivLifeArrows.appendChild(pArrowsImg);
+            pDivLifeArrows.classList.add("bulletsArrowsDiv");
+            pDivLifeArrows_char.appendChild(pDivName);
+            pDivLifeArrows_char.appendChild(pDivLifeArrows);
+            pDivLifeArrows_char.appendChild(pChar);
+            pDiv.appendChild(pDivLifeArrows_char);
+            pRoleDiv.appendChild(pRole);
+            pDiv.appendChild(pRoleDiv);
+            divToAppend.appendChild(pDiv);
         }
 
-      function players_data_setup([players,index,role,arrowsLeft]){
+      function playersDataSetup([players,index,role,arrowsLeft]){
 
         document.getElementById('wait_screen').style.display = 'none';
         document.getElementById('game').classList.toggle('game_wait');
@@ -122,7 +122,7 @@ let socket = io();
         playerRole = role;
         player = players[index];
 
-        cur_player_data(player);
+        curPlayerData(player);
 
         console.log(playerRole);
         createPlayer(player,document.getElementById("player"),playerRole);
@@ -140,22 +140,22 @@ let socket = io();
         }
       }
 
-      function players_data_refresh([players,arrowsLeft,pAlive,game_log]){
+      function playersDataRefresh([players,arrowsLeft,pAlive,gameLog]){
         playersAr = players;
         player = playersAr[playerIndex];
         playersAlive = pAlive;
-        cur_player_data(players[playerIndex]);
+        curPlayerData(players[playerIndex]);
 
           //other players data
-          let p_data_divs = document.getElementById('otherPlayers').children;
+          let p_dataDivs = document.getElementById('otherPlayers').children;
           for (let p of playersAr){
             if (p.index!=playerIndex){
-              p_data_div = document.getElementById("player_"+p.name);
-              p_data_div.children[0].children[0].children[0].textContent=p.name;
-              p_data_div.children[0].children[1].children[0].textContent=p.life;
-              p_data_div.children[0].children[1].children[2].textContent=p.arrows;
-              p_data_div.children[0].children[1].src= 'images/c_'+p.character.name+'.jpg';
-              if (p.life<=0) p_data_div.children[0].children[2].src= 'images/r_'+p.role+'.jpg';
+              p_dataDiv = document.getElementById("player_"+p.name);
+              p_dataDiv.children[0].children[0].children[0].textContent=p.name;
+              p_dataDiv.children[0].children[1].children[0].textContent=p.life;
+              p_dataDiv.children[0].children[1].children[2].textContent=p.arrows;
+              p_dataDiv.children[0].children[1].src= 'images/c_'+p.character.name+'.jpg';
+              if (p.life<=0) p_dataDiv.children[0].children[2].src= 'images/r_'+p.role+'.jpg';
               }
             }
           document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
@@ -163,17 +163,17 @@ let socket = io();
           //printing logs
           let log_id = document.getElementById('log');
           log_id.innerHTML = '';
-          console.log(game_log)
-          for (let i = game_log.length-1; i > 0; i--){
+          console.log(gameLog)
+          for (let i = gameLog.length-1; i > 0; i--){
             let p = document.createElement('p');
-            p.appendChild(document.createTextNode(game_log[i]));
+            p.appendChild(document.createTextNode(gameLog[i]));
             log_id.appendChild(p);
           }
           
       }
 
-      function rollResults([roll_result,selections]){
-        player.curDices = roll_result;
+      function rollResults([rollResult,selections]){
+        player.curDices = rollResult;
         player.selections = selections;
 
 
@@ -233,28 +233,28 @@ let socket = io();
         }
         if (dice.rerollsLeft>0){
           //reroll
-          let reroll_button = document.createElement('p');
-          reroll_button.appendChild(document.createTextNode("Újradobás ("+dice.rerollsLeft+" maradt)"));
-          reroll_button.addEventListener('click',function(){
+          let rerollButton = document.createElement('p');
+          rerollButton.appendChild(document.createTextNode("Újradobás ("+dice.rerollsLeft+" maradt)"));
+          rerollButton.addEventListener('click',function(){
             document.getElementById("resolveDropdown").classList.toggle("show");
             console.log("reroll button clicked for "+[dice.type,dice.index]);
             socket.emit('reroll',dice.index);
             player.selections = [];
             print_selections(player.selections,document.getElementById('selections'));
             });
-            resolveDropdownDiv.appendChild(reroll_button);
+            resolveDropdownDiv.appendChild(rerollButton);
           }
 
-          let alive_players = playersAr.filter(x=>x.life>0);
+          let alivePlayers = playersAr.filter(x=>x.life>0);
 
           //players the player can effect with the dice
           if (dice.type===2||dice.type===3||dice.type===4){
             let prevPlayer,nextPlayer;
 
-            let aliveIndex = alive_players.findIndex(x=>x===player);
+            let aliveIndex = alivePlayers.findIndex(x=>x===player);
 
             let shootingDistances = [];
-            if (dice.type===2||(dice.type===3&&alive_players.length<=3)){
+            if (dice.type===2||(dice.type===3&&alivePlayers.length<=3)){
               shootingDistances.push(1);
               } else if (dice.type===3){
                 shootingDistances.push(2);
@@ -273,53 +273,71 @@ let socket = io();
               shootingDistances.push(shootingDistances[0]+1);
             }
 
-            if (dice.type===2||dice.type===3){ //arrow2
+            if (dice.type===2||dice.type===3){ //gun
               for (let shootingDistance of shootingDistances){
-                let p_name = document.createElement('p');
-                let n_name = document.createElement('p');
+                let pName = document.createElement('p');
+                let nName = document.createElement('p');
                 console.log(shootingDistances)
                 if (aliveIndex < shootingDistance){
-                  prevPlayer = alive_players[aliveIndex-shootingDistance+alive_players.length];
+                  prevPlayer = alivePlayers[aliveIndex-shootingDistance+alivePlayers.length];
                 } else {
-                  prevPlayer = alive_players[aliveIndex-shootingDistance];
+                  prevPlayer = alivePlayers[aliveIndex-shootingDistance];
                 }
-                if (aliveIndex >= alive_players.length-shootingDistance){
-                  nextPlayer = alive_players[aliveIndex+shootingDistance-alive_players.length];
+                if (aliveIndex >= alivePlayers.length-shootingDistance){
+                  nextPlayer = alivePlayers[aliveIndex+shootingDistance-alivePlayers.length];
                 }  else {
-                  nextPlayer = alive_players[aliveIndex+shootingDistance];
+                  nextPlayer = alivePlayers[aliveIndex+shootingDistance];
                 }
-                p_name.appendChild(document.createTextNode(prevPlayer.name));
-                n_name.appendChild(document.createTextNode(nextPlayer.name));
-                p_name.setAttribute('onclick','selectTarget('+dice.index+','+prevPlayer.index+')');
-                n_name.setAttribute('onclick','selectTarget('+dice.index+','+nextPlayer.index+')'); 
+                pName.appendChild(document.createTextNode(prevPlayer.name));
+                nName.appendChild(document.createTextNode(nextPlayer.name));
+                pName.setAttribute('onclick','selectTarget('+dice.index+','+prevPlayer.index+')');
+                nName.setAttribute('onclick','selectTarget('+dice.index+','+nextPlayer.index+')'); 
   
-                resolveDropdownDiv.appendChild(p_name);
+                console.log(document.getElementById("player_"+prevPlayer.name));
+                pName.addEventListener("mouseover",function(){highlightPlayer(document.getElementById("player_"+prevPlayer.name).children[0].children[0].children[0])});
+                pName.addEventListener("mouseout",function(){revertHighlightPlayer(document.getElementById("player_"+prevPlayer.name).children[0].children[0].children[0])});
+                resolveDropdownDiv.appendChild(pName);
                 if (prevPlayer!=nextPlayer){
-                  resolveDropdownDiv.appendChild(n_name);
+                  console.log(document.getElementById("player_"+nextPlayer.name));
+                  nName.addEventListener("mouseover",function(){highlightPlayer(document.getElementById("player_"+nextPlayer.name).children[0].children[0].children[0])});
+                  nName.addEventListener("mouseout",function(){revertHighlightPlayer(document.getElementById("player_"+nextPlayer.name).children[0].children[0].children[0])});
+
+                  resolveDropdownDiv.appendChild(nName);
                   }
                 }
               } else if (dice.type===4){ //beer
   
-                for (let p of alive_players){
-                  let b_name = document.createElement('p');
-                  b_name.appendChild(document.createTextNode(p.name));
-                  b_name.setAttribute('onclick','selectTarget('+dice.index+','+p.index+')');
-                  resolveDropdownDiv.appendChild(b_name);
+                for (let p of alivePlayers){
+                  let bName = document.createElement('p');
+                  bName.appendChild(document.createTextNode(p.name));
+                  bName.setAttribute('onclick','selectTarget('+dice.index+','+p.index+')');
+                  console.log(document.getElementById("player_"+p.name));
+                  bName.addEventListener("mouseover",function(){highlightPlayer(document.getElementById("player_"+p.name).children[0].children[0].children[0])});
+                  bName.addEventListener("mouseout",function(){revertHighlightPlayer(document.getElementById("player_"+p.name).children[0].children[0].children[0])});
+
+                  resolveDropdownDiv.appendChild(bName);
                 }
               }
             }
+        }
+
+        function highlightPlayer(playerNameDiv){
+          playerNameDiv.style.backgroundColor="silver";
+        }
+        function revertHighlightPlayer(playerNameDiv){
+          playerNameDiv.style.backgroundColor="white";
         }
 
 
       function drawDice(dices){
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
-          dice_elements[i].src = 'images/d'+(dices[i].type)+'.png';
-          dice_elements[i].setAttribute('onclick',`diceDropdown(${i})`);
+          diceElements[i].src = 'images/d'+(dices[i].type)+'.png';
+          diceElements[i].setAttribute('onclick',`diceDropdown(${i})`);
           if (dices[i].abilityActivated) {
-            dice_elements[i].style.opacity=0.4;
+            diceElements[i].style.opacity=0.4;
         } else {
-          dice_elements[i].style.opacity=1;
+          diceElements[i].style.opacity=1;
         }
       }
     }
@@ -349,7 +367,7 @@ let socket = io();
       });
       document.getElementById('chatInput').addEventListener('submit',function(event){
         event.preventDefault();
-        socket.emit("send_message",document.getElementById('chatInputText').value);
+        socket.emit("sendMessage",document.getElementById('chatInputText').value);
       });
 
 

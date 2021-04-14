@@ -1,7 +1,7 @@
 const Game = require("./game");
 
 class Room {
-    constructor(roomName,playerLimit,playersLeft,playerNames=[],characters=[],connections=[]){
+    constructor(roomName,playerLimit,playersLeft=playerLimit,playerNames=[],characters=[],connections=[]){
         this.name = roomName;
         this.playerLimit = playerLimit;
         this.playersLeft = playersLeft;
@@ -20,6 +20,7 @@ class Room {
     addPlayer(newPlayerName,character=null){
          if (this.playerNames.length<this.playerLimit){
              this.playerNames.push(newPlayerName);
+             this.playersLeft--;
          }
          if (character){
              this.game.characters.push()

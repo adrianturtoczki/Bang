@@ -69,7 +69,7 @@ class GameServer{
         //todo popup room already exists?
         res.redirect('/');
       } else {
-        let new_room = new Room(req.body.roomName,parseInt(req.body.playerLimit),parseInt(req.body.playerLimit-1));
+        let new_room = new Room(req.body.roomName,parseInt(req.body.playerLimit));
         new_room.addPlayer(req.body.playerName);
         this.rooms.push(new_room);
       
