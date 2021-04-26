@@ -2,6 +2,8 @@ const Player = require('./player');
 const Character = require('./character');
 const {waitFor} = require('./helper');
 
+'use strict';
+
 class Game {
     constructor(){
         this.started = false;
@@ -20,7 +22,7 @@ class Game {
         this.log.push("Game started!");
         while (this.end!=true){
             for (let p of this.players){
-                this.log.push("New turn");
+                this.log.push("Új kör");
                 if (p.life>0){
                     p.curTurn = true;
                     console.log(p.name+"'s round");

@@ -43,7 +43,7 @@ function getRooms(){
                 }
             }
         } else {
-            roomDiv.innerHTML = "nincs jelenleg szoba."
+            roomDiv.innerHTML = "";
             rooms = [];
         }
     
