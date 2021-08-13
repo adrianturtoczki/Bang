@@ -16,7 +16,7 @@ const GameClient = require('./gameclient');
 class GameServer{
   constructor(){
     var router = express.Router();
-    app.use(express.static('public'));
+    app.use(express.static(path.join(__dirname, '/public')));
     app.use(express.urlencoded({
       extended: true
     }))
@@ -31,7 +31,7 @@ class GameServer{
     
     router.get('/', (req, res) => {
       console.log('/');
-      res.sendFile(path.join(__dirname + '/public/setup.html'));
+      res.sendFile(path.join(__dirname + '/public/lobby.html'));
     });
     
     router.get('/rooms', (req, res) => {
@@ -45,7 +45,7 @@ class GameServer{
       if (room.game.started==false){
         res.sendFile(path.join(__dirname + '/public/game.html'));
       } else {
-        res.sendFile(path.join(__dirname + '/public/setup.html'));
+        res.sendFile(path.join(__dirname + '/public/lobby.html'));
       }
     });
     

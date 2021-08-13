@@ -29,6 +29,7 @@
 
   .playerRow{
     display:flex;
+    justify-content: space-between;
   }
 
   .player_column{
@@ -93,6 +94,7 @@
 
   #chat{
     overflow:auto;
+    height:270px;
   }
 
   #chatInput{
