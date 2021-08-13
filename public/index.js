@@ -1,5 +1,3 @@
-'use strict';
-
 let socket = io();
 
       var urlParams = new URLSearchParams(window.location.search);
@@ -40,7 +38,6 @@ let socket = io();
           for (let i = gameChat.length-1; i >= 0; i--){
             let p = document.createElement('p');
             p.appendChild(document.createTextNode(gameChat[i]));
-            p.classList.add("chatLogP");
             chatId.appendChild(p);
           }
       }
@@ -56,6 +53,10 @@ let socket = io();
 
       function curPlayerData(player) {
         //player data
+
+
+        //document.getElementById('player_health_number').textContent=player.life;
+        //document.getElementById('player_arrow_number').textContent=player.arrows;
 
         if (player.curTurn===true&&player.rolled===false){
           document.getElementById('dices').style.display = 'none';
@@ -146,25 +147,27 @@ let socket = io();
         curPlayerData(players[playerIndex]);
 
           //other players data
+          let p_dataDivs = document.getElementById('otherPlayers').children;
           for (let p of playersAr){
-              let pDataDiv = document.getElementById("player_"+p.name);
-              pDataDiv.children[0].children[0].children[0].textContent=p.name;
-              pDataDiv.children[0].children[1].children[0].textContent=p.life;
-              pDataDiv.children[0].children[1].children[2].textContent=p.arrows;
-              //pDataDiv.children[0].children[1].src= 'images/c_'+p.character.name+'.jpg';
-              if (p.life<=0) pDataDiv.children[1].children[0].src= 'images/r_'+p.role+'.jpg';
+            if (p.index!=playerIndex){
+              p_dataDiv = document.getElementById("player_"+p.name);
+              p_dataDiv.children[0].children[0].children[0].textContent=p.name;
+              p_dataDiv.children[0].children[1].children[0].textContent=p.life;
+              p_dataDiv.children[0].children[1].children[2].textContent=p.arrows;
+              p_dataDiv.children[0].children[1].src= 'images/c_'+p.character.name+'.jpg';
+              if (p.life<=0) p_dataDiv.children[0].children[2].src= 'images/r_'+p.role+'.jpg';
+              }
             }
           document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
 
           //printing logs
-          let logId = document.getElementById('log');
-          logId.innerHTML = '';
+          let log_id = document.getElementById('log');
+          log_id.innerHTML = '';
           console.log(gameLog)
           for (let i = gameLog.length-1; i > 0; i--){
             let p = document.createElement('p');
             p.appendChild(document.createTextNode(gameLog[i]));
-            p.classList.add("chatLogP");
-            logId.appendChild(p);
+            log_id.appendChild(p);
           }
           
       }
@@ -172,6 +175,7 @@ let socket = io();
       function rollResults([rollResult,selections]){
         player.curDices = rollResult;
         player.selections = selections;
+
 
         drawDice(player.curDices);
         checkSelections(selections,document.getElementById('endTurnButton'));
@@ -290,22 +294,13 @@ let socket = io();
                 nName.setAttribute('onclick','selectTarget('+dice.index+','+nextPlayer.index+')'); 
   
                 console.log(document.getElementById("player_"+prevPlayer.name));
-                pName.onmouseover = (function(i){
-                  return function(){highlightPlayer(i); }
-                })(prevPlayer.name);
-                pName.onmouseleave = (function(i){
-                  return function(){revertHighlightPlayer(i); }
-                })(prevPlayer.name);
-
+                pName.addEventListener("mouseover",function(){highlightPlayer(document.getElementById("player_"+prevPlayer.name).children[0].children[0].children[0])});
+                pName.addEventListener("mouseout",function(){revertHighlightPlayer(document.getElementById("player_"+prevPlayer.name).children[0].children[0].children[0])});
                 resolveDropdownDiv.appendChild(pName);
                 if (prevPlayer!=nextPlayer){
                   console.log(document.getElementById("player_"+nextPlayer.name));
-                  nName.onmouseover = (function(i){
-                    return function(){highlightPlayer(i); }
-                  })(nextPlayer.name);
-                  nName.onmouseleave = (function(i){
-                    return function(){revertHighlightPlayer(i); }
-                  })(nextPlayer.name);
+                  nName.addEventListener("mouseover",function(){highlightPlayer(document.getElementById("player_"+nextPlayer.name).children[0].children[0].children[0])});
+                  nName.addEventListener("mouseout",function(){revertHighlightPlayer(document.getElementById("player_"+nextPlayer.name).children[0].children[0].children[0])});
 
                   resolveDropdownDiv.appendChild(nName);
                   }
@@ -317,8 +312,8 @@ let socket = io();
                   bName.appendChild(document.createTextNode(p.name));
                   bName.setAttribute('onclick','selectTarget('+dice.index+','+p.index+')');
                   console.log(document.getElementById("player_"+p.name));
-                  bName.onmouseover = function(){highlightPlayer(p.name)};
-                  bName.onmouseleave = function(){revertHighlightPlayer(p.name)};
+                  bName.addEventListener("mouseover",function(){highlightPlayer(document.getElementById("player_"+p.name).children[0].children[0].children[0])});
+                  bName.addEventListener("mouseout",function(){revertHighlightPlayer(document.getElementById("player_"+p.name).children[0].children[0].children[0])});
 
                   resolveDropdownDiv.appendChild(bName);
                 }
@@ -326,12 +321,10 @@ let socket = io();
             }
         }
 
-        function highlightPlayer(playerName){
-          let playerNameDiv = document.getElementById("player_"+playerName).children[0].children[0].children[0];
+        function highlightPlayer(playerNameDiv){
           playerNameDiv.style.backgroundColor="silver";
         }
-        function revertHighlightPlayer(playerName){
-          let playerNameDiv = document.getElementById("player_"+playerName).children[0].children[0].children[0];
+        function revertHighlightPlayer(playerNameDiv){
           playerNameDiv.style.backgroundColor="white";
         }
 

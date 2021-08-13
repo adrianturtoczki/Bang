@@ -3,8 +3,6 @@ const Game = require('./game');
 const Room = require('./room');
 const Dice = require('./dice');
 
-'use strict';
-
 class GameClient{
     constructor(socket,io,server){
         this.socket = socket;
@@ -189,8 +187,8 @@ class GameClient{
         }
   
         this.player.rolled = true;
-        console.log(this.player.name + ' dobott: '+ rollResults.map(x=>x.name));
-        this.curRoom.game.log.push(this.player.name + ' dobott: '+ rollResults.map(x=>x.name));
+        console.log(this.player.name + ' rolled: '+ rollResults.map(x=>x.type));
+        this.curRoom.game.log.push(this.player.name + ' rolled: '+ rollResults.map(x=>x.type));
   
         this.player.curDices = rollResults;
   
@@ -205,8 +203,8 @@ class GameClient{
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
   
       rerolledDice.roll();
-      console.log(this.player.name + ' újradobott: '+ rerolledDice.name);
-      this.curRoom.game.log.push(this.player.name + ' újradobott: '+ rerolledDice.name);
+      console.log(this.player.name + ' rerolled: '+ rerolledDice.type);
+      this.curRoom.game.log.push(this.player.name + ' rerolled: '+ rerolledDice.type);
   
       if (rerolledDice.type === 0 || rerolledDice.type === 1 ||rerolledDice.type === 5){
         this.player.selections[rerolledDiceIndex] = rerolledDice.type;
@@ -219,7 +217,7 @@ class GameClient{
       let dynamiteDices = this.player.curDices.filter(x=>x.type===1&&x.abilityActivated === false);
   
       if (rerolledDice.type===0){
-        this.curRoom.game.log.push(this.player.name+' kapott egy nyilat.');
+        this.curRoom.game.log.push(this.player.name+' gets an arrow.');
         this.player.arrows++;
         this.curRoom.game.arrowsLeft--;
   
@@ -230,7 +228,7 @@ class GameClient{
       }
   
       if (dynamiteDices.length>=3){
-        this.curRoom.game.log.push(this.player.name + ' 3 dinamitot dobott.');
+        this.curRoom.game.log.push(this.player.name + ' rolled 3 dynamites.');
         this.player.life--;
         dynamiteDices.forEach(x=>x.abilityActivated = true);
         this.player.curDices.forEach(x=>x.rerollsLeft = 0);
