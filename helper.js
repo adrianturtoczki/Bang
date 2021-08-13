@@ -1,4 +1,5 @@
 module.exports = {
+  
     waitFor(conditionFunction) {
         const poll = resolve => {
           if(conditionFunction()) resolve();
