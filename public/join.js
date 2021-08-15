@@ -70,7 +70,7 @@ function createRoomDiv(room){
     rDiv.appendChild(rPlayersLeft);
     if (room.playersLeft>0){
         let rJoinButton = document.createElement('button');
-        rJoinButton.textContent = "Join";
+        rJoinButton.textContent = "Csatlakozás";
         rJoinButton.addEventListener('click',function(){
             getName(room.name);
             });

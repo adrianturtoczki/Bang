@@ -36,12 +36,9 @@
         }
         .lobby_buttons {
         }
-        .lobby_buttons a {
+        .lobby_buttons button {
             background-color: #dab49d;
             height:50px;
-            appearance: button;
-            text-decoration: none;
-            color: initial;
         }
         .lobby_buttons button:hover {
             background-color: #FFFFFF;
@@ -54,15 +51,28 @@
 </head>
 <body>
 <div class="center_div">
-<div>
-    <h1 class="bang_text">BANG:</h1>
-    <h2>Kockajáték</h2>
-</div>
-    <div class="lobby_buttons">
-        <a href="create.html">Szoba létrehozása</a>
-        <a href="join.html">Csatlakozás</a>
-        <a href="help.html">Segítség</a>
+    <div>
+        <form action="/create_room" method="POST" id="create_room">
+            <h2>Szoba létrehozása</h2>
+            <label for="roomName">Szoba neve</label>
+            <input type="text" name="roomName" required/>
+            <br>
+            <label for="roomName">Játékos neve</label>
+            <input type="text" name="playerName" required/>
+            <br>
+            <label for="playerLimit">Játékosok száma</label>
+            <select id="playerLimit" name="playerLimit">
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+              <br>
+            <input type="submit" />
+        </form>
     </div>
 </div>
+    <script type="text/javascript" src="create.js"></script>
 </body>
 </html>
