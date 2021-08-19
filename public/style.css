@@ -111,3 +111,63 @@
     margin-left:auto;
     margin-right:auto;
   }
+
+  *{
+    box-sizing: border-box;
+}
+html,body{
+    height: 100%;
+}
+body {
+    background-color: #F3E9DC;
+    font-family: 'Saira Stencil One';
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+button {
+    font-family: inherit;
+}
+.center_div{
+    margin:auto;
+}
+.submit_button {
+    background-color: #dab49d;
+    height:30px;
+    text-decoration: none;
+    color: initial;
+}
+.lobby_buttons a {
+    background-color: #dab49d;
+    height:50px;
+    text-decoration: none;
+    color: initial;
+    padding:10px;
+}
+.lobby_buttons button:hover {
+    background-color: #FFFFFF;
+}
+.bang_text {
+    color: #DC1313;
+    line-height: 0;
+}
+#create_room__modal,#join_room__modal,#help__modal {
+    display:none;
+    position:fixed;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    overflow: auto;
+    background-color: rgba(0,0,0,0);
+    background-color: rgba(0,0,0,0.3);
+    padding-top: 100px;
+}
+.modal_content{
+    background-color: #fff4e6;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}

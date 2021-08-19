@@ -17,40 +17,13 @@
 
 </head>
 <body>
-
-  <div id='wait_screen'>
-    <p>Waiting for players ..</p>
-  </div>
-
-  <div id='game' class='game_wait'>
     <h1>Bang! Kockajáték</h1>
 
     <div>
+      <div id="otherPlayers"></div>
       <div>
         <p id='curTurn'></p>
         <p id='arrowsLeft'>Arrows left:</p>
-      </div>
-
-      <div class='playerRow'>
-        <div>
-          <div id="player"></div>
-
-          <div id='rollDiv'>
-            <div id='dices'></div>
-            <button id="roll">dobás</button>
-      
-            <div class="dropdown">
-              <div id="resolveDropdown" class="dropdown-content">
-                <a href="#">Link 1</a>
-                <a href="#">Link 2</a>
-                <a href="#">Link 3</a>
-              </div>
-              <p id='selections'>Választott műveletek:</p>
-              <button id="resetSelectionsButton">reset</button>
-              <button id="endTurnButton" disabled>Kör befejezése</button>
-            </div>
-          </div>
-        
       </div>
 
       <div>
@@ -68,11 +41,28 @@
     </div>
     <hr>
 
-    <div id="otherPlayers">
+    <div class='playerRow'>
+      <div>
+        <div id="player"></div>
 
+        <div id='rollDiv'>
+          <div id='dices'></div>
+          <button id="roll">dobás</button>
+    
+          <div class="dropdown">
+            <div id="resolveDropdown" class="dropdown-content">
+              <a href="#">Link 1</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+            <p id='selections'>Választott műveletek:</p>
+            <button id="resetSelectionsButton">reset</button>
+            <button id="endTurnButton" disabled>Kör befejezése</button>
+          </div>
+        </div>
+      
     </div>
-  </div>
-
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="index.js"></script>
 </body>

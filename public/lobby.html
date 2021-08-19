@@ -17,40 +17,6 @@
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#F3E9DC">
-    <style>
-        html,body{
-            height: 100%;
-        }
-        body {
-            background-color: #F3E9DC;
-            font-family: 'Saira Stencil One';
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
-        button {
-            font-family: inherit;
-        }
-        .center_div{
-            margin:auto;
-        }
-        .lobby_buttons {
-        }
-        .lobby_buttons a {
-            background-color: #dab49d;
-            height:50px;
-            appearance: button;
-            text-decoration: none;
-            color: initial;
-        }
-        .lobby_buttons button:hover {
-            background-color: #FFFFFF;
-        }
-        .bang_text {
-            color: #DC1313;
-            line-height: 0;
-        }
-    </style>
 </head>
 <body>
 <div class="center_div">
@@ -58,11 +24,83 @@
     <h1 class="bang_text">BANG:</h1>
     <h2>Kockajáték</h2>
 </div>
+    <div id="create_room__modal">
+        <div class="modal_content">
+            <span class="close">&times</span>
+            <form action="/create_room" method="POST" id="create_room">
+                <h2>Szoba létrehozása</h2>
+                <label for="roomName">Szoba neve</label>
+                <input type="text" name="roomName" required/>
+                <br>
+                <label for="roomName">Játékos neve</label>
+                <input type="text" name="playerName" required/>
+                <br>
+                <label for="playerLimit">Játékosok száma</label>
+                <select id="playerLimit" name="playerLimit">
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                  </select>
+                  <br>
+                <input type="submit" value="Létrehozás" class="submit_button"/>
+            </form>
+    </div>
+    </div>
+    <div id="join_room__modal">
+        <div class="modal_content">
+            <span class="close">&times</span>
+            <h2>Szobák</h2>
+            <div id="rooms">
+            </div>
+        </div>
+    </div>
+    <div id="help__modal">
+        <div class="modal_content">
+            <span class="close">&times</span>
+            <div>
+                <h2>Leírás</h2>
+                <p>Ez a "Bang! Kockajáték" implementációja. A játékban szereplő 16 karakterből 8 van implementálva, és 4-8 játékos játszhat. Az eredeti játékszabály megtalálható <a href="szabalyok.pdf">itt</a>.</p>
+                <h3>A játék célja</h3>
+                <p>Minden játékost más-más cél vezérel, a szerepkártyájától függően:</p>
+                <ul>
+                    <li>Seriff: le kell számolnia a banditákkal és a renegátokkal</li>
+                    <li>Banditák: le akarják lőni a seriffet</li>
+                    <li>Seriffhelyettesek: a seriffet segítik és védik</li>
+                    <li>Renegát: célja a játékban utolsóként életben maradni</li>
+                </ul>
+                <h3>Kockák</h3>
+                <ul id="dices">
+                    <li><img src="images/d0.png"><p>Ad egy nyilat. (amikor elfogynak a nyilak, mindenki annyi életet veszít, amennyi nyila van.)</p></li>
+                    <li><img src="images/d1.png"><p>Ha három dinamitot dobsz, akkor vesztesz egy életet és nem dobhatsz többször.</p></li>
+                    <li><img src="images/d2.png"><p>Lőhetsz egy játékosra, aki tőled 1 távolságra van.</p></li>
+                    <li><img src="images/d3.png"><p>Lőhetsz egy játékosra, aki tőled 2 távolságra van.</p></li>
+                    <li><img src="images/d4.png"><p>A kiválasztott játékos gyógyul egy életerőpontot.</p></li>
+                    <li><img src="images/d5.png"><p>Ha három vagy több Gatling szimbólumot dobsz, akkor rajtad kívül mindenki sebződik egy életerőpontnyit a kör végén.</p></li>
+                </ul>
+                <h3>A játék menete</h3>
+                <p>Először hozzunk létre egy szobát, vagy csatlakozzunk egyhez.</p>
+                <p>Felül látható a karakterünk, alul a többi játékos. Ha ez a mi körünk, akkor megjelenik a dobás gomb a karakterünk alatt:</p>
+                <img src="images/gallery/game_overview.png">
+                <p>A dobás gombra rányomva láthatjuk a kockákat. Ahhoz, hogy újradobjuk őket vagy kiválasszunk egy műveletet, nyomjunk rá (a reset gombra kattintva el tudjuk törölni ezeket):</p>
+                <img src="images/gallery/dobas.png">
+                <p>Ha kiválasztottuk az összes műveletet, akkor nyomjunk a "Kör befejezése" gombra.</p>
+                <h3>A játék vége</h3>
+                <p>A játék véget ér, ha:</p>
+                <ul>
+                    <li>A seriff kiesik a játékból. Ha ekkor már csak a Renegát van életben, akkor ő a győztes, egyébként a Banditák nyerték a játékot.</li>
+                    <li>Minden Bandita és Renegát kiesik a játékból. Ekkor a seriff és a seriffhelyettesek nyertek.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <div class="lobby_buttons">
-        <a href="create.html">Szoba létrehozása</a>
-        <a href="join.html">Csatlakozás</a>
-        <a href="help.html">Segítség</a>
+        <a href="#" id="create_room__btn">Szoba létrehozása</a>
+        <a href="#" id="join_room__btn">Csatlakozás</a>
+        <a href="#" id="help__btn">Segítség</a>
     </div>
 </div>
+    <script type="text/javascript" src="lobby.js"></script>
 </body>
 </html>

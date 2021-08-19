@@ -113,6 +113,11 @@ let socket = io();
         }
 
       function playersDataSetup([players,index,role,arrowsLeft]){
+        //creating html elements
+        //let divTurnArrow = document.createElement("div");
+        //let pCurTurn = document.createElement("p");
+        //let ArrowsLeft = document.createElement("p");
+
 
         document.getElementById('wait_screen').style.display = 'none';
         document.getElementById('game').classList.toggle('game_wait');
