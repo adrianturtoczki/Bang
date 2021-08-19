@@ -1,33 +1,59 @@
 <!DOCTYPE html>
 <head>
-    <meta charset="utf-8">
-    <title>Bang! Kockajáték</title>
-    <meta name="description" content="Bang! Kockajáték szoftveres megvalósítása">
-    <meta name="author" content="Adrian Turtoczki">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="utf-8">
+  <title>Bang! Kockajáték</title>
+  <meta name="description" content="Bang! Kockajáték szoftveres megvalósítása">
+  <meta name="author" content="Adrian Turtoczki">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="style.css">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#F3E9DC">
 
 </head>
 <body>
+
+  <div id='wait_screen'>
+    <p>Waiting for players ..</p>
+  </div>
+
+  <div id='game' class='game_wait'>
     <h1>Bang! Kockajáték</h1>
 
     <div>
-      <div id="otherPlayers"></div>
       <div>
         <p id='curTurn'></p>
         <p id='arrowsLeft'>Arrows left:</p>
       </div>
 
+      <div class='playerRow'>
+        <div>
+          <div id="player"></div>
+      </div>
+      <div id='rollDiv'>
+        <div id='dices'></div>
+        <input type="submit" value="dobás" id="roll"></input>
+  
+        <div class="dropdown">
+          <div id="resolveDropdown" class="dropdown-content">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+          </div>
+          <p id='selections'>Választott műveletek:</p>
+          <input type="submit" value="Választott műveletek törlése" id="resetSelectionsButton"></input>
+          <input type="submit" value="Kör befejezése" id="endTurnButton" disabled></input>
+        </div>
+      </div>
       <div>
-        <div id="log"></div>
   
         <div id="chatDiv">
           <div id="chat"></div>
@@ -41,28 +67,11 @@
     </div>
     <hr>
 
-    <div class='playerRow'>
-      <div>
-        <div id="player"></div>
+    <div id="otherPlayers">
 
-        <div id='rollDiv'>
-          <div id='dices'></div>
-          <button id="roll">dobás</button>
-    
-          <div class="dropdown">
-            <div id="resolveDropdown" class="dropdown-content">
-              <a href="#">Link 1</a>
-              <a href="#">Link 2</a>
-              <a href="#">Link 3</a>
-            </div>
-            <p id='selections'>Választott műveletek:</p>
-            <button id="resetSelectionsButton">reset</button>
-            <button id="endTurnButton" disabled>Kör befejezése</button>
-          </div>
-        </div>
-      
     </div>
-    </div>
+  </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="index.js"></script>
 </body>

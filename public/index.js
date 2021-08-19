@@ -77,7 +77,6 @@ let socket = io();
             let pDivName = document.createElement('div');
             let pDivLifeArrows_char = document.createElement('div');
             let pDivLifeArrows = document.createElement('div');
-            let pRoleDiv = document.createElement('div');
             let pName = document.createElement('h3');
             let pLife = document.createElement('p');
             let pArrows = document.createElement('p');
@@ -102,13 +101,12 @@ let socket = io();
             pDivLifeArrows.appendChild(pLifeImg);
             pDivLifeArrows.appendChild(pArrows);
             pDivLifeArrows.appendChild(pArrowsImg);
+            pDivLifeArrows.appendChild(pRole);
             pDivLifeArrows.classList.add("bulletsArrowsDiv");
             pDivLifeArrows_char.appendChild(pDivName);
             pDivLifeArrows_char.appendChild(pDivLifeArrows);
             pDivLifeArrows_char.appendChild(pChar);
             pDiv.appendChild(pDivLifeArrows_char);
-            pRoleDiv.appendChild(pRole);
-            pDiv.appendChild(pRoleDiv);
             divToAppend.appendChild(pDiv);
         }
 
@@ -156,7 +154,6 @@ let socket = io();
               pDataDiv.children[0].children[0].children[0].textContent=p.name;
               pDataDiv.children[0].children[1].children[0].textContent=p.life;
               pDataDiv.children[0].children[1].children[2].textContent=p.arrows;
-              //pDataDiv.children[0].children[1].src= 'images/c_'+p.character.name+'.jpg';
               if (p.life<=0) pDataDiv.children[1].children[0].src= 'images/r_'+p.role+'.jpg';
             }
           document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
@@ -337,7 +334,7 @@ let socket = io();
         }
         function revertHighlightPlayer(playerName){
           let playerNameDiv = document.getElementById("player_"+playerName).children[0].children[0].children[0];
-          playerNameDiv.style.backgroundColor="white";
+          playerNameDiv.style.backgroundColor="#F3E9DC";
         }
 
 
