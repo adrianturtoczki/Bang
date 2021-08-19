@@ -64,7 +64,7 @@ class GameServer{
     });
     
     router.post('/create_room', (req, res) => {
-      //console.log(req.body);
+      console.log('/create_room');
       if (this.rooms.find(x=>x.name===req.body.roomName)){
         //todo popup room already exists?
         res.redirect('/');

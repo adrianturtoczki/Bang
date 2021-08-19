@@ -100,6 +100,7 @@ describe("my awesome project", () => {
 
   test("sendMessage", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
+      console.log(clients[0].curRoom.game.chat);
       expect(clients[0].curRoom.game.chat).toEqual([]);
       clients[0].sendMessage("teszt");
       expect(clients[0].curRoom.game.chat).toEqual(["player 1: teszt"]);

@@ -13,16 +13,15 @@ class Game {
         this.roundCount = 1;
         this.turnCount = 0;
         this.arrowsLeft = 9;
-        this.log = [];
         this.chat = [];
     }
 
     async run(){
         this.started = true;
-        this.log.push("Game started!");
+        this.chat.push("Game started!");
         while (this.end!=true){
             for (let p of this.players){
-                this.log.push("Új kör");
+                this.chat.push("Új kör");
                 if (p.life>0){
                     p.curTurn = true;
                     console.log(p.name+"'s round");

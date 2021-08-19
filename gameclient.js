@@ -133,7 +133,7 @@ class GameClient{
   
       setTimeout(() => { //TODO: not ideal, would be better without timeout
         console.log("ending turn .. ");
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.players.alive,this.curRoom.game.log]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.players.alive,this.curRoom.game.chat]);
         this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
       }, 500);
     }
@@ -196,7 +196,7 @@ class GameClient{
   
         this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
   
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.log]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.chat]);
   
       }
     }
@@ -238,7 +238,7 @@ class GameClient{
   
       this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
   
-      this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.log]);
+      this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.chat]);
   
     }
     
