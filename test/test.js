@@ -103,7 +103,7 @@ describe("my awesome project", () => {
       console.log(clients[0].curRoom.game.chat);
       expect(clients[0].curRoom.game.chat).toEqual([]);
       clients[0].sendMessage("teszt");
-      expect(clients[0].curRoom.game.chat).toEqual(["player 1: teszt"]);
+      expect(clients[0].curRoom.game.chat[4]).toEqual("player 1: teszt");
       done();
     });
   });
