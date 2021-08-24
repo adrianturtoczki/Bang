@@ -33,8 +33,8 @@ let socket = io();
       socket.on('gameEnd', gameEnd);
       socket.on('updateChat',updateChat);
 
-      function updatePlayerNumber(current,total){
-        document.getElementById('wait_text').textContent = 'Waiting for players .. /';
+      function updatePlayerNumber([current,total]){
+        document.getElementById('wait_text').textContent = 'Waiting for players .. '+total+'/'+current;
       }
 
       function updateChat(gameChat){
