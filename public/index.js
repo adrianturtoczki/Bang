@@ -24,6 +24,7 @@ let socket = io();
       let playerRole;
       let player;
 
+      socket.on('updatePlayerNumber',updatePlayerNumber);
       socket.on('aPlayerDisconnected',aPlayerDisconnected);
       socket.on('currentTurn',currentTurn);
       socket.on('playersDataSetup', playersDataSetup);
@@ -31,6 +32,10 @@ let socket = io();
       socket.on('rollResults',rollResults);
       socket.on('gameEnd', gameEnd);
       socket.on('updateChat',updateChat);
+
+      function updatePlayerNumber(current,total){
+        document.getElementById('wait_text').textContent = 'Waiting for players .. /';
+      }
 
       function updateChat(gameChat){
           //printing chat

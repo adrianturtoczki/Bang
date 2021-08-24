@@ -39,7 +39,7 @@ describe("my awesome project", () => {
     clientSocket2.close();
     clientSocket3.close();
     clientSocket4.close();
-    room.game.end = true;
+    room.end = true;
     io.close();
   });
 
@@ -47,7 +47,7 @@ describe("my awesome project", () => {
     expect("asd").toBe("asd");
   });
   test("check player names",()=>{
-    expect(room.game.players.map(x=>x.name)).toEqual(["player 1","player 2","player 3", "player 4"]);
+    expect(room.players.map(x=>x.name)).toEqual(["player 1","player 2","player 3", "player 4"]);
   })
 
   test("checkArrowsLeft", (done) => {
@@ -64,7 +64,7 @@ describe("my awesome project", () => {
       }
       expect(clients[0].player.arrows).toEqual(5);
 
-      clients[0].curRoom.game.arrowsLeft = 0;
+      clients[0].curRoom.arrowsLeft = 0;
       clients[0].player.arrows = 1;
       clients[0].checkArrowsLeft();
       //sheriffs have +2 health
@@ -101,7 +101,7 @@ describe("my awesome project", () => {
   test("sendMessage", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
       clients[0].sendMessage("teszt");
-      expect(clients[0].curRoom.game.chat[4]).toEqual("player 1: teszt");
+      expect(clients[0].curRoom.chat[4]).toEqual("player 1: teszt");
       done();
     });
   });

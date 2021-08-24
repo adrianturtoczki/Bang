@@ -1,5 +1,4 @@
 const {waitFor} = require('./helper');
-const Game = require('./game');
 const Room = require('./room');
 const Dice = require('./dice');
 
@@ -29,16 +28,15 @@ class GameClient{
         this.socket.on('sendMessage', this.sendMessage); //public, maybe implement private later
         this.socket.on('disconnect', this.disconnect);
 
-        waitFor(x=>this.curRoom&&this.curRoom.game.started).then(x=>{
+        waitFor(x=>this.curRoom&&this.curRoom.started).then(x=>{
             this.setupAllConnected();
           });
     }
+
     setup(roomName){
-        //console.log("setup "+roomName);
         this.curRoom = this.server.rooms.find(x=>x.name===roomName);
         this.socket.join(this.curRoom.name);
     
-        //todo check if playerIndex always player.index
         for (let i in this.curRoom.connections){
           if (this.curRoom.connections[i] === null){
             this.playerIndex = parseInt(i);
@@ -47,21 +45,21 @@ class GameClient{
         }
         if (this.playerIndex == -1) return
         this.curRoom.connections[this.playerIndex] = this.socket;
+        this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playersLeft]);
+
       }
 
     setupAllConnected(){
-      //console.log("setup_all_connected");
-      this.player = this.curRoom.game.players[this.playerIndex];
+      this.player = this.curRoom.players[this.playerIndex];
       this.player.index = this.playerIndex;
-      this.player_role = this.curRoom.game.roles[this.playerIndex];
-      //console.log(this.player.name+' connected');
-      this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
-      this.socket.emit('playersDataSetup',[this.curRoom.game.players,this.playerIndex,this.player_role,this.curRoom.game.arrowsLeft]);
+      this.player_role = this.curRoom.roles[this.playerIndex];
+      this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.players[this.curRoom.turnCount].name);
+      this.socket.emit('playersDataSetup',[this.curRoom.players,this.playerIndex,this.player_role,this.curRoom.arrowsLeft]);
     }
     
     // ending a turn
     endTurn(selections){
-      let alivePlayers = this.curRoom.game.players.filter(x=>x.life>0);
+      let alivePlayers = this.curRoom.players.filter(x=>x.life>0);
   
       //resolving
       //console.log('resolving '+this.player.name+"'s turn ..");
@@ -71,9 +69,9 @@ class GameClient{
         this.player.life+=2;
       }
       //character check: el gringo
-      if (selections.some(x=>(x!=0&&x!=1&&x!=3&&x!=4&&x!=5)&&(x[0]===2||x[0]===3)&&this.curRoom.game.players[x[1]].character.name==='el_gringo')){
+      if (selections.some(x=>(x!=0&&x!=1&&x!=3&&x!=4&&x!=5)&&(x[0]===2||x[0]===3)&&this.curRoom.players[x[1]].character.name==='el_gringo')){
           this.player.arrows++;
-          this.curRoom.game.arrowsLeft--;
+          this.curRoom.arrowsLeft--;
           this.checkArrowsLeft();
       }
   
@@ -81,7 +79,7 @@ class GameClient{
         if (s!=null){
           //console.log("resolving " +s+ " ..");
           let dice_type = s[0];
-          let selectedPlayer = this.curRoom.game.players[s[1]];
+          let selectedPlayer = this.curRoom.players[s[1]];
           //console.log(dice_type,selectedPlayer);
           if (dice_type===2||dice_type===3){
             selectedPlayer.life--;
@@ -99,7 +97,7 @@ class GameClient{
       let gatlingDices = selections.filter(x=>x===5);
       //character check: willy the kid
       if (gatlingDices.length>=3||(gatlingDices.length===2&&this.player.character.name==='willy_the_kid')){
-        this.curRoom.game.arrowsLeft+=this.player.arrows;
+        this.curRoom.arrowsLeft+=this.player.arrows;
         this.player.arrows = 0;
         for (let p of alivePlayers){
           //character check: paul regret
@@ -111,13 +109,13 @@ class GameClient{
   
       let killedPlayers = alivePlayers.filter(x=>x.life<=0) //return killed this.player's arrows back
       for (let p of killedPlayers){
-        this.curRoom.game.arrowsLeft+=p.arrows;
+        this.curRoom.arrowsLeft+=p.arrows;
         p.arrows = 0;
         p.life = 0;
-        p.role = this.curRoom.game.roles[p.index];
+        p.role = this.curRoom.roles[p.index];
       }
   
-      let winner = this.curRoom.game.checkWinConditions(this.curRoom.playerLimit)
+      let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
       console.log(winner);
       if (winner){
         this.io.to(this.curRoom.name).emit('game_end',winner);
@@ -131,17 +129,17 @@ class GameClient{
       }
       
   
-      setTimeout(() => { //TODO: not ideal, would be better without timeout
+      setTimeout(() => {
         console.log("ending turn .. ");
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.players.alive,this.curRoom.game.chat]);
-        this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.game.players[this.curRoom.game.turnCount].name);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players,this.curRoom.arrowsLeft,this.curRoom.players.alive,this.curRoom.chat]);
+        this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.players[this.curRoom.turnCount].name);
       }, 500);
     }
     
     //check if no arrows are left
     checkArrowsLeft(){
-     if (this.curRoom.game.arrowsLeft<=0){
-        for (let p of this.curRoom.game.players){
+     if (this.curRoom.arrowsLeft<=0){
+        for (let p of this.curRoom.players){
           //character check: jourdonnais
           if (p.character.name!='jourdonnais'){
             p.life-=p.arrows;
@@ -150,7 +148,7 @@ class GameClient{
           }
           p.arrows = 0;
         }
-        this.curRoom.game.arrowsLeft = 9;
+        this.curRoom.arrowsLeft = 9;
       }
     }
     
@@ -174,7 +172,7 @@ class GameClient{
   
           if (d.type===0){
             this.player.arrows++;
-            this.curRoom.game.arrowsLeft--;
+            this.curRoom.arrowsLeft--;
     
             this.checkArrowsLeft();
           }
@@ -190,13 +188,13 @@ class GameClient{
   
         this.player.rolled = true;
         console.log(this.player.name + ' dobott: '+ rollResults.map(x=>x.name));
-        this.curRoom.game.chat.push(this.player.name + ' dobott: '+ rollResults.map(x=>x.name));
+        this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x=>x.name));
   
         this.player.curDices = rollResults;
   
         this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
   
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.chat]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players,this.curRoom.arrowsLeft,this.curRoom.playersAlive,this.curRoom.chat]);
   
       }
     }
@@ -206,7 +204,7 @@ class GameClient{
   
       rerolledDice.roll();
       console.log(this.player.name + ' újradobott: '+ rerolledDice.name);
-      this.curRoom.game.chat.push(this.player.name + ' újradobott: '+ rerolledDice.name);
+      this.curRoom.chat.push(this.player.name + ' újradobott: '+ rerolledDice.name);
   
       if (rerolledDice.type === 0 || rerolledDice.type === 1 ||rerolledDice.type === 5){
         this.player.selections[rerolledDiceIndex] = rerolledDice.type;
@@ -219,9 +217,9 @@ class GameClient{
       let dynamiteDices = this.player.curDices.filter(x=>x.type===1&&x.abilityActivated === false);
   
       if (rerolledDice.type===0){
-        this.curRoom.game.chat.push(this.player.name+' kapott egy nyilat.');
+        this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
         this.player.arrows++;
-        this.curRoom.game.arrowsLeft--;
+        this.curRoom.arrowsLeft--;
   
         this.checkArrowsLeft();
       }
@@ -230,7 +228,7 @@ class GameClient{
       }
   
       if (dynamiteDices.length>=3){
-        this.curRoom.game.chat.push(this.player.name + ' 3 dinamitot dobott.');
+        this.curRoom.chat.push(this.player.name + ' 3 dinamitot dobott.');
         this.player.life--;
         dynamiteDices.forEach(x=>x.abilityActivated = true);
         this.player.curDices.forEach(x=>x.rerollsLeft = 0);
@@ -238,14 +236,14 @@ class GameClient{
   
       this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
   
-      this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.game.players,this.curRoom.game.arrowsLeft,this.curRoom.game.playersAlive,this.curRoom.game.chat]);
+      this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players,this.curRoom.arrowsLeft,this.curRoom.playersAlive,this.curRoom.chat]);
   
     }
     
     sendMessage(m){
       console.log(this.player.name+" sent message: "+m);
-      this.curRoom.game.chat.push(this.player.name+": "+m);
-      this.io.to(this.curRoom.name).emit('updateChat',this.curRoom.game.chat);
+      this.curRoom.chat.push(this.player.name+": "+m);
+      this.io.to(this.curRoom.name).emit('updateChat',this.curRoom.chat);
     }
     
     //disconnect

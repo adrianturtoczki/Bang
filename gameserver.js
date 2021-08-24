@@ -42,7 +42,7 @@ class GameServer{
       console.log("/game");
       let room = this.rooms.find(x=>x.name==req.query.room);
       //console.log(room.game);
-      if (room.game.started==false){
+      if (room.started==false){
         res.sendFile(path.join(__dirname + '/public/game.html'));
       } else {
         res.sendFile(path.join(__dirname + '/public/lobby.html'));

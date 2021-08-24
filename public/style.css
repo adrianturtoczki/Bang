@@ -15,8 +15,7 @@
   }
 
   .game_wait{
-    filter:blur(8px);
-    pointer-events: none;
+    display:none;
   }
 
 
