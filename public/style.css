@@ -140,7 +140,7 @@ button {
     color: #DC1313;
     line-height: 0;
 }
-#create_room__modal,#join_room__modal,#help__modal {
+#create_room__modal,#join_room__modal,#help__modal,#join_room_form__modal {
     display:none;
     position:fixed;
     z-index: 1;

@@ -45,7 +45,7 @@ class GameClient{
         }
         if (this.playerIndex == -1) return
         this.curRoom.connections[this.playerIndex] = this.socket;
-        this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playersLeft]);
+        this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playerLimit-this.curRoom.playersLeft]);
 
       }
 

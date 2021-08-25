@@ -1,6 +1,5 @@
 'use strict';
 
-const Game = require('./game');
 const Room = require('./room');
 const Dice = require('./dice');
 const {waitFor} = require('./helper')
@@ -50,12 +49,17 @@ class GameServer{
     });
     
     router.post('/join_room', (req, res) => {
+      console.log(req.body);
+      console.log(this.rooms);
       console.log('/join_room');
       let room = this.rooms.find(x=>x.name==req.body.roomName);
       //checks if name already in room
       //console.log(req.body.playerName,room.playerNames);
       if (room.playerNames.includes(req.body.playerName)){
         console.log("error: name already in room!",req.body.playerName,room.playerNames);
+        res.send({"accepted":"false"}); //todo fix
+      } else if (room.password!=req.body.password) {
+        console.log("error: bad password!",req.body.password,room.password);
         res.send({"accepted":"false"}); //todo fix
       } else {
         room.addPlayer(req.body.playerName);

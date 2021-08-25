@@ -35,6 +35,9 @@
                 <label for="roomName">Játékos neve</label>
                 <input type="text" name="playerName" required/>
                 <br>
+                <label for="password">Jelszó (opcionális)</label>
+                <input type="text" name="password"/>
+                <br>
                 <label for="playerLimit">Játékosok száma</label>
                 <select id="playerLimit" name="playerLimit">
                     <option value="4">4</option>
@@ -54,6 +57,22 @@
             <h2>Szobák</h2>
             <div id="rooms">
             </div>
+        </div>
+    </div>
+    <div id="join_room_form__modal">
+        <div class="modal_content">
+            <span class="close">&times</span>
+            <form id="join_room__form">
+                <h2>Csatlakozás</h2>
+                <label for="playerName">Játékos neve</label>
+                <input type="text" name="playerName" required/>
+                <br>
+                <label for="password">Jelszó</label>
+                <input type="text" name="password"/>
+                <input type="hidden" id="roomName" name="roomName"/>
+                  <br>
+                <input type="submit" value="Létrehozás" class="submit_button" id="join_room_send__btn"/>
+            </form>
         </div>
     </div>
     <div id="help__modal">
