@@ -3,12 +3,13 @@ const Character = require('./character');
 const {waitFor} = require('./helper');
 
 class Room {
-    constructor(roomName,playerLimit,playersLeft=playerLimit,playerNames=[],characters=[],connections=[]){
+    constructor(roomName,playerLimit,password,playersLeft=playerLimit,playerNames=[],characters=[],connections=[]){
         this.name = roomName;
         this.playerLimit = playerLimit;
         this.playersLeft = playersLeft;
         this.playerNames = playerNames;
         this.characters = characters;
+        this.password = password;
 
         this.started = false;
         this.players = [];
