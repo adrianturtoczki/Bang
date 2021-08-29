@@ -23,6 +23,8 @@ let socket = io();
       let playerIndex = -1;
       let playerRole;
       let player;
+      let playerSelection = false;
+      let selectedPlayers = [];
 
       socket.on('updatePlayerNumber',updatePlayerNumber);
       socket.on('aPlayerDisconnected',aPlayerDisconnected);
@@ -116,11 +118,6 @@ let socket = io();
         }
 
       function playersDataSetup([players,index,role,arrowsLeft]){
-        //creating html elements
-        //let divTurnArrow = document.createElement("div");
-        //let pCurTurn = document.createElement("p");
-        //let ArrowsLeft = document.createElement("p");
-
 
         document.getElementById('wait_screen').style.display = 'none';
         document.getElementById('game').classList.toggle('game_wait');
@@ -162,17 +159,6 @@ let socket = io();
               if (p.life<=0) pDataDiv.children[1].children[0].src= 'images/r_'+p.role+'.jpg';
             }
           document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
-
-          //printing logs
-          let logId = document.getElementById('log');
-          logId.innerHTML = '';
-          console.log(gameLog)
-          for (let i = gameLog.length-1; i > 0; i--){
-            let p = document.createElement('p');
-            p.appendChild(document.createTextNode(gameLog[i]));
-            p.classList.add("chatLogP");
-            logId.appendChild(p);
-          }
           
       }
 
@@ -199,8 +185,8 @@ let socket = io();
       }
 
       function selectTarget(diceIndex,playerIndex){
+        console.log("selecttarget");
         let dice = player.curDices[diceIndex];
-        document.getElementById("resolveDropdown").classList.toggle("show");
         player.selections[dice.index] = [dice.type,playerIndex];
         print_selections(player.selections,document.getElementById('selections'));
 
@@ -227,119 +213,93 @@ let socket = io();
       }
   
       function diceDropdown(diceIndex) {
-        let resolveDropdownDiv = document.getElementById('resolveDropdown');
-        resolveDropdownDiv.innerHTML='';
-        let dice = player.curDices[diceIndex];
-
-        if (dice.type!=1){
-          document.getElementById("resolveDropdown").classList.toggle("show");
-        }
-        if (dice.rerollsLeft>0){
-          //reroll
-          let rerollButton = document.createElement('p');
-          rerollButton.appendChild(document.createTextNode("Újradobás ("+dice.rerollsLeft+" maradt)"));
-          rerollButton.addEventListener('click',function(){
-            document.getElementById("resolveDropdown").classList.toggle("show");
-            console.log("reroll button clicked for "+[dice.type,dice.index]);
-            socket.emit('reroll',dice.index);
-            player.selections = [];
-            print_selections(player.selections,document.getElementById('selections'));
-            });
-            resolveDropdownDiv.appendChild(rerollButton);
+        if (playerSelection){
+          playerSelection = false;
+          for (let p of selectedPlayers){
+            revertHighlightPlayer(p.name);
           }
-
-          let alivePlayers = playersAr.filter(x=>x.life>0);
-
-          //players the player can effect with the dice
-          if (dice.type===2||dice.type===3||dice.type===4){
-            let prevPlayer,nextPlayer;
-
-            let aliveIndex = alivePlayers.findIndex(x=>x===player);
-
-            let shootingDistances = [];
-            if (dice.type===2||(dice.type===3&&alivePlayers.length<=3)){
-              shootingDistances.push(1);
-              } else if (dice.type===3){
-                shootingDistances.push(2);
-              }
-              
-            //character check: calamity jane
-            if (player.character.name==="calamity_janet"){
-              if (shootingDistances[0]==1){
-                shootingDistances.push(2);
-              } else{
-                shootingDistances.push(1);
-              }
-            }
-            //character check: rose doolan
-            if (player.character.name==="rose_doolan"){
-              shootingDistances.push(shootingDistances[0]+1);
-            }
-
-            if (dice.type===2||dice.type===3){ //gun
-              for (let shootingDistance of shootingDistances){
-                let pName = document.createElement('p');
-                let nName = document.createElement('p');
-                console.log(shootingDistances)
-                if (aliveIndex < shootingDistance){
-                  prevPlayer = alivePlayers[aliveIndex-shootingDistance+alivePlayers.length];
-                } else {
-                  prevPlayer = alivePlayers[aliveIndex-shootingDistance];
-                }
-                if (aliveIndex >= alivePlayers.length-shootingDistance){
-                  nextPlayer = alivePlayers[aliveIndex+shootingDistance-alivePlayers.length];
-                }  else {
-                  nextPlayer = alivePlayers[aliveIndex+shootingDistance];
-                }
-                pName.appendChild(document.createTextNode(prevPlayer.name));
-                nName.appendChild(document.createTextNode(nextPlayer.name));
-                pName.setAttribute('onclick','selectTarget('+dice.index+','+prevPlayer.index+')');
-                nName.setAttribute('onclick','selectTarget('+dice.index+','+nextPlayer.index+')'); 
+          selectedPlayers = [];
+        } else {
+          let dice = player.curDices[diceIndex];
   
-                console.log(document.getElementById("player_"+prevPlayer.name));
-                pName.onmouseover = (function(i){
-                  return function(){highlightPlayer(i); }
-                })(prevPlayer.name);
-                pName.onmouseleave = (function(i){
-                  return function(){revertHighlightPlayer(i); }
-                })(prevPlayer.name);
+          if (dice.type!=1){
+            //document.getElementById("resolveDropdown").classList.toggle("show");
+            playerSelection = true;
+          }
+          if (dice.rerollsLeft>0){
+            //reroll
+            //temporarily removed reroll
+            console.log('reroll');
+            }
 
-                resolveDropdownDiv.appendChild(pName);
-                if (prevPlayer!=nextPlayer){
-                  console.log(document.getElementById("player_"+nextPlayer.name));
-                  nName.onmouseover = (function(i){
-                    return function(){highlightPlayer(i); }
-                  })(nextPlayer.name);
-                  nName.onmouseleave = (function(i){
-                    return function(){revertHighlightPlayer(i); }
-                  })(nextPlayer.name);
-
-                  resolveDropdownDiv.appendChild(nName);
+            let alivePlayers = playersAr.filter(x=>x.life>0);
+  
+            //players the player can effect with the dice
+            if (dice.type===2||dice.type===3||dice.type===4){
+              let prevPlayer,nextPlayer;
+  
+              let aliveIndex = alivePlayers.findIndex(x=>x===player);
+  
+              let shootingDistances = [];
+              if (dice.type===2||(dice.type===3&&alivePlayers.length<=3)){
+                shootingDistances.push(1);
+                } else if (dice.type===3){
+                  shootingDistances.push(2);
+                }
+                
+              //character check: calamity jane
+              if (player.character.name==="calamity_janet"){
+                if (shootingDistances[0]==1){
+                  shootingDistances.push(2);
+                } else{
+                  shootingDistances.push(1);
+                }
+              }
+              //character check: rose doolan
+              if (player.character.name==="rose_doolan"){
+                shootingDistances.push(shootingDistances[0]+1);
+              }
+  
+              if (dice.type===2||dice.type===3){ //gun
+                for (let shootingDistance of shootingDistances){
+                  console.log(shootingDistances)
+                  if (aliveIndex < shootingDistance){
+                    prevPlayer = alivePlayers[aliveIndex-shootingDistance+alivePlayers.length];
+                  } else {
+                    prevPlayer = alivePlayers[aliveIndex-shootingDistance];
+                  }
+                  if (aliveIndex >= alivePlayers.length-shootingDistance){
+                    nextPlayer = alivePlayers[aliveIndex+shootingDistance-alivePlayers.length];
+                  }  else {
+                    nextPlayer = alivePlayers[aliveIndex+shootingDistance];
+                  }
+                  selectedPlayers.push(prevPlayer);
+                  selectedPlayers.push(nextPlayer);
+    
+                  console.log(document.getElementById("player_"+prevPlayer.name));
+                }
+                } else if (dice.type===4){ //beer
+    
+                  for (let p of alivePlayers){
+                    selectedPlayers.push(p);
                   }
                 }
-              } else if (dice.type===4){ //beer
-  
-                for (let p of alivePlayers){
-                  let bName = document.createElement('p');
-                  bName.appendChild(document.createTextNode(p.name));
-                  bName.setAttribute('onclick','selectTarget('+dice.index+','+p.index+')');
-                  console.log(document.getElementById("player_"+p.name));
-                  bName.onmouseover = function(){highlightPlayer(p.name)};
-                  bName.onmouseleave = function(){revertHighlightPlayer(p.name)};
-
-                  resolveDropdownDiv.appendChild(bName);
+                for (let p of selectedPlayers){
+                  highlightPlayer(dice.index,p.name);
                 }
               }
-            }
+        }
         }
 
-        function highlightPlayer(playerName){
+        function highlightPlayer(dice_index,playerName){
           let playerNameDiv = document.getElementById("player_"+playerName).children[0].children[0].children[0];
-          playerNameDiv.style.backgroundColor="silver";
+          playerNameDiv.classList.add('highlighted');
+          playerNameDiv.onclick = () => selectTarget(dice_index,playerName);
         }
         function revertHighlightPlayer(playerName){
           let playerNameDiv = document.getElementById("player_"+playerName).children[0].children[0].children[0];
-          playerNameDiv.style.backgroundColor="#F3E9DC";
+          playerNameDiv.classList.remove('highlighted');
+          playerNameDiv.removeAttribute('onclick');
         }
 
 

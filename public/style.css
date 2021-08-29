@@ -101,6 +101,13 @@
     margin-right:auto;
   }
 
+  .highlighted{
+    background-color:silver;
+  }
+  .highlighted:hover{
+    background-color: #9c9797;
+  }
+
   *{
     box-sizing: border-box;
 }

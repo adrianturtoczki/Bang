@@ -51,10 +51,9 @@ function joinRoom(event){
               //if room good
               console.log(data.accepted);
               if (data.accepted=="true"){
-                  console.log("ok");
                   window.location.href="/game?room="+join_room__form.elements["roomName"].value;
               } else {
-                  console.log("error: name already in room!");
+                  alert("error!"); //todo separate alert messages for different errors
               }
           });
           
