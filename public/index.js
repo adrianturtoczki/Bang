@@ -99,9 +99,7 @@ let socket = io();
             pChar.src = 'images/c_'+p.character.name+'.jpg';
             pRole.src= 'images/r_'+playerRole+'.jpg';
             pArrowsImg.src='images/arrow.png';
-            pArrowsImg.style.height="50px";
             pLifeImg.src='images/bullet.png';
-            pLifeImg.style.height=pArrowsImg.style.height;
 
             pDivName.appendChild(pName);
             pDivLifeArrows.appendChild(pLife);
