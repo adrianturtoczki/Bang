@@ -92,13 +92,15 @@
     border: 1px solid;
     border-radius: 3px;
     margin: 10px 10px;
-    background-color: #ffebbd;
+    background-color: #dab49d;;
     overflow-wrap: break-word;
   }
 
   #submitBtn{
     margin-left:auto;
     margin-right:auto;
+    margin-bottom: 1px;
+    background-color: #dab49d;
   }
 
   .highlighted{
