@@ -54,6 +54,7 @@ class GameClient{
       this.player.index = this.playerIndex;
       this.player_role = this.curRoom.roles[this.playerIndex];
       this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.players[this.curRoom.turnCount].name);
+      this.io.to(this.curRoom.name).emit('updateChat',this.curRoom.chat); //todo
       this.socket.emit('playersDataSetup',[this.curRoom.players,this.playerIndex,this.player_role,this.curRoom.arrowsLeft]);
     }
     
@@ -69,7 +70,8 @@ class GameClient{
         this.player.life+=2;
       }
       //character check: el gringo
-      if (selections.some(x=>(x!=0&&x!=1&&x!=3&&x!=4&&x!=5)&&(x[0]===2||x[0]===3)&&this.curRoom.players[x[1]].character.name==='el_gringo')){
+      console.log(this.curRoom.players,selections)
+      if (selections.some(x=>(x!=0&&x!=1&&x!=3&&x!=4&&x!=5)&&(x[0]===2||x[0]===3)&&this.curRoom.players[x[1]].character.name==='el_gringo')){ //todo check
           this.player.arrows++;
           this.curRoom.arrowsLeft--;
           this.checkArrowsLeft();

@@ -51,7 +51,6 @@ class Room {
 
     async run(){
         this.started = true;
-        this.chat.push("Game started!");
         while (this.end!=true){
             for (let p of this.players){
                 this.chat.push("Új kör");

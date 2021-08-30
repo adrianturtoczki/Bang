@@ -184,13 +184,15 @@ let socket = io();
         }
       }
 
-      function selectTarget(diceIndex,playerIndex){
+      function selectTarget(dice,playerToSelect){
         console.log("selecttarget");
-        let dice = player.curDices[diceIndex];
-        player.selections[dice.index] = [dice.type,playerIndex];
+        player.selections[dice.index] = [dice.type,playerToSelect.index];
         print_selections(player.selections,document.getElementById('selections'));
-
         checkSelections(player.selections,document.getElementById('endTurnButton'));
+
+        playerSelection = false;
+        revertHighlightPlayers();
+
       }
 
       function print_selections(selections,selectionsDiv){
@@ -204,6 +206,7 @@ let socket = io();
             } else if (s[0]===4){
               prettierSelection+="Sör ->";
             }
+            console.log(s);
             prettierSelection+=playersAr[s[1]].name+';';
           }
         }
@@ -215,15 +218,12 @@ let socket = io();
       function diceDropdown(diceIndex) {
         if (playerSelection){
           playerSelection = false;
-          for (let p of selectedPlayers){
-            revertHighlightPlayer(p.name);
-          }
+          revertHighlightPlayers();
           selectedPlayers = [];
         } else {
           let dice = player.curDices[diceIndex];
   
-          if (dice.type!=1){
-            //document.getElementById("resolveDropdown").classList.toggle("show");
+          if (dice.type!=0 && dice.type!=1){
             playerSelection = true;
           }
           if (dice.rerollsLeft>0){
@@ -285,21 +285,25 @@ let socket = io();
                   }
                 }
                 for (let p of selectedPlayers){
-                  highlightPlayer(dice.index,p.name);
+                  highlightPlayer(dice,p);
                 }
               }
         }
         }
 
-        function highlightPlayer(dice_index,playerName){
-          let playerNameDiv = document.getElementById("player_"+playerName).children[0].children[0].children[0];
+        function highlightPlayer(dice,playerToHighlight){
+          let playerNameDiv = document.getElementById("player_"+playerToHighlight.name).children[0].children[0].children[0];
           playerNameDiv.classList.add('highlighted');
-          playerNameDiv.onclick = () => selectTarget(dice_index,playerName);
+          playerNameDiv.onclick = () => selectTarget(dice,playerToHighlight);
         }
-        function revertHighlightPlayer(playerName){
-          let playerNameDiv = document.getElementById("player_"+playerName).children[0].children[0].children[0];
-          playerNameDiv.classList.remove('highlighted');
-          playerNameDiv.removeAttribute('onclick');
+        function revertHighlightPlayers(){
+          let highlightedDivs = document.getElementsByClassName("highlighted");
+          console.log(highlightedDivs);
+          while(highlightedDivs.length){ //todo
+            console.log(highlightedDivs[0]);
+            highlightedDivs[0].removeAttribute('onclick');
+            highlightedDivs[0].classList.remove('highlighted');
+          }
         }
 
 
