@@ -101,7 +101,7 @@ describe("my awesome project", () => {
   test("sendMessage", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
       clients[0].sendMessage("teszt");
-      expect(clients[0].curRoom.chat[4]).toEqual("player 1: teszt");
+      expect(clients[0].curRoom.chat[clients[0].curRoom.chat.length-1]).toEqual("player 1: teszt");
       done();
     });
   });

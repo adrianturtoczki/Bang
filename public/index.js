@@ -24,7 +24,6 @@ let socket = io();
       let playerRole;
       let player;
       let playerSelection = false;
-      let selectedPlayers = [];
 
       socket.on('updatePlayerNumber',updatePlayerNumber);
       socket.on('aPlayerDisconnected',aPlayerDisconnected);
@@ -214,19 +213,35 @@ let socket = io();
       }
   
       function diceDropdown(diceIndex) {
+        let selectedPlayers = [];
         if (playerSelection){
           playerSelection = false;
+          rerollButton.style.display="none";
           revertHighlightPlayers();
-          selectedPlayers = [];
         } else {
           let dice = player.curDices[diceIndex];
   
-          if (dice.type!=0 && dice.type!=1){
-            playerSelection = true;
+          if (dice.type==1){
+            dice.rerollsLeft = 0;
           }
-          if (dice.rerollsLeft>0){
+          if (dice.rerollsLeft>0 && dice.type!=0 && dice.type!=1){
             //reroll
-            //temporarily removed reroll
+            playerSelection = true;
+            document.getElementById('dices').children[dice.index].style.filter = "brightness(0.9)";
+
+            let rerollButton = document.getElementById("rerollButton");
+            rerollButton.value = "Újradobás ("+dice.rerollsLeft+" maradt)";
+            rerollButton.addEventListener('click',function(event){
+              event.preventDefault();
+              console.log("reroll button clicked for "+[dice.type,dice.index]);
+              socket.emit('reroll',dice.index);
+              player.selections = [];
+              print_selections(player.selections,document.getElementById('selections'));
+              rerollButton.style.display="none";
+              playerSelection=false;
+              document.getElementById('dices').children[dice.index].style.removeProperty('filter');
+              });
+              rerollButton.style.display="block";
             console.log('reroll');
             }
 
@@ -345,6 +360,15 @@ let socket = io();
         event.preventDefault();
         socket.emit("sendMessage",document.getElementById('chatInputText').value);
       });
+
+      window.addEventListener("click",(event) => {
+        console.log("click",event.target);
+        if (playerSelection && event.target!=rerollButton ){
+          console.log("not reroll, cancelling");
+          playerSelection=false;
+          rerollButton.style.display="none";
+        };
+    });
 
 
 
