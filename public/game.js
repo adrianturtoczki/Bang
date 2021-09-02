@@ -24,6 +24,7 @@ let socket = io();
       let playerRole;
       let player;
       let playerSelection = false;
+      let selectedDiceIndex = -1;
 
       socket.on('updatePlayerNumber',updatePlayerNumber);
       socket.on('aPlayerDisconnected',aPlayerDisconnected);
@@ -137,7 +138,7 @@ let socket = io();
         }
 
         if (player.rolled&&player.curDices!=[]){
-          drawDice(player.curDices);
+          drawDices(player.curDices);
         }
       }
 
@@ -160,10 +161,11 @@ let socket = io();
       }
 
       function rollResults([rollResult,selections]){
+        console.log(rollResult)
         player.curDices = rollResult;
         player.selections = selections;
 
-        drawDice(player.curDices);
+        drawDices(player.curDices);
         checkSelections(selections,document.getElementById('endTurnButton'));
       }
 
@@ -187,8 +189,7 @@ let socket = io();
         print_selections(player.selections,document.getElementById('selections'));
         checkSelections(player.selections,document.getElementById('endTurnButton'));
 
-        playerSelection = false;
-        revertHighlightPlayers();
+        resetSelection();
 
       }
 
@@ -217,6 +218,8 @@ let socket = io();
         if (playerSelection){
           playerSelection = false;
           rerollButton.style.display="none";
+          document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
+          selectedDiceIndex=-1;
           revertHighlightPlayers();
         } else {
           let dice = player.curDices[diceIndex];
@@ -224,26 +227,14 @@ let socket = io();
           if (dice.type==1){
             dice.rerollsLeft = 0;
           }
-          if (dice.rerollsLeft>0 && dice.type!=0 && dice.type!=1){
+          if (dice.rerollsLeft>0 && dice.type!=1){
             //reroll
             playerSelection = true;
-            document.getElementById('dices').children[dice.index].style.filter = "brightness(0.9)";
-
+            selectedDiceIndex=diceIndex
             let rerollButton = document.getElementById("rerollButton");
             rerollButton.value = "Újradobás ("+dice.rerollsLeft+" maradt)";
-            rerollButton.addEventListener('click',function(event){
-              event.preventDefault();
-              console.log("reroll button clicked for "+[dice.type,dice.index]);
-              socket.emit('reroll',dice.index);
-              player.selections = [];
-              print_selections(player.selections,document.getElementById('selections'));
-              rerollButton.style.display="none";
-              playerSelection=false;
-              document.getElementById('dices').children[dice.index].style.removeProperty('filter');
-              });
-              rerollButton.style.display="block";
-            console.log('reroll');
-            }
+            rerollButton.style.display="block";
+          }
 
             let alivePlayers = playersAr.filter(x=>x.life>0);
   
@@ -320,15 +311,17 @@ let socket = io();
         }
 
 
-      function drawDice(dices){
+      function drawDices(dices){
+        console.log("drawdices:",dices);
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
+          console.log(dices);
           diceElements[i].src = 'images/d'+(dices[i].type)+'.png';
           diceElements[i].setAttribute('onclick',`diceDropdown(${i})`);
           if (dices[i].abilityActivated) {
-            diceElements[i].style.opacity=0.4;
+            diceElements[i].classList.add("abilityActivated");
         } else {
-          diceElements[i].style.opacity=1;
+          diceElements[i].classList.remove("abilityActivated");
         }
       }
     }
@@ -361,18 +354,35 @@ let socket = io();
         socket.emit("sendMessage",document.getElementById('chatInputText').value);
       });
 
-      window.addEventListener("click",(event) => {
+     /* 
+      document.addEventListener("click",(event) => {
         console.log("click",event.target);
-        if (playerSelection && event.target!=rerollButton ){
+        if (playerSelection && event.target!=rerollButton && event.target!=document.getElementById("dices")[selectedDiceIndex]  ){
           console.log("not reroll, cancelling");
           playerSelection=false;
           rerollButton.style.display="none";
+          document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
+          selectedDiceIndex=-1;
+          revertHighlightPlayers();
         };
-    });
+    });*/
 
+    rerollButton.addEventListener('click',function(event){
+      event.preventDefault();
+      let dice = player.curDices[selectedDiceIndex];
+      console.log("reroll button clicked for "+[dice.type,dice.index]);
+      socket.emit('reroll',dice.index);
+      player.selections = [];
+      print_selections(player.selections,document.getElementById('selections'));
+      rerollButton.style.display="none";
+      resetSelection();
+      });
 
-
-      //TODO: hide dropdown after clicking outside
-
+      function resetSelection(){
+        playerSelection=false;
+        document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
+        selectedDiceIndex=-1;
+        revertHighlightPlayers();
+      }
       //todo fix: confirm dialog when leaving page
       //window.onbeforeunload = function(){return 'Are you sure you want to quit?'};

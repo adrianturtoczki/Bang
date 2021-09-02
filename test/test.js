@@ -2,7 +2,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const Client = require("socket.io-client");
 const Room = require("../room");
-const GameClient = require("../gameclient");
+const socketServer = require("../socketServer");
 const {waitFor} = require('../helper');
 
 describe("my awesome project", () => {
@@ -22,7 +22,7 @@ describe("my awesome project", () => {
       clientSocket3 = new Client(`http://localhost:${port}`);
       clientSocket4 = new Client(`http://localhost:${port}`);
       io.on("connection", (socket) => {
-        let client = new GameClient(socket,io,server);
+        let client = new socketServer(socket,io,server);
         client.setup("test_room");
         clients.push(client);
       });

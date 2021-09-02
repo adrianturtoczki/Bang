@@ -69,6 +69,14 @@
     height:270px;
   }
 
+  #selectedDice{
+    filter:brightness(0.9);
+  }
+
+  .abilityActivated{
+    opacity:0.4;
+  }
+
   #chatInput{
     position: absolute; 
     bottom: 0px; 

@@ -10,9 +10,9 @@ const io = require('socket.io')(http);
 const config = require('./config.js');
 const path = require('path');
 const CircularJSON = require('circular-json');
-const GameClient = require('./gameclient');
+const socketServer = require('./socketServer');
 
-class GameServer{
+class expressServer{
   constructor(){
     var router = express.Router();
     app.use(express.static(path.join(__dirname, '/public')));
@@ -78,7 +78,7 @@ class GameServer{
         this.rooms.push(new_room);
       
         //waits for all players to connect then starts the game
-        waitFor(x=>new_room.allPlayersConnected()).then(x=>{
+        waitFor(x=>new_room.allPlayersConnected()).then(()=>{
           console.log("game started");
           new_room.start();
         });
@@ -90,9 +90,9 @@ class GameServer{
     http.listen(config.port, () => console.log('server started'));
 
     io.on('connection', (socket) => {
-      let client = new GameClient(socket,io,this);
+      let client = new socketServer(socket,io,this);
     });
   }
 }
 
-let server = new GameServer();
+let server = new expressServer();

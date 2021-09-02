@@ -2,7 +2,7 @@
   "name": "bang",
   "version": "1.0.0",
   "description": "Javascript implementation of Bang: the Dice Game",
-  "main": "gameserver.js",
+  "main": "expressServer.js",
   "dependencies": {
     "circular-json": "^0.5.9",
     "ejs": "^3.1.6",
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "node gameserver.js"
+    "start": "node expressServer.js"
   },
   "author": "Adrian Turtoczki",
   "license": "ISC"

@@ -4,7 +4,7 @@ const Dice = require('./dice');
 
 'use strict';
 
-class GameClient{
+class socketServer{
     constructor(socket,io,server){
         this.socket = socket;
         this.io = io;
@@ -28,7 +28,7 @@ class GameClient{
         this.socket.on('sendMessage', this.sendMessage); //public, maybe implement private later
         this.socket.on('disconnect', this.disconnect);
 
-        waitFor(x=>this.curRoom&&this.curRoom.started).then(x=>{
+        waitFor(x=>this.curRoom&&this.curRoom.started).then(()=>{
             this.setupAllConnected();
           });
     }
@@ -203,9 +203,12 @@ class GameClient{
     
     reroll(rerolledDiceIndex){
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
+      console.log("test:");
+      console.log(rerolledDice);
   
       rerolledDice.roll();
-      console.log(this.player.name + ' újradobott: '+ rerolledDice.name);
+      console.log(rerolledDice);
+      console.log(this.player.name + ' újradobott: '+ rerolledDice.name,rerolledDice.type);
       this.curRoom.chat.push(this.player.name + ' újradobott: '+ rerolledDice.name);
   
       if (rerolledDice.type === 0 || rerolledDice.type === 1 ||rerolledDice.type === 5){
@@ -259,4 +262,4 @@ class GameClient{
     }
 }
 
-module.exports = GameClient;
+module.exports = socketServer;
