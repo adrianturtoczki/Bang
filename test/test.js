@@ -13,7 +13,7 @@ describe("my awesome project", () => {
     clients = [];
     const httpServer = createServer();
     io = new Server(httpServer);
-    room = new Room("test_room",4,0,playerNames=["player 1","player 2","player 3", "player 4"],characters=["bart_cassidy","black_jack","calamity_janet","el_gringo"]);
+    room = new Room("test_room",4,"",4,playerNames=["player 1","player 2","player 3", "player 4"],characters=["bart_cassidy","black_jack","calamity_janet","el_gringo"]);
     server.rooms.push(room);
     httpServer.listen(() => {
       const port = httpServer.address().port;

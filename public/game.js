@@ -142,7 +142,8 @@ let socket = io();
         }
       }
 
-      function playersDataRefresh([players,arrowsLeft,pAlive,gameLog]){
+      function playersDataRefresh([players,arrowsLeft,pAlive,gameChat]){
+        updateChat(gameChat);
         playersAr = players;
         player = playersAr[playerIndex];
         playersAlive = pAlive;
@@ -348,6 +349,7 @@ let socket = io();
             }
         }
         print_selections(player.selections,document.getElementById('selections'));
+        revertHighlightPlayers();
       });
       document.getElementById('chatInput').addEventListener('submit',function(event){
         event.preventDefault();
@@ -380,8 +382,10 @@ let socket = io();
 
       function resetSelection(){
         playerSelection=false;
-        document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
-        selectedDiceIndex=-1;
+        if (selectedDiceIndex!=-1){
+          document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
+          selectedDiceIndex=-1;
+        }
         revertHighlightPlayers();
       }
       //todo fix: confirm dialog when leaving page
