@@ -296,7 +296,7 @@ let socket = io();
         }
 
         function highlightPlayer(dice,playerToHighlight){
-          let playerNameDiv = document.getElementById("player_"+playerToHighlight.name).children[0].children[0].children[0];
+          let playerNameDiv = document.getElementById("player_"+playerToHighlight.name);
           playerNameDiv.classList.add('highlighted');
           playerNameDiv.onclick = () => selectTarget(dice,playerToHighlight);
         }
