@@ -76,12 +76,7 @@ class expressServer{
         let new_room = new Room(req.body.roomName,parseInt(req.body.playerLimit),req.body.password);
         new_room.addPlayer(req.body.playerName);
         this.rooms.push(new_room);
-      
-        //waits for all players to connect then starts the game
-        waitFor(x=>new_room.allPlayersConnected()).then(()=>{
-          console.log("game started");
-          new_room.start();
-        });
+        
         res.redirect('/game?room='+req.body.roomName);
       }
     });

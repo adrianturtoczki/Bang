@@ -15,10 +15,10 @@ class Room {
         this.players = [];
         this.roles = []; //separated from players so they don't get sent to everyone
         this.end = false;
-        this.roundCount = 1;
-        this.turnCount = 0;
         this.arrowsLeft = 9;
         this.chat = [];
+
+        this.currentPlayerIndex = 0;
 
         if (connections.length===0){
             this.connections = new Array(this.playerLimit).fill(null);
@@ -45,39 +45,40 @@ class Room {
     }
 
     start(){
-        this.setup(this.playerLimit,this.playerNames,this.characters);
-        this.run();
-    }
-
-    async run(){
+        this.setupPlayersAndRoles(this.playerLimit,this.playerNames,this.characters);
         this.started = true;
-        while (this.end!=true){
-            for (let p of this.players){
-                this.chat.push("Új kör");
-                if (p.life>0){
-                    p.curTurn = true;
-                    console.log(p.name+"'s round");
-                    await waitFor(_ => p.turnEnd === true).then(_ => {
-                        console.log(p.name+"'s turn over!");
-                        console.log(p);
-                        p.curTurn = false;
-                        p.turnEnd = false;
-                        p.rolled = false;
-                        p.curDices = [];
-                        p.selections = [];
-                        console.log(this.turnCount)
-                    });
-                }
-                this.turnCount++;
+        let firstPlayer = this.players[0];
+        this.chat.push("Új kör");
+        firstPlayer.curTurn = true;
+        console.log(firstPlayer.name+" köre");
+    }
+    nextPlayer(){
+        if (!this.end){
+            let lastPlayer = this.players[this.currentPlayerIndex]
+            this.chat.push("Új kör");
+            console.log(lastPlayer.name+"' körének vége!");
+            lastPlayer.curTurn = false;
+            lastPlayer.turnEnd = false;
+            lastPlayer.rolled = false;
+            lastPlayer.curDices = [];
+            lastPlayer.selections = [];
+            if (this.currentPlayerIndex==this.playerLimit-1){
+                this.currentPlayerIndex = 0;
+            } else {
+                this.currentPlayerIndex++;
             }
-            this.turnCount = 0;
-            this.roundCount++;
+            let currentPlayer = this.players[this.currentPlayerIndex];
+            console.log("current player: ",currentPlayer);
+            if (currentPlayer.life>0){
+                currentPlayer.curTurn = true;
+                console.log(currentPlayer.name+" köre");
+            }
+        } else {
+            this.started = false;
         }
-        this.started = false;
     }
 
-
-    setup(playerNumber,playerNames,characters=[]){
+    setupPlayersAndRoles(playerNumber,playerNames,characters=[]){
         this.players = [];
         let allCharacters = ["paul_regret","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid","calamity_janet","rose_doolan"];
         let roleAr = ["sheriff","renegade","outlaw","outlaw","deputy","outlaw","deputy","renegade"].slice(0,playerNumber);

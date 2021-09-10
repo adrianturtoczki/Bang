@@ -23,7 +23,7 @@ describe("my awesome project", () => {
       clientSocket4 = new Client(`http://localhost:${port}`);
       io.on("connection", (socket) => {
         let client = new socketServer(socket,io,server);
-        client.setup("test_room");
+        client.setupPlayersAndRoles("test_room");
         clients.push(client);
       });
 

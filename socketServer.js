@@ -14,14 +14,14 @@ class socketServer{
         this.player;
         this.player_role;
 
-        this.setup = this.setup.bind(this);
+        this.addSocket = this.addSocket.bind(this);
         this.endTurn = this.endTurn.bind(this);
         this.roll = this.roll.bind(this);
         this.reroll = this.reroll.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.disconnect = this.disconnect.bind(this);
 
-        this.socket.on('setup',this.setup);
+        this.socket.on('addSocket',this.addSocket);
         this.socket.on('endTurn', this.endTurn);
         this.socket.on('roll', this.roll);
         this.socket.on('reroll', this.reroll);
@@ -33,7 +33,7 @@ class socketServer{
           });
     }
 
-    setup(roomName){
+    addSocket(roomName){
         this.curRoom = this.server.rooms.find(x=>x.name===roomName);
         this.socket.join(this.curRoom.name);
     
@@ -45,6 +45,10 @@ class socketServer{
         }
         if (this.playerIndex == -1) return
         this.curRoom.connections[this.playerIndex] = this.socket;
+        if (this.curRoom.allPlayersConnected()){
+          console.log("a játék elindult");
+          this.curRoom.start();
+        }
         this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playerLimit-this.curRoom.playersLeft]);
 
       }
@@ -53,7 +57,6 @@ class socketServer{
       this.player = this.curRoom.players[this.playerIndex];
       this.player.index = this.playerIndex;
       this.player_role = this.curRoom.roles[this.playerIndex];
-      this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.players[this.curRoom.turnCount].name);
       this.io.to(this.curRoom.name).emit('updateChat',this.curRoom.chat); //todo
       this.socket.emit('playersDataSetup',[this.curRoom.players,this.playerIndex,this.player_role,this.curRoom.arrowsLeft]);
     }
@@ -127,14 +130,13 @@ class socketServer{
       //ending turn
       console.log(this.player.name+"'s turn ended");
       if (this.player.curTurn){
-        this.player.turnEnd = true;
+        this.curRoom.nextPlayer();
       }
       
   
       setTimeout(() => {
         console.log("ending turn .. ");
         this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players,this.curRoom.arrowsLeft,this.curRoom.players.alive,this.curRoom.chat]);
-        this.io.to(this.curRoom.name).emit('currentTurn',this.curRoom.players[this.curRoom.turnCount].name);
       }, 500);
     }
     

@@ -3,7 +3,7 @@
 let socket = io();
 
       var urlParams = new URLSearchParams(window.location.search);
-      socket.emit('setup',urlParams.get('room'));
+      socket.emit('addSocket',urlParams.get('room'));
       
       //setup
       let d1 = new Image();
@@ -28,7 +28,6 @@ let socket = io();
 
       socket.on('updatePlayerNumber',updatePlayerNumber);
       socket.on('aPlayerDisconnected',aPlayerDisconnected);
-      socket.on('currentTurn',currentTurn);
       socket.on('playersDataSetup', playersDataSetup);
       socket.on('playersDataRefresh',playersDataRefresh);
       socket.on('rollResults',rollResults);
@@ -36,7 +35,7 @@ let socket = io();
       socket.on('updateChat',updateChat);
 
       function updatePlayerNumber([current,total]){
-        document.getElementById('wait_text').textContent = 'Waiting for players .. '+total+'/'+current;
+        document.getElementById('wait_text').textContent = 'Várás a többi játékosra .. '+total+'/'+current;
       }
 
       function updateChat(gameChat){
@@ -55,10 +54,6 @@ let socket = io();
       function aPlayerDisconnected(){
         alert('Egy játékos  kilépett. Visszalépés a főoldalra.');
         window.location.href = '/';
-      }
-
-      function currentTurn(turnName){
-        document.getElementById('curTurn').textContent='Jelenlegi kör: '+turnName;
       }
 
       function curPlayerData(player) {
