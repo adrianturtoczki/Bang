@@ -28,9 +28,6 @@ class socketServer{
         this.socket.on('sendMessage', this.sendMessage); //public, maybe implement private later
         this.socket.on('disconnect', this.disconnect);
 
-        waitFor(x=>this.curRoom&&this.curRoom.started).then(()=>{
-            this.setupAllConnected();
-          });
     }
 
     addSocket(roomName){
@@ -48,12 +45,15 @@ class socketServer{
         if (this.curRoom.allPlayersConnected()){
           console.log("a játék elindult");
           this.curRoom.start();
+          console.log(this.curRoom.name);
+          this.setupAllConnected(); //todo change to socketio
         }
         this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playerLimit-this.curRoom.playersLeft]);
 
       }
 
     setupAllConnected(){
+      console.log("test");
       this.player = this.curRoom.players[this.playerIndex];
       this.player.index = this.playerIndex;
       this.player_role = this.curRoom.roles[this.playerIndex];
@@ -82,10 +82,8 @@ class socketServer{
   
       for (let s of selections){
         if (s!=null){
-          //console.log("resolving " +s+ " ..");
           let dice_type = s[0];
           let selectedPlayer = this.curRoom.players[s[1]];
-          //console.log(dice_type,selectedPlayer);
           if (dice_type===2||dice_type===3){
             selectedPlayer.life--;
           } else if (dice_type===4&&selectedPlayer.life<selectedPlayer.startingLife){
@@ -205,11 +203,8 @@ class socketServer{
     
     reroll(rerolledDiceIndex){
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
-      console.log("test:");
-      console.log(rerolledDice);
   
       rerolledDice.roll();
-      console.log(rerolledDice);
       console.log(this.player.name + ' újradobott: '+ rerolledDice.name,rerolledDice.type);
       this.curRoom.chat.push(this.player.name + ' újradobott: '+ rerolledDice.name);
   

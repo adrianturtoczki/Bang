@@ -42,7 +42,6 @@ let socket = io();
           //printing chat
           let chatId = document.getElementById('chat');
           chatId.innerHTML = '';
-          console.log(gameChat)
           for (let i = gameChat.length-1; i >= 0; i--){
             let p = document.createElement('p');
             p.appendChild(document.createTextNode(gameChat[i]));

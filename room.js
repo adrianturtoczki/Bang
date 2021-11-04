@@ -1,6 +1,5 @@
 const Player = require('./player');
 const Character = require('./character');
-const {waitFor} = require('./helper');
 
 class Room {
     constructor(roomName,playerLimit,password,playersLeft=playerLimit,playerNames=[],characters=[],connections=[]){

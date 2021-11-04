@@ -2,7 +2,6 @@
 
 const Room = require('./room');
 const Dice = require('./dice');
-const {waitFor} = require('./helper')
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -49,8 +48,6 @@ class expressServer{
     });
     
     router.post('/join_room', (req, res) => {
-      console.log(req.body);
-      console.log(this.rooms);
       console.log('/join_room');
       let room = this.rooms.find(x=>x.name==req.body.roomName);
       //checks if name already in room
