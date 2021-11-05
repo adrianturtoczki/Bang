@@ -51,7 +51,6 @@ describe("my awesome project", () => {
   })
 
   test("checkArrowsLeft", (done) => {
-    waitFor(x=>clients[0].player).then(x=>{
       //check if arrowsLeft>0
       clients[0].curRoom.arrowsLeft = 4;
       clients[0].player.arrows = 5;
@@ -75,35 +74,28 @@ describe("my awesome project", () => {
       }
       expect(clients[0].player.arrows).toEqual(0);
       done();
-    });
   });
   test("roll", (done) => {
-    waitFor(x=>clients[0].player).then(x=>{
       expect(clients[0].player.curDices).toEqual([]);
       clients[0].roll();
       expect(clients[0].player.curDices.length).toEqual(5);
       //if player rolled an arrow or 3 dynamites, check if the effects work
       //if (clients[0].player.curDices)
       done();
-    });
   });
 
   test("reroll", (done) => {
-    waitFor(x=>clients[0].player).then(x=>{
       clients[0].roll();
       //if player rolled an arrow or 3 dynamites, check the effects at the initial roll
       clients[0].reroll(0);
       //check the reroll's effect
       done();
-    });
   });
 
   test("sendMessage", (done) => {
-    waitFor(x=>clients[0].player).then(x=>{
       clients[0].sendMessage("teszt");
       expect(clients[0].curRoom.chat[clients[0].curRoom.chat.length-1]).toEqual("player 1: teszt");
       done();
-    });
   });
 
 });

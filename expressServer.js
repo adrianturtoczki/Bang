@@ -21,9 +21,7 @@ class expressServer{
     app.use(express.json());
 
     this.clients = [];
-    
     this.rooms = [];
-
     this.http = http;
     this.io = io;
     
