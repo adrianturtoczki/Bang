@@ -181,14 +181,14 @@ let socket = io();
       function selectTarget(dice, playerToSelect){
         console.log("selecttarget");
         player.selections[dice.index] = [dice.type, playerToSelect.index];
-        print_selections(player.selections, document.getElementById('selections'));
+        printSelections(player.selections, document.getElementById('selections'));
         checkSelections(player.selections, document.getElementById('endTurnButton'));
 
         resetSelection();
 
       }
 
-      function print_selections(selections, selectionsDiv){
+      function printSelections(selections, selectionsDiv){
         console.log(selections);
         console.log(playersAr);
         let prettierSelection = '';
@@ -331,7 +331,7 @@ let socket = io();
         console.log("end turn button clicked");
         socket.emit('endTurn',player.selections);
         player.selections = [];
-        print_selections(player.selections,document.getElementById('selections'));
+        printSelections(player.selections,document.getElementById('selections'));
         player.curDices = [];
         document.getElementById('endTurnButton').disabled = true;
       });
@@ -342,7 +342,7 @@ let socket = io();
             player.selections[i] = null;
             }
         }
-        print_selections(player.selections, document.getElementById('selections'));
+        printSelections(player.selections, document.getElementById('selections'));
         revertHighlightPlayers();
       });
       document.getElementById('chatInput').addEventListener('submit', function(event){
@@ -356,7 +356,7 @@ let socket = io();
       console.log("reroll button clicked for "+[dice.type, dice.index]);
       socket.emit('reroll', dice.index);
       player.selections = [];
-      print_selections(player.selections, document.getElementById('selections'));
+      printSelections(player.selections, document.getElementById('selections'));
       rerollButton.style.display = "none";
       resetSelection();
       });

@@ -36,6 +36,10 @@
     flex-wrap: wrap;
   }
 
+  #rooms a{
+    margin:5px;
+  }
+
   .bulletsArrowsDiv{
     display:flex;
   }

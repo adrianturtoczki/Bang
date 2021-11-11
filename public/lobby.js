@@ -103,11 +103,11 @@ function createRoomDiv(room){
     rDiv.appendChild(rName);
     rDiv.appendChild(rPlayerNumber);
     rDiv.appendChild(rPlayersLeft);
-    if (room.playersLeft>0){
+    if (room.playersLeft > 0){
         let rJoinButton = document.createElement('a');
         rJoinButton.textContent = "Csatlakozás";
         rJoinButton.classList.add("submit_button");
-        rJoinButton.addEventListener("click",() => {
+        rJoinButton.addEventListener("click", () => {
             join_room_form__modal.style.display = "block";
             selectedRoom.value = room.name;
         });
