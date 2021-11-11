@@ -20,6 +20,7 @@ class socketServer{
         this.reroll = this.reroll.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.disconnect = this.disconnect.bind(this);
+        this.setupAllConnected = this.setupAllConnected.bind(this);
 
         this.socket.on('addSocket',this.addSocket);
         this.socket.on('endTurn', this.endTurn);
@@ -27,6 +28,11 @@ class socketServer{
         this.socket.on('reroll', this.reroll);
         this.socket.on('sendMessage', this.sendMessage); //public, maybe implement private later
         this.socket.on('disconnect', this.disconnect);
+        this.socket.on('setupAllConnected', this.setupAllConnected);
+
+        waitFor(x=>this.curRoom&&this.curRoom.started).then(()=>{
+          this.setupAllConnected();
+        });
 
     }
 
@@ -46,7 +52,21 @@ class socketServer{
           console.log("a játék elindult");
           this.curRoom.start();
           console.log(this.curRoom.name);
-          this.setupAllConnected(); //todo change to socketio
+
+          /*
+          let waitFor = (conditionFunction) => {
+            const poll = resolve => {
+              if(conditionFunction()) resolve();
+              else setTimeout(() => poll(resolve), 500);
+            }
+            return new Promise(poll);
+          }
+          waitFor(x=>this.curRoom&&this.curRoom.started).then(()=>{
+            this.setupAllConnected();
+          });
+
+          */
+          
         }
         this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playerLimit-this.curRoom.playersLeft]);
 
