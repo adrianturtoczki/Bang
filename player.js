@@ -1,12 +1,12 @@
 class Player {
-    constructor(name,role,character){
+    constructor(name, role, character){
 
         this.index = -1;
 
         this.name = name;
         this.character = character;
         this.life = character.life;
-        if (role==='sheriff'){
+        if (role === 'sheriff'){
             this.role = 'sheriff';
             this.life = this.life+=2;
         } else {

@@ -13,7 +13,7 @@ const socketServer = require('./socketServer');
 
 class expressServer{
   constructor(){
-    var router = express.Router();
+    let router = express.Router();
     app.use(express.static(path.join(__dirname, '/public')));
     app.use(express.urlencoded({
       extended: true
@@ -36,9 +36,8 @@ class expressServer{
     
     router.get('/game', (req, res) => {
       console.log("/game");
-      let room = this.rooms.find(x=>x.name==req.query.room);
-      //console.log(room.game);
-      if (room.started==false){
+      let room = this.rooms.find(x => x.name == req.query.room);
+      if (!room.started){
         res.sendFile(path.join(__dirname + '/public/game.html'));
       } else {
         res.sendFile(path.join(__dirname + '/public/lobby.html'));
@@ -49,7 +48,6 @@ class expressServer{
       console.log('/join_room');
       let room = this.rooms.find(x=>x.name==req.body.roomName);
       //checks if name already in room
-      //console.log(req.body.playerName,room.playerNames);
       if (room.playerNames.includes(req.body.playerName)){
         console.log("error: name already in room!",req.body.playerName,room.playerNames);
         res.send({"accepted":"false"}); //todo fix

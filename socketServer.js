@@ -30,14 +30,14 @@ class socketServer{
         this.socket.on('disconnect', this.disconnect);
         this.socket.on('setupAllConnected', this.setupAllConnected);
 
-        waitFor(x=>this.curRoom&&this.curRoom.started).then(()=>{
+        waitFor(x => this.curRoom && this.curRoom.started).then(()=>{
           this.setupAllConnected();
         });
 
     }
 
     addSocket(roomName){
-        this.curRoom = this.server.rooms.find(x=>x.name===roomName);
+        this.curRoom = this.server.rooms.find(x => x.name === roomName);
         this.socket.join(this.curRoom.name);
     
         for (let i in this.curRoom.connections){
@@ -52,20 +52,6 @@ class socketServer{
           console.log("a játék elindult");
           this.curRoom.start();
           console.log(this.curRoom.name);
-
-          /*
-          let waitFor = (conditionFunction) => {
-            const poll = resolve => {
-              if(conditionFunction()) resolve();
-              else setTimeout(() => poll(resolve), 500);
-            }
-            return new Promise(poll);
-          }
-          waitFor(x=>this.curRoom&&this.curRoom.started).then(()=>{
-            this.setupAllConnected();
-          });
-
-          */
           
         }
         this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playerLimit-this.curRoom.playersLeft]);
@@ -73,7 +59,6 @@ class socketServer{
       }
 
     setupAllConnected(){
-      console.log("test");
       this.player = this.curRoom.players[this.playerIndex];
       this.player.index = this.playerIndex;
       this.player_role = this.curRoom.roles[this.playerIndex];
@@ -86,29 +71,28 @@ class socketServer{
       let alivePlayers = this.curRoom.players.filter(x=>x.life>0);
   
       //resolving
-      //console.log('resolving '+this.player.name+"'s turn ..");
   
       //character check: suzy lafayette
-      if (this.player.name==='suzy_lafayette'&&selections.filter(x=>x[0]===2||x[0]===3).length === 0){
+      if (this.player.name === 'suzy_lafayette' && selections.filter(x => x[0] === 2 || x[0] === 3).length === 0){
         this.player.life+=2;
       }
       //character check: el gringo
       console.log(this.curRoom.players,selections)
-      if (selections.some(x=>(x!=0&&x!=1&&x!=3&&x!=4&&x!=5)&&(x[0]===2||x[0]===3)&&this.curRoom.players[x[1]].character.name==='el_gringo')){ //todo check
+      if (selections.some(x => (x!=0 && x!=1 && x!=3 && x!=4 && x!=5) && (x[0] === 2 || x[0] === 3) && this.curRoom.players[x[1]].character.name === 'el_gringo')){ //todo check
           this.player.arrows++;
           this.curRoom.arrowsLeft--;
           this.checkArrowsLeft();
       }
   
       for (let s of selections){
-        if (s!=null){
+        if (s != null){
           let dice_type = s[0];
           let selectedPlayer = this.curRoom.players[s[1]];
-          if (dice_type===2||dice_type===3){
+          if (dice_type === 2 || dice_type === 3){
             selectedPlayer.life--;
-          } else if (dice_type===4&&selectedPlayer.life<selectedPlayer.startingLife){
+          } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
             //character check: jesse jones
-            if (selectedPlayer.name==='jesse_jones'&&selectedPlayer===this.player&&selectedPlayer.life<=4){
+            if (selectedPlayer.name === 'jesse_jones' && selectedPlayer === this.player && selectedPlayer.life <= 4){
               selectedPlayer.life+=2;
             } else {
               selectedPlayer.life++;
@@ -117,22 +101,22 @@ class socketServer{
         }
       }
   
-      let gatlingDices = selections.filter(x=>x===5);
+      let gatlingDices = selections.filter(x => x === 5);
       //character check: willy the kid
-      if (gatlingDices.length>=3||(gatlingDices.length===2&&this.player.character.name==='willy_the_kid')){
-        this.curRoom.arrowsLeft+=this.player.arrows;
+      if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
+        this.curRoom.arrowsLeft += this.player.arrows;
         this.player.arrows = 0;
         for (let p of alivePlayers){
           //character check: paul regret
-          if (p!=this.player&&p.character.name!='paul_regret'){
+          if (p != this.player && p.character.name != 'paul_regret'){
             p.life--;
           }
         }
       }
   
-      let killedPlayers = alivePlayers.filter(x=>x.life<=0) //return killed this.player's arrows back
+      let killedPlayers = alivePlayers.filter(x => x.life <= 0) //return killed this.player's arrows back
       for (let p of killedPlayers){
-        this.curRoom.arrowsLeft+=p.arrows;
+        this.curRoom.arrowsLeft += p.arrows;
         p.arrows = 0;
         p.life = 0;
         p.role = this.curRoom.roles[p.index];
@@ -141,8 +125,8 @@ class socketServer{
       let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
       console.log(winner);
       if (winner){
-        this.io.to(this.curRoom.name).emit('game_end',winner);
-        this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom),1);
+        this.io.to(this.curRoom.name).emit('game_end', winner);
+        this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
       }
   
       //ending turn
@@ -154,17 +138,17 @@ class socketServer{
   
       setTimeout(() => {
         console.log("ending turn .. ");
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players,this.curRoom.arrowsLeft,this.curRoom.players.alive,this.curRoom.chat]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.players.alive, this.curRoom.chat]);
       }, 500);
     }
     
     //check if no arrows are left
     checkArrowsLeft(){
-     if (this.curRoom.arrowsLeft<=0){
+     if (this.curRoom.arrowsLeft <= 0){
         for (let p of this.curRoom.players){
           //character check: jourdonnais
-          if (p.character.name!='jourdonnais'){
-            p.life-=p.arrows;
+          if (p.character.name != 'jourdonnais'){
+            p.life -= p.arrows;
           } else {
             p.life--;
           }
@@ -176,47 +160,47 @@ class socketServer{
     
     //dice roll
     roll(){
-      if (this.player.rolled===false){
+      if (this.player.rolled === false){
   
         let rollResults = [];
         for (let i = 0; i < 5; i++){
           let cur_dice = new Dice(i);
           rollResults.push(cur_dice);
-          if (cur_dice.type === 0 ||cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1,2
+          if (cur_dice.type === 0 || cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1,2
             this.player.selections[i] = cur_dice.type;
             } else {
               this.player.selections[i] = null;
             }
         }
   
-        let dynamiteDices = rollResults.filter(x=>x.type===1);
+        let dynamiteDices = rollResults.filter(x => x.type === 1);
         for (let d of rollResults){
   
-          if (d.type===0){
+          if (d.type === 0){
             this.player.arrows++;
             this.curRoom.arrowsLeft--;
     
             this.checkArrowsLeft();
           }
-          else if (d.type==1){
+          else if (d.type === 1){
             d.rerollsLeft = 0;
           }
         }
-        if (dynamiteDices.length>=3){
+        if (dynamiteDices.length >= 3){
           this.player.life--;
           dynamiteDices.forEach(x=>x.abilityActivated = true);
           rollResults.forEach(x=>x.rerollsLeft = 0);
         }
   
         this.player.rolled = true;
-        console.log(this.player.name + ' dobott: '+ rollResults.map(x=>x.name));
-        this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x=>x.name));
+        console.log(this.player.name + ' dobott: '+ rollResults.map(x => x.name));
+        this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x => x.name));
   
         this.player.curDices = rollResults;
   
-        this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
+        this.socket.emit('rollResults',[this.player.curDices, this.player.selections]);
   
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players,this.curRoom.arrowsLeft,this.curRoom.playersAlive,this.curRoom.chat]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.playersAlive, this.curRoom.chat]);
   
       }
     }
@@ -225,7 +209,7 @@ class socketServer{
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
   
       rerolledDice.roll();
-      console.log(this.player.name + ' újradobott: '+ rerolledDice.name,rerolledDice.type);
+      console.log(this.player.name + ' újradobott: '+ rerolledDice.name, rerolledDice.type);
       this.curRoom.chat.push(this.player.name + ' újradobott: '+ rerolledDice.name);
   
       if (rerolledDice.type === 0 || rerolledDice.type === 1 ||rerolledDice.type === 5){
@@ -236,46 +220,45 @@ class socketServer{
   
       rerolledDice.rerollsLeft--;
   
-      let dynamiteDices = this.player.curDices.filter(x=>x.type===1&&x.abilityActivated === false);
+      let dynamiteDices = this.player.curDices.filter(x => x.type === 1 && x.abilityActivated === false);
   
-      if (rerolledDice.type===0){
+      if (rerolledDice.type === 0){
         this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
         this.player.arrows++;
         this.curRoom.arrowsLeft--;
   
         this.checkArrowsLeft();
       }
-      else if (rerolledDice.type==1){
+      else if (rerolledDice.type === 1){
         rerolledDice.rerollsLeft = 0;
       }
   
-      if (dynamiteDices.length>=3){
+      if (dynamiteDices.length >= 3){
         this.curRoom.chat.push(this.player.name + ' 3 dinamitot dobott.');
         this.player.life--;
-        dynamiteDices.forEach(x=>x.abilityActivated = true);
-        this.player.curDices.forEach(x=>x.rerollsLeft = 0);
+        dynamiteDices.forEach(x => x.abilityActivated = true);
+        this.player.curDices.forEach(x => x.rerollsLeft = 0);
       }
   
-      this.socket.emit('rollResults',[this.player.curDices,this.player.selections]);
+      this.socket.emit('rollResults', [this.player.curDices, this.player.selections]);
   
-      this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players,this.curRoom.arrowsLeft,this.curRoom.playersAlive,this.curRoom.chat]);
+      this.io.to(this.curRoom.name).emit('playersDataRefresh', [this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.playersAlive, this.curRoom.chat]);
   
     }
     
-    sendMessage(m){
-      console.log(this.player.name+" sent message: "+m);
-      this.curRoom.chat.push(this.player.name+": "+m);
-      this.io.to(this.curRoom.name).emit('updateChat',this.curRoom.chat);
+    sendMessage(message){
+      console.log(this.player.name+" sent message: "+message);
+      this.curRoom.chat.push(this.player.name+": "+message);
+      this.io.to(this.curRoom.name).emit('updateChat', this.curRoom.chat);
     }
     
     //disconnect
     disconnect(){
       this.curRoom.connections[this.playerIndex] = null;
       this.io.to(this.curRoom.name).emit("aPlayerDisconnected");
-      if (this.server.rooms.indexOf(this.curRoom)!=-1){
-        this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom),1);
+      if (this.server.rooms.indexOf(this.curRoom) != -1){
+        this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
       }
-      //this.server.clients.remove(this);
     }
 }
 

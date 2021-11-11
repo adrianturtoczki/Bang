@@ -2,7 +2,7 @@ const Player = require('./player');
 const Character = require('./character');
 
 class Room {
-    constructor(roomName,playerLimit,password,playersLeft=playerLimit,playerNames=[],characters=[],connections=[]){
+    constructor(roomName, playerLimit, password, playersLeft = playerLimit, playerNames = [], characters = [], connections = []){
         this.name = roomName;
         this.playerLimit = playerLimit;
         this.playersLeft = playersLeft;
