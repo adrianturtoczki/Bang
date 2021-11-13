@@ -196,7 +196,7 @@ class socketServer{
   
         this.player.rolled = true;
         console.log(this.player.name + ' dobott: '+ rollResults.map(x => x.name));
-        this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x => x.name));
+        this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x => '<img class="chatDices" src="'+x.image+'">'));
   
         this.player.curDices = rollResults;
   
