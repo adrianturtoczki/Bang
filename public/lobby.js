@@ -64,10 +64,10 @@ let roomDiv = document.getElementById("rooms");
 
 roomInterval = setInterval(x => getRooms(), 2000);
 function getRooms(){
-    fetch('/rooms').then(function(result){
+    fetch('/rooms').then(result=>{
         console.log(result);
         return result.json();
-    }).then(function(r){
+    }).then(r=>{
         if (r.length){
             for (let room of r){
                 if (rooms.some(x=>x.name===room.name)){

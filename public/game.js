@@ -18,7 +18,7 @@ let socket = io();
       document.getElementById('dices').appendChild(d4);
       document.getElementById('dices').appendChild(d5);
 
-      let playersAlive;
+      let alivePlayerCount;
       let playersAr = [];
       let playerIndex = -1;
       let playerRole;
@@ -44,7 +44,7 @@ let socket = io();
           chatId.innerHTML = '';
           for (let i = gameChat.length-1; i >= 0; i--){
             let p = document.createElement('p');
-            p.appendChild(document.createTextNode(gameChat[i]));
+            p.innerHTML = gameChat[i];
             p.classList.add("chatLogP");
             chatId.appendChild(p);
           }
@@ -140,7 +140,7 @@ let socket = io();
         updateChat(gameChat);
         playersAr = players;
         player = playersAr[playerIndex];
-        playersAlive = pAlive;
+        alivePlayerCount = pAlive;
         curPlayerData(players[playerIndex]);
 
           //other players data

@@ -5,10 +5,12 @@ class Dice {
         this.rerollsLeft = 2;
         this.abilityActivated = false;
         this.setName(this.type);
+        this.setImage(this.type);
     }
     roll(){
       this.type = Math.floor(Math.random() * 6);
       this.setName();
+      this.setImage();
   }
   setName(){
     switch(this.type){
@@ -29,6 +31,29 @@ class Dice {
         break;
       case 5:
         this.name = "gatling";
+        break;
+
+    }
+  }
+  setImage(){
+    switch(this.type){
+      case 0:
+        this.image = "images/d0.png";
+        break;
+      case 1:
+        this.image = "images/d1.png";
+        break;
+      case 2:
+        this.image = "images/d2.png";
+        break;
+      case 3:
+        this.image = "images/d3.png";
+        break;
+      case 4:
+        this.image = "images/d4.png";
+        break;
+      case 5:
+        this.image = "images/d5.png";
         break;
 
     }

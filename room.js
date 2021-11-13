@@ -12,6 +12,7 @@ class Room {
 
         this.started = false;
         this.players = [];
+        this.alivePlayers = [];
         this.roles = []; //separated from players so they don't get sent to everyone
         this.end = false;
         this.arrowsLeft = 9;
@@ -40,38 +41,37 @@ class Room {
          }
     }
     allPlayersConnected(){
-        return this.connections.every(function(i) { return i !== null; })
+        return this.connections.every(i => i !== null )
     }
 
     start(){
         this.setupPlayersAndRoles(this.playerLimit, this.playerNames, this.characters);
         this.started = true;
         let firstPlayer = this.players[0];
-        this.chat.push("Új kör");
+        this.chat.push("Új kör: "+firstPlayer.name);
         firstPlayer.curTurn = true;
         console.log(firstPlayer.name+" köre");
     }
     nextPlayer(){
         if (!this.end){
-            let lastPlayer = this.players[this.currentPlayerIndex]
-            this.chat.push("Új kör");
-            console.log(lastPlayer.name+"' körének vége!");
+            let lastPlayer = this.alivePlayers[this.currentPlayerIndex]
+            console.log(lastPlayer.name+" körének vége!");
             lastPlayer.curTurn = false;
             lastPlayer.turnEnd = false;
             lastPlayer.rolled = false;
             lastPlayer.curDices = [];
             lastPlayer.selections = [];
-            if (this.currentPlayerIndex==this.playerLimit-1){
+            if (this.currentPlayerIndex==this.alivePlayerCount-1){
                 this.currentPlayerIndex = 0;
             } else {
                 this.currentPlayerIndex++;
             }
-            let currentPlayer = this.players[this.currentPlayerIndex];
+            console.log("teszt:",this.alivePlayers,this.currentPlayerIndex);
+            let currentPlayer = this.alivePlayers[this.currentPlayerIndex];
+            this.chat.push("Új kör: "+currentPlayer.name);
             console.log("current player: ", currentPlayer);
-            if (currentPlayer.life>0){
-                currentPlayer.curTurn = true;
-                console.log(currentPlayer.name+" köre");
-            }
+            currentPlayer.curTurn = true;
+            console.log(currentPlayer.name+" köre");
         } else {
             this.started = false;
         }
@@ -88,7 +88,8 @@ class Room {
             let pChar = characters.length == playerNames.length ? new Character(characters[i]) : new Character(allCharacters.splice(Math.floor(Math.random()*allCharacters.length), 1)[0]); //can use predefined characters or give random
             this.players.push(new Player(playerNames[i], pRole, pChar));
           }
-        this.playersAlive = playerNumber;
+        this.alivePlayerCount = playerNumber;
+        this.alivePlayers = Array.from(this.players);
     }
 
     checkWinConditions(playerNumber){
@@ -129,8 +130,8 @@ class Room {
                 break;
         }
         for (let p of this.players){
-            if (p.life === 0){
-                this.playersAlive--;
+            if (p.life <= 0){
+                this.alivePlayerCount--;
                 switch(this.roles[p.index]){
                     case "sheriff":
                         sheriffAlive--;
@@ -155,7 +156,7 @@ class Room {
             this.end = true;
             return "banditák";
         }
-        else if (renegadesAlive>1 && sheriffAlive<=0&&deputiesAlive <= 0 && outlawsAlive <= 0){
+        else if (renegadesAlive > 1 && sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
             return "renegát";
         }

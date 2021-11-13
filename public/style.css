@@ -102,18 +102,12 @@
     background-color: #dab49d;
   }
 
-  #resetSelectionsButton{
-    background-color: #dab49d;
-  }
-  #endTurnButton{
-    background-color: #dab49d;
-  }
-
-  #roll{
+  #resetSelectionsButton,#endTurnButton,#roll{
     background-color: #dab49d;
   }
 
   #rerollButton{
+    background-color: #dab49d;
     display:none;
   }
 
@@ -169,7 +163,6 @@ button {
     left: 0;
     top: 0;
     overflow: auto;
-    background-color: rgba(0,0,0,0);
     background-color: rgba(0,0,0,0.3);
     padding-top: 100px;
 }
@@ -179,4 +172,9 @@ button {
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
+}
+
+.chatDices {
+  max-height: 25px;
+  vertical-align: bottom;
 }

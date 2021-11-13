@@ -68,7 +68,7 @@ class socketServer{
     
     // ending a turn
     endTurn(selections){
-      let alivePlayers = this.curRoom.players.filter(x=>x.life>0);
+      //let alivePlayers = this.curRoom.players.filter(x=>x.life>0);
   
       //resolving
   
@@ -106,7 +106,7 @@ class socketServer{
       if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
         this.curRoom.arrowsLeft += this.player.arrows;
         this.player.arrows = 0;
-        for (let p of alivePlayers){
+        for (let p of this.curRoom.alivePlayers){
           //character check: paul regret
           if (p != this.player && p.character.name != 'paul_regret'){
             p.life--;
@@ -114,18 +114,20 @@ class socketServer{
         }
       }
   
-      let killedPlayers = alivePlayers.filter(x => x.life <= 0) //return killed this.player's arrows back
+      let killedPlayers = this.curRoom.alivePlayers.filter(x => x.life <= 0) //return killed this.player's arrows back
       for (let p of killedPlayers){
         this.curRoom.arrowsLeft += p.arrows;
         p.arrows = 0;
         p.life = 0;
         p.role = this.curRoom.roles[p.index];
+        this.curRoom.alivePlayers.splice(this.curRoom.alivePlayers.indexOf(p),1);
+        this.curRoom.alivePlayerCount--;
       }
   
       let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
       console.log(winner);
       if (winner){
-        this.io.to(this.curRoom.name).emit('game_end', winner);
+        this.io.to(this.curRoom.name).emit('gameEnd', winner);
         this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
       }
   
@@ -200,17 +202,18 @@ class socketServer{
   
         this.socket.emit('rollResults',[this.player.curDices, this.player.selections]);
   
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.playersAlive, this.curRoom.chat]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat]);
   
       }
     }
     
     reroll(rerolledDiceIndex){
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
+      let originalDice = {...rerolledDice};
   
       rerolledDice.roll();
       console.log(this.player.name + ' újradobott: '+ rerolledDice.name, rerolledDice.type);
-      this.curRoom.chat.push(this.player.name + ' újradobott: '+ rerolledDice.name);
+      this.curRoom.chat.push(this.player.name + ' újradobott: '+ '<img class="chatDices" src="'+originalDice.image+'">'+'->'+'<img class="chatDices" src="'+rerolledDice.image+'">');
   
       if (rerolledDice.type === 0 || rerolledDice.type === 1 ||rerolledDice.type === 5){
         this.player.selections[rerolledDiceIndex] = rerolledDice.type;
@@ -242,7 +245,7 @@ class socketServer{
   
       this.socket.emit('rollResults', [this.player.curDices, this.player.selections]);
   
-      this.io.to(this.curRoom.name).emit('playersDataRefresh', [this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.playersAlive, this.curRoom.chat]);
+      this.io.to(this.curRoom.name).emit('playersDataRefresh', [this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat]);
   
     }
     
