@@ -92,8 +92,8 @@ let socket = io();
             pArrows.appendChild(document.createTextNode(p.arrows));
             pChar.src = 'images/c_'+p.character.name+'.jpg';
             pRole.src= 'images/r_'+playerRole+'.jpg';
-            pArrowsImg.src='images/arrow.png';
-            pLifeImg.src='images/bullet.png';
+            pArrowsImg.src='images/arrow.webp';
+            pLifeImg.src='images/bullet.webp';
 
             pDivName.appendChild(pName);
             pDivLifeArrows.appendChild(pLife);
@@ -311,7 +311,7 @@ let socket = io();
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
           console.log(dices);
-          diceElements[i].src = 'images/d'+(dices[i].type)+'.png';
+          diceElements[i].src = 'images/d'+(dices[i].type)+'.webp';
           diceElements[i].setAttribute('onclick',`diceDropdown(${i})`);
           if (dices[i].abilityActivated) {
             diceElements[i].classList.add("abilityActivated");

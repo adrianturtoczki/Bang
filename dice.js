@@ -38,22 +38,22 @@ class Dice {
   setImage(){
     switch(this.type){
       case 0:
-        this.image = "images/d0.png";
+        this.image = "images/d0.webp";
         break;
       case 1:
-        this.image = "images/d1.png";
+        this.image = "images/d1.webp";
         break;
       case 2:
-        this.image = "images/d2.png";
+        this.image = "images/d2.webp";
         break;
       case 3:
-        this.image = "images/d3.png";
+        this.image = "images/d3.webp";
         break;
       case 4:
-        this.image = "images/d4.png";
+        this.image = "images/d4.webp";
         break;
       case 5:
-        this.image = "images/d5.png";
+        this.image = "images/d5.webp";
         break;
 
     }
