@@ -71,7 +71,7 @@ let socket = io();
           }
         }
 
-        function createPlayer(p, divToAppend, playerRole){
+        function createPlayer(p,playerRole){
           let pDiv = document.createElement('div');
             pDiv.classList.add("player_data");
             pDiv.id="player_"+p.name;
@@ -92,8 +92,8 @@ let socket = io();
             pArrows.appendChild(document.createTextNode(p.arrows));
             pChar.src = 'images/c_'+p.character.name+'.jpg';
             pRole.src= 'images/r_'+playerRole+'.jpg';
-            pArrowsImg.src='images/arrow.webp';
-            pLifeImg.src='images/bullet.webp';
+            pArrowsImg.src='images/arrow.png';
+            pLifeImg.src='images/bullet.png';
 
             pDivName.appendChild(pName);
             pDivLifeArrows.appendChild(pLife);
@@ -106,7 +106,7 @@ let socket = io();
             pDivLifeArrows_char.appendChild(pDivLifeArrows);
             pDivLifeArrows_char.appendChild(pChar);
             pDiv.appendChild(pDivLifeArrows_char);
-            divToAppend.appendChild(pDiv);
+            return pDiv;
         }
 
       function playersDataSetup([players, index, role, arrowsLeft]){
@@ -120,13 +120,12 @@ let socket = io();
 
         curPlayerData(player);
 
-        console.log(playerRole);
-        createPlayer(player, document.getElementById("player"), playerRole);
+        document.getElementById("player").append(createPlayer(player, playerRole));
 
         document.getElementById('otherPlayers').innerHTML='';
       for (let p of players){
           if (p!=player){
-            createPlayer(p, document.getElementById('otherPlayers'), p.role);
+            document.getElementById('otherPlayers').append(createPlayer(p, p.role));
             }
           document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
         }
@@ -156,7 +155,6 @@ let socket = io();
       }
 
       function rollResults([rollResult, selections]){
-        console.log(rollResult)
         player.curDices = rollResult;
         player.selections = selections;
 
@@ -179,7 +177,6 @@ let socket = io();
       }
 
       function selectTarget(dice, playerToSelect){
-        console.log("selecttarget");
         player.selections[dice.index] = [dice.type, playerToSelect.index];
         printSelections(player.selections, document.getElementById('selections'));
         checkSelections(player.selections, document.getElementById('endTurnButton'));
@@ -189,8 +186,6 @@ let socket = io();
       }
 
       function printSelections(selections, selectionsDiv){
-        console.log(selections);
-        console.log(playersAr);
         let prettierSelection = '';
         for (let s of selections){
           if (s!=null && s!=0 && s!=1 && s!=5){
@@ -199,7 +194,6 @@ let socket = io();
             } else if (s[0] === 4){
               prettierSelection+="Sör ->";
             }
-            console.log(s);
             prettierSelection+=playersAr[s[1]].name+';';
           }
         }
@@ -261,7 +255,6 @@ let socket = io();
   
               if (dice.type === 2 || dice.type === 3){ //gun
                 for (let shootingDistance of shootingDistances){
-                  console.log(shootingDistances)
                   if (aliveIndex < shootingDistance){
                     prevPlayer = alivePlayers[aliveIndex-shootingDistance+alivePlayers.length];
                   } else {
@@ -275,7 +268,6 @@ let socket = io();
                   selectedPlayers.push(prevPlayer);
                   selectedPlayers.push(nextPlayer);
     
-                  console.log(document.getElementById("player_"+prevPlayer.name));
                 }
                 } else if (dice.type === 4){ //beer
     
@@ -297,9 +289,7 @@ let socket = io();
         }
         function revertHighlightPlayers(){
           let highlightedDivs = document.getElementsByClassName("highlighted");
-          console.log(highlightedDivs);
           while(highlightedDivs.length){ //todo
-            console.log(highlightedDivs[0]);
             highlightedDivs[0].removeAttribute('onclick');
             highlightedDivs[0].classList.remove('highlighted');
           }
@@ -307,11 +297,9 @@ let socket = io();
 
 
       function drawDices(dices){
-        console.log("drawdices:",dices);
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
-          console.log(dices);
-          diceElements[i].src = 'images/d'+(dices[i].type)+'.webp';
+          diceElements[i].src = 'images/d'+(dices[i].type)+'.png';
           diceElements[i].setAttribute('onclick',`diceDropdown(${i})`);
           if (dices[i].abilityActivated) {
             diceElements[i].classList.add("abilityActivated");
@@ -324,11 +312,9 @@ let socket = io();
       //event listeners
 
       document.getElementById('roll').addEventListener('click',function(){
-        console.log("roll button clicked");
         socket.emit('roll');
       });
       document.getElementById('endTurnButton').addEventListener('click', function(){
-        console.log("end turn button clicked");
         socket.emit('endTurn',player.selections);
         player.selections = [];
         printSelections(player.selections,document.getElementById('selections'));
@@ -336,7 +322,6 @@ let socket = io();
         document.getElementById('endTurnButton').disabled = true;
       });
       document.getElementById('resetSelectionsButton').addEventListener('click', function(){
-        console.log("reset selections button clicked");
         for (let i = 0; i < player.selections.length; i++){
           if (player.selections[i] != 0 && player.selections[i] != 1 && player.selections[i] != 4 && player.selections[i] != 5){ //add all non-arrows to selections
             player.selections[i] = null;
@@ -353,7 +338,6 @@ let socket = io();
     rerollButton.addEventListener('click', function(event){
       event.preventDefault();
       let dice = player.curDices[selectedDiceIndex];
-      console.log("reroll button clicked for "+[dice.type, dice.index]);
       socket.emit('reroll', dice.index);
       player.selections = [];
       printSelections(player.selections, document.getElementById('selections'));

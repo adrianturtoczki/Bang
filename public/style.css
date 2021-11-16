@@ -23,6 +23,11 @@
   .player_data{
     display:flex;
     flex-wrap: wrap;
+    flex-basis: 0;
+  }
+
+  #player{
+    flex-basis: 0;
   }
 
   #otherPlayers{
@@ -52,7 +57,7 @@
     width:auto;
   }
   .charImg {
-    max-width: 250px;
+    max-width: 100%;
   }
 
   #dices img {
