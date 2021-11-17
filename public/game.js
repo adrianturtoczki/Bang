@@ -90,10 +90,10 @@ let socket = io();
             pName.appendChild(document.createTextNode(p.name));
             pLife.appendChild(document.createTextNode(p.life));
             pArrows.appendChild(document.createTextNode(p.arrows));
-            pChar.src = 'images/c_'+p.character.name+'.jpg';
-            pRole.src= 'images/r_'+playerRole+'.jpg';
-            pArrowsImg.src='images/arrow.png';
-            pLifeImg.src='images/bullet.png';
+            pChar.src = 'images/c_'+p.character.name+'.webp';
+            pRole.src= 'images/r_'+playerRole+'.webp';
+            pArrowsImg.src='images/arrow.webp';
+            pLifeImg.src='images/bullet.webp';
 
             pDivName.appendChild(pName);
             pDivLifeArrows.appendChild(pLife);
@@ -148,7 +148,7 @@ let socket = io();
               pDataDiv.children[0].children[0].children[0].textContent=p.name;
               pDataDiv.children[0].children[1].children[0].textContent=p.life;
               pDataDiv.children[0].children[1].children[2].textContent=p.arrows;
-              if (p.life<=0) pDataDiv.children[1].children[0].src= 'images/r_'+p.role+'.jpg';
+              if (p.life<=0) pDataDiv.children[1].children[0].src= 'images/r_'+p.role+'.webp';
             }
           document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
           
@@ -299,7 +299,7 @@ let socket = io();
       function drawDices(dices){
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
-          diceElements[i].src = 'images/d'+(dices[i].type)+'.png';
+          diceElements[i].src = 'images/d'+(dices[i].type)+'.webp';
           diceElements[i].setAttribute('onclick',`diceDropdown(${i})`);
           if (dices[i].abilityActivated) {
             diceElements[i].classList.add("abilityActivated");
