@@ -4,7 +4,7 @@ const Dice = require('./dice');
 
 'use strict';
 
-class socketServer{
+class SocketServer{
     constructor(socket,io,server){
         this.socket = socket;
         this.io = io;
@@ -12,15 +12,13 @@ class socketServer{
         this.curRoom;
         this.playerIndex = -1;
         this.player;
-        this.player_role;
-
+        this.playerRole;
         this.addSocket = this.addSocket.bind(this);
         this.endTurn = this.endTurn.bind(this);
         this.roll = this.roll.bind(this);
         this.reroll = this.reroll.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.disconnect = this.disconnect.bind(this);
-        this.setupAllConnected = this.setupAllConnected.bind(this);
 
         this.socket.on('addSocket',this.addSocket);
         this.socket.on('endTurn', this.endTurn);
@@ -28,7 +26,6 @@ class socketServer{
         this.socket.on('reroll', this.reroll);
         this.socket.on('sendMessage', this.sendMessage); //public, maybe implement private later
         this.socket.on('disconnect', this.disconnect);
-        this.socket.on('setupAllConnected', this.setupAllConnected);
 
         waitFor(x => this.curRoom && this.curRoom.started).then(()=>{
           this.setupAllConnected();
@@ -46,7 +43,7 @@ class socketServer{
             break;
           }
         }
-        if (this.playerIndex == -1) return
+        if (this.playerIndex === -1) return
         this.curRoom.connections[this.playerIndex] = this.socket;
         if (this.curRoom.allPlayersConnected()){
           console.log("a játék elindult");
@@ -54,16 +51,16 @@ class socketServer{
           console.log(this.curRoom.name);
           
         }
-        this.io.to(this.curRoom.name).emit('updatePlayerNumber',[this.curRoom.playerLimit,this.curRoom.playerLimit-this.curRoom.playersLeft]);
+        this.io.to(this.curRoom.name).emit('updatePlayerNumber',this.curRoom.playerLimit,this.curRoom.playerLimit-this.curRoom.playersLeft);
 
       }
 
     setupAllConnected(){
       this.player = this.curRoom.players[this.playerIndex];
       this.player.index = this.playerIndex;
-      this.player_role = this.curRoom.roles[this.playerIndex];
+      this.playerRole = this.curRoom.roles[this.playerIndex];
       this.io.to(this.curRoom.name).emit('updateChat',this.curRoom.chat); //todo
-      this.socket.emit('playersDataSetup',[this.curRoom.players,this.playerIndex,this.player_role,this.curRoom.arrowsLeft]);
+      this.socket.emit('playersDataSetup',this.curRoom.players,this.playerIndex,this.playerRole,this.curRoom.arrowsLeft);
     }
     
     // ending a turn
@@ -140,7 +137,7 @@ class socketServer{
   
       setTimeout(() => {
         console.log("ending turn .. ");
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.players.alive, this.curRoom.chat]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.players.alive, this.curRoom.chat);
       }, 500);
     }
     
@@ -200,9 +197,9 @@ class socketServer{
   
         this.player.curDices = rollResults;
   
-        this.socket.emit('rollResults',[this.player.curDices, this.player.selections]);
+        this.socket.emit('rollResults',this.player.curDices, this.player.selections);
   
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',[this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat]);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat);
   
       }
     }
@@ -243,9 +240,9 @@ class socketServer{
         this.player.curDices.forEach(x => x.rerollsLeft = 0);
       }
   
-      this.socket.emit('rollResults', [this.player.curDices, this.player.selections]);
+      this.socket.emit('rollResults', this.player.curDices, this.player.selections);
   
-      this.io.to(this.curRoom.name).emit('playersDataRefresh', [this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat]);
+      this.io.to(this.curRoom.name).emit('playersDataRefresh', this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat);
   
     }
     
@@ -265,4 +262,4 @@ class socketServer{
     }
 }
 
-module.exports = socketServer;
+module.exports = SocketServer;

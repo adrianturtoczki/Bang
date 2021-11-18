@@ -85,7 +85,7 @@ class Room {
         for(var i = 0; i < playerNumber; i++){
             let pRole = roleAr[i];
             this.roles.push(pRole);
-            let pChar = characters.length == playerNames.length ? new Character(characters[i]) : new Character(allCharacters.splice(Math.floor(Math.random()*allCharacters.length), 1)[0]); //can use predefined characters or give random
+            let pChar = characters.length === playerNames.length ? new Character(characters[i]) : new Character(allCharacters.splice(Math.floor(Math.random()*allCharacters.length), 1)[0]); //can use predefined characters or give random
             this.players.push(new Player(playerNames[i], pRole, pChar));
           }
         this.alivePlayerCount = playerNumber;

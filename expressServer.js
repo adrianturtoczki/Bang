@@ -9,9 +9,9 @@ const io = require('socket.io')(http);
 const config = require('./config.js');
 const path = require('path');
 const CircularJSON = require('circular-json');
-const socketServer = require('./socketServer');
+const SocketServer = require('./socketserver');
 
-class expressServer{
+class ExpressServer{
   constructor(){
     let router = express.Router();
     app.use(express.static(path.join(__dirname, '/public')));
@@ -36,7 +36,7 @@ class expressServer{
     
     router.get('/game', (req, res) => {
       console.log("/game");
-      let room = this.rooms.find(x => x.name == req.query.room);
+      let room = this.rooms.find(x => x.name === req.query.room);
       if (!room.started){
         res.sendFile(path.join(__dirname + '/public/game.html'));
       } else {
@@ -78,9 +78,9 @@ class expressServer{
     http.listen(config.port, () => console.log('server started'));
 
     io.on('connection', (socket) => {
-      let client = new socketServer(socket,io,this);
+      let client = new SocketServer(socket,io,this);
     });
   }
 }
 
-let server = new expressServer();
+new ExpressServer();

@@ -34,7 +34,7 @@ let socket = io();
       socket.on('gameEnd', gameEnd);
       socket.on('updateChat',updateChat);
 
-      function updatePlayerNumber([current, total]){
+      function updatePlayerNumber(current, total){
         document.getElementById('wait_text').textContent = 'Várás a többi játékosra .. '+total+'/'+current;
       }
 
@@ -109,7 +109,7 @@ let socket = io();
             return pDiv;
         }
 
-      function playersDataSetup([players, index, role, arrowsLeft]){
+      function playersDataSetup(players, index, role, arrowsLeft){
 
         document.getElementById('wait_screen').style.display = 'none';
         document.getElementById('game').classList.toggle('game_wait');
@@ -135,7 +135,7 @@ let socket = io();
         }
       }
 
-      function playersDataRefresh([players, arrowsLeft, pAlive, gameChat]){
+      function playersDataRefresh(players, arrowsLeft, pAlive, gameChat){
         updateChat(gameChat);
         playersAr = players;
         player = playersAr[playerIndex];
@@ -154,7 +154,7 @@ let socket = io();
           
       }
 
-      function rollResults([rollResult, selections]){
+      function rollResults(rollResult, selections){
         player.curDices = rollResult;
         player.selections = selections;
 
@@ -213,7 +213,7 @@ let socket = io();
         } else {
           let dice = player.curDices[diceIndex];
   
-          if (dice.type == 1){
+          if (dice.type === 1){
             dice.rerollsLeft = 0;
           }
           if (dice.rerollsLeft>0 && dice.type!=1){
@@ -297,9 +297,10 @@ let socket = io();
 
 
       function drawDices(dices){
+        console.log(player.curDices);
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
-          diceElements[i].src = 'images/d'+(dices[i].type)+'.webp';
+          diceElements[i].src = dices[i].image;
           diceElements[i].setAttribute('onclick',`diceDropdown(${i})`);
           if (dices[i].abilityActivated) {
             diceElements[i].classList.add("abilityActivated");
