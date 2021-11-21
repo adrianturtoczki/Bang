@@ -28,7 +28,7 @@
     <div id="create_room__modal">
         <div class="modal_content">
             <span class="close">&times</span>
-            <form action="/create_room" method="POST" id="create_room">
+            <form id="create_room__form">
                 <h2>Szoba létrehozása</h2>
                 <label for="roomName">Szoba neve</label>
                 <input type="text" name="roomName" required/>
@@ -48,7 +48,7 @@
                     <option value="8">8</option>
                   </select>
                   <br>
-                <input type="submit" value="Létrehozás" class="submit_button"/>
+                <input type="submit" value="Létrehozás" class="submit_button" id="create_room_send__btn"/>
             </form>
     </div>
     </div>

@@ -49,28 +49,27 @@ class ExpressServer{
       let room = this.rooms.find(x=>x.name==req.body.roomName);
       //checks if name already in room
       if (room.playerNames.includes(req.body.playerName)){
-        console.log("error: name already in room!",req.body.playerName,room.playerNames);
-        res.send({"accepted":"false"}); //todo fix
+        console.log("error: name already in room!");
+        res.send({"message":"name_already_in_room"});
       } else if (room.password!=req.body.password) {
-        console.log("error: bad password!",req.body.password,room.password);
-        res.send({"accepted":"false"}); //todo fix
+        console.log("error: bad password!");
+        res.send({"message":"bad_password"});
       } else {
         room.addPlayer(req.body.playerName);
-        res.send({"accepted":"true"});
+        res.send({"message":"ok"});
       }
     });
     
     router.post('/create_room', (req, res) => {
       console.log('/create_room');
       if (this.rooms.find(x=>x.name===req.body.roomName)){
-        //todo popup room already exists?
-        res.redirect('/');
+        res.send({"message":"room_already_exists"});
       } else {
         let new_room = new Room(req.body.roomName,parseInt(req.body.playerLimit),req.body.password);
         new_room.addPlayer(req.body.playerName);
         this.rooms.push(new_room);
         
-        res.redirect('/game?room='+req.body.roomName);
+        res.send({"message":"ok"});
       }
     });
     

@@ -13,6 +13,7 @@ join_room__btn.addEventListener("click",() => {
     getRooms();
 });
 help__btn.addEventListener("click",() => help__modal.style.display = "block");
+create_room__form.addEventListener("submit",(event) => createRoom(event));
 join_room__form.addEventListener("submit",(event) => joinRoom(event));
 
 window.addEventListener("click",(event) => {
@@ -36,6 +37,27 @@ for (span of closes){
         if (help__modal.style.display="block"){help__modal.style.display="none"};
     });
 }
+function createRoom(event){
+    event.preventDefault();
+    console.log(create_room__form.elements);
+    
+        fetch("/create_room", {
+            method: "POST", 
+            headers: {
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify({playerName:create_room__form.elements["playerName"].value,roomName:create_room__form.elements["roomName"].value,password:create_room__form.elements["password"].value,playerLimit:create_room__form.elements["playerLimit"].value})
+          }).then(res => res.json()).then(data=>{
+              //checks if room exists already and if the password is good
+              console.log(data.accepted);
+              if (data.message == "ok"){
+                  window.location.href="/game?room="+create_room__form.elements["roomName"].value;
+              } else if (data.message == "room_already_exists"){
+                  alert("Error! A room already exists with that name.");
+              }
+          });
+          
+}
 
 function joinRoom(event){
     event.preventDefault();
@@ -48,12 +70,14 @@ function joinRoom(event){
               },
             body: JSON.stringify({playerName:join_room__form.elements["playerName"].value,roomName:join_room__form.elements["roomName"].value,password:join_room__form.elements["password"].value})
           }).then(res => res.json()).then(data=>{
-              //if room good
+              //checks if room exists already and if the password is good
               console.log(data.accepted);
-              if (data.accepted=="true"){
+              if (data.message == "ok"){
                   window.location.href="/game?room="+join_room__form.elements["roomName"].value;
-              } else {
-                  alert("error!"); //todo separate alert messages for different errors
+              } else if (data.message == "name_already_in_room"){
+                  alert("Error! Name already in room.");
+              } else if (data.message == "bad_password"){
+                  alert("error: bad password!");
               }
           });
           

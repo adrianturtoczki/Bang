@@ -289,7 +289,7 @@ let socket = io();
         }
         function revertHighlightPlayers(){
           let highlightedDivs = document.getElementsByClassName("highlighted");
-          while(highlightedDivs.length){ //todo
+          while(highlightedDivs.length){
             highlightedDivs[0].removeAttribute('onclick');
             highlightedDivs[0].classList.remove('highlighted');
           }
@@ -297,7 +297,6 @@ let socket = io();
 
 
       function drawDices(dices){
-        console.log(player.curDices);
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
           diceElements[i].src = dices[i].image;
