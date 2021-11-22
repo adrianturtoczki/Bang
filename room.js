@@ -50,12 +50,11 @@ class Room {
         let firstPlayer = this.players[0];
         this.chat.push("Új kör: "+firstPlayer.name);
         firstPlayer.curTurn = true;
-        console.log(firstPlayer.name+" köre");
+        console.log(this.name+": "+firstPlayer.name+" köre");
     }
-    nextPlayer(){
+    nextPlayer(lastPlayer){
         if (!this.end){
-            let lastPlayer = this.alivePlayers[this.currentPlayerIndex]
-            console.log(lastPlayer.name+" körének vége!");
+            console.log(this.name+": "+lastPlayer.name+" körének vége!");
             lastPlayer.curTurn = false;
             lastPlayer.turnEnd = false;
             lastPlayer.rolled = false;
@@ -69,9 +68,9 @@ class Room {
             console.log("teszt:",this.alivePlayers,this.currentPlayerIndex);
             let currentPlayer = this.alivePlayers[this.currentPlayerIndex];
             this.chat.push("Új kör: "+currentPlayer.name);
-            console.log("current player: ", currentPlayer);
+            console.log(this.name+": current player: ", currentPlayer);
             currentPlayer.curTurn = true;
-            console.log(currentPlayer.name+" köre");
+            console.log(this.name+": "+currentPlayer.name+" köre");
         } else {
             this.started = false;
         }

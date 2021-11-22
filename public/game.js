@@ -177,7 +177,7 @@ let socket = io();
       }
 
       function selectTarget(dice, playerToSelect){
-        player.selections[dice.index] = [dice.type, playerToSelect.index];
+        player.selections[dice.index] = [dice, playerToSelect.index];
         printSelections(player.selections, document.getElementById('selections'));
         checkSelections(player.selections, document.getElementById('endTurnButton'));
 
@@ -189,17 +189,13 @@ let socket = io();
         let prettierSelection = '';
         for (let s of selections){
           if (s!=null && s!=0 && s!=1 && s!=5){
-            if (s[0]===2 || s[0]===3){
-              prettierSelection+="Célkereszt->";
-            } else if (s[0] === 4){
-              prettierSelection+="Sör ->";
-            }
+            prettierSelection+="<img class='smallDices' src='"+s[0].image+"'>->";
             prettierSelection+=playersAr[s[1]].name+';';
           }
         }
 
 
-        selectionsDiv.textContent = 'Választott műveletek: '+prettierSelection;
+        selectionsDiv.innerHTML = 'Választott műveletek: '+prettierSelection;
       }
   
       function diceDropdown(diceIndex) {
