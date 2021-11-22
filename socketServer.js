@@ -68,12 +68,12 @@ class SocketServer{
       //resolving
   
       //character check: suzy lafayette
-      if (this.player.name === 'suzy_lafayette' && selections.filter(x => x[0] === 2 || x[0] === 3).length === 0){
+      if (this.player.name === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
         this.player.life+=2;
       }
       //character check: el gringo 
       console.log(this.curRoom.name+": "+this.curRoom.players,selections)
-      if (selections.some(x => (x!=0 && x!=1 && x!=3 && x!=4 && x!=5) && (x[0] === 2 || x[0] === 3) && this.curRoom.players[x[1]].character.name === 'el_gringo')){
+      if (selections.some(x => (x.type === 2 || x.type === 3) && this.curRoom.players[x.type].character.name === 'el_gringo')){
           this.player.arrows++;
           this.curRoom.arrowsLeft--;
           this.checkArrowsLeft();
@@ -81,8 +81,8 @@ class SocketServer{
   
       for (let s of selections){
         if (s != null){
-          let dice_type = s[0];
-          let selectedPlayer = this.curRoom.players[s[1]];
+          let dice_type = s.type;
+          let selectedPlayer = this.curRoom.players[s.selection];
           if (dice_type === 2 || dice_type === 3){
             selectedPlayer.life--;
           } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
@@ -96,7 +96,7 @@ class SocketServer{
         }
       }
   
-      let gatlingDices = selections.filter(x => x === 5);
+      let gatlingDices = selections.filter(x => x.type === 5);
       //character check: willy the kid
       if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
         this.curRoom.arrowsLeft += this.player.arrows;
@@ -165,7 +165,7 @@ class SocketServer{
           let cur_dice = new Dice(i);
           rollResults.push(cur_dice);
           if (cur_dice.type === 0 || cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1,2
-            this.player.selections[i] = cur_dice.type;
+            this.player.selections[i] = cur_dice;
             } else {
               this.player.selections[i] = null;
             }
@@ -212,7 +212,7 @@ class SocketServer{
       this.curRoom.chat.push(this.player.name + ' újradobott: '+ '<img class="smallDices" src="'+originalDice.image+'">'+'->'+'<img class="smallDices" src="'+rerolledDice.image+'">');
   
       if (rerolledDice.type === 0 || rerolledDice.type === 1 ||rerolledDice.type === 5){
-        this.player.selections[rerolledDiceIndex] = rerolledDice.type;
+        this.player.selections[rerolledDiceIndex] = rerolledDice;
       } else {
         this.player.selections[rerolledDiceIndex] = null;
       }

@@ -177,7 +177,8 @@ let socket = io();
       }
 
       function selectTarget(dice, playerToSelect){
-        player.selections[dice.index] = [dice, playerToSelect.index];
+        dice.selection = playerToSelect.index
+        player.selections[dice.index] = dice;
         printSelections(player.selections, document.getElementById('selections'));
         checkSelections(player.selections, document.getElementById('endTurnButton'));
 
@@ -188,9 +189,9 @@ let socket = io();
       function printSelections(selections, selectionsDiv){
         let prettierSelection = '';
         for (let s of selections){
-          if (s!=null && s!=0 && s!=1 && s!=5){
-            prettierSelection+="<img class='smallDices' src='"+s[0].image+"'>->";
-            prettierSelection+=playersAr[s[1]].name+';';
+          if (s!=null && s.type!=0 && s.type!=1 && s.type!=5){
+            prettierSelection+="<img class='smallDices' src='"+s.image+"'>->";
+            prettierSelection+=playersAr[s.selection].name+';';
           }
         }
 
@@ -212,11 +213,15 @@ let socket = io();
           if (dice.type === 1){
             dice.rerollsLeft = 0;
           }
-          if (dice.rerollsLeft>0 && dice.type!=1){
-            //allows reroll
+
+          if (dice.rerollsLeft>0 || dice.type===2 || dice.type===3 || dice.type===4){
             playerSelection = true;
             selectedDiceIndex=diceIndex
             document.getElementById('dices').children[selectedDiceIndex].classList.add("selectedDice");
+          }
+          
+          if (dice.rerollsLeft>0){
+            //allows reroll
             let rerollButton = document.getElementById("rerollButton");
             rerollButton.value = "Újradobás ("+dice.rerollsLeft+" maradt)";
             rerollButton.style.display="block";
@@ -321,7 +326,7 @@ let socket = io();
       });
       document.getElementById('resetSelectionsButton').addEventListener('click', function(){
         for (let i = 0; i < player.selections.length; i++){
-          if (player.selections[i] != 0 && player.selections[i] != 1 && player.selections[i] != 4 && player.selections[i] != 5){ //add all non-arrows to selections
+          if (player.selections[i].type != 0 && player.selections[i].type != 1 && player.selections[i].type != 4 && player.selections[i].type != 5){ //add all non-arrows to selections
             player.selections[i] = null;
             }
         }

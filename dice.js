@@ -4,6 +4,7 @@ class Dice {
         this.index = index;
         this.rerollsLeft = 2;
         this.abilityActivated = false;
+        this.selection = null;
         this.setData();
     }
     roll(){
