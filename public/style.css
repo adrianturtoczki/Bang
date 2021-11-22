@@ -183,3 +183,7 @@ button {
   max-height: 25px;
   vertical-align: bottom;
 }
+
+.selectedDice {
+  filter: brightness(0.6);
+}

@@ -204,6 +204,7 @@ let socket = io();
           playerSelection = false;
           rerollButton.style.display="none";
           document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
+          document.getElementById('dices').children[selectedDiceIndex].classList.remove("selectedDice");
           selectedDiceIndex=-1;
           revertHighlightPlayers();
         } else {
@@ -213,9 +214,10 @@ let socket = io();
             dice.rerollsLeft = 0;
           }
           if (dice.rerollsLeft>0 && dice.type!=1){
-            //reroll
+            //allows reroll
             playerSelection = true;
             selectedDiceIndex=diceIndex
+            document.getElementById('dices').children[selectedDiceIndex].classList.add("selectedDice");
             let rerollButton = document.getElementById("rerollButton");
             rerollButton.value = "Újradobás ("+dice.rerollsLeft+" maradt)";
             rerollButton.style.display="block";
