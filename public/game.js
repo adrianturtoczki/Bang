@@ -203,7 +203,6 @@ let socket = io();
         if (playerSelection){
           playerSelection = false;
           rerollButton.style.display="none";
-          document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
           document.getElementById('dices').children[selectedDiceIndex].classList.remove("selectedDice");
           selectedDiceIndex=-1;
           revertHighlightPlayers();
@@ -288,7 +287,7 @@ let socket = io();
         function revertHighlightPlayers(){
           let highlightedDivs = document.getElementsByClassName("highlighted");
           while(highlightedDivs.length){
-            highlightedDivs[0].removeAttribute('onclick');
+            highlightedDivs[0].onclick = null;
             highlightedDivs[0].classList.remove('highlighted');
           }
         }
@@ -304,6 +303,7 @@ let socket = io();
         } else {
           diceElements[i].classList.remove("abilityActivated");
         }
+        diceElements[i].classList.remove("selectedDice");
       }
     }
 
@@ -346,7 +346,7 @@ let socket = io();
       function resetSelection(){
         playerSelection = false;
         if (selectedDiceIndex != -1){
-          document.getElementById('dices').children[selectedDiceIndex].style.removeProperty('filter');
+          document.getElementById('dices').children[selectedDiceIndex].classList.remove("selectedDice");
           selectedDiceIndex = -1;
         }
         revertHighlightPlayers();
