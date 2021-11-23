@@ -33,6 +33,7 @@ class SocketServer{
 
     }
 
+    //Adds a socket to the room
     addSocket(roomName){
         this.curRoom = this.server.rooms.find(x => x.name === roomName);
         this.socket.join(this.curRoom.name);
@@ -54,6 +55,7 @@ class SocketServer{
 
       }
 
+      //Sets the player's data, then sends it to the client-side
     setupAllConnected(){
       this.player = this.curRoom.players[this.playerIndex];
       this.player.index = this.playerIndex;

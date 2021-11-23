@@ -11,6 +11,8 @@ class Dice {
       this.type = Math.floor(Math.random() * 6);
       this.setData();
   }
+
+  //sets name and image path for the dice
   setData(){
     switch(this.type){
       case 0:

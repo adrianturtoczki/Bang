@@ -34,10 +34,12 @@ let socket = io();
       socket.on('gameEnd', gameEnd);
       socket.on('updateChat',updateChat);
 
+      //updates the number of players while waiting
       function updatePlayerNumber(current, total){
         document.getElementById('wait_text').textContent = 'Várás a többi játékosra .. '+total+'/'+current;
       }
 
+      //updates the chat
       function updateChat(gameChat){
           //printing chat
           let chatId = document.getElementById('chat');
@@ -50,11 +52,13 @@ let socket = io();
           }
       }
 
+      //returns user to the lobby if somebody exits
       function aPlayerDisconnected(){
         alert('Egy játékos  kilépett. Visszalépés a főoldalra.');
         window.location.href = '/';
       }
 
+      //shows or hides the dices and the buttons depending if it's the player's turn or not
       function curPlayerData(player) {
         //player data
 
@@ -71,6 +75,7 @@ let socket = io();
           }
         }
 
+        //creates player's div
         function createPlayer(p,playerRole){
           let pDiv = document.createElement('div');
             pDiv.classList.add("player_data");
@@ -109,6 +114,7 @@ let socket = io();
             return pDiv;
         }
 
+        //setups the data of the players
       function playersDataSetup(players, index, role, arrowsLeft){
 
         document.getElementById('wait_screen').style.display = 'none';
@@ -135,6 +141,7 @@ let socket = io();
         }
       }
 
+      //refreshes the data of all players
       function playersDataRefresh(players, arrowsLeft, pAlive, gameChat){
         updateChat(gameChat);
         playersAr = players;
@@ -154,6 +161,7 @@ let socket = io();
           
       }
 
+      //sets the player's dices and selections, then draws dices and checks the selections
       function rollResults(rollResult, selections){
         player.curDices = rollResult;
         player.selections = selections;
@@ -162,12 +170,13 @@ let socket = io();
         checkSelections(selections, document.getElementById('endTurnButton'));
       }
 
+      //shows who won then sends user back to the lobby
       function gameEnd(winner){
         alert('Nyert: '+winner);
         window.location.href = '/';
       }
 
-
+      //if all possible selections have been set, then shows the button for ending the turn
       function checkSelections(selections, endTurnButton){
         if (selections.filter(x=>x!=null).length===5){
           endTurnButton.disabled = false;
@@ -176,6 +185,7 @@ let socket = io();
         }
       }
 
+      //handles selecting the target
       function selectTarget(dice, playerToSelect){
         dice.selection = playerToSelect.index
         player.selections[dice.index] = dice;
@@ -186,6 +196,7 @@ let socket = io();
 
       }
 
+      //prints the selections
       function printSelections(selections, selectionsDiv){
         let prettierSelection = '';
         for (let s of selections){
@@ -199,6 +210,7 @@ let socket = io();
         selectionsDiv.innerHTML = 'Választott műveletek: '+prettierSelection;
       }
   
+      //handles clicking the dice.
       function diceDropdown(diceIndex) {
         let selectedPlayers = [];
         if (playerSelection){

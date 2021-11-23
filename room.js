@@ -30,7 +30,7 @@ class Room {
     }
 
     
-
+    //Adds a player to the room
     addPlayer(newPlayerName, character = null){
          if (this.playerNames.length < this.playerLimit){
              this.playerNames.push(newPlayerName);
@@ -40,10 +40,13 @@ class Room {
              this.characters.push()
          }
     }
+
+    //Checks if the room is full
     allPlayersConnected(){
         return this.connections.every(i => i !== null )
     }
 
+    //Starts the room, sets the players and their roles, and starts the first player's turn
     start(){
         this.setupPlayersAndRoles(this.playerLimit, this.playerNames, this.characters);
         this.started = true;
@@ -52,6 +55,8 @@ class Room {
         firstPlayer.curTurn = true;
         console.log(this.name+": "+firstPlayer.name+" köre");
     }
+
+    //Sets the next player in the turn as the current one
     nextPlayer(lastPlayer){
         if (!this.end){
             console.log(this.name+": "+lastPlayer.name+" körének vége!");
@@ -76,6 +81,7 @@ class Room {
         }
     }
 
+    //Setups players and their roles. Characters can be given or be randomly given.
     setupPlayersAndRoles(playerNumber, playerNames, characters = []){
         this.players = [];
         let allCharacters = ["paul_regret","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid","calamity_janet","rose_doolan"];
@@ -91,6 +97,7 @@ class Room {
         this.alivePlayers = Array.from(this.players);
     }
 
+    //Checks win conditions.
     checkWinConditions(playerNumber){
         let sheriffAlive;
         let deputiesAlive;
