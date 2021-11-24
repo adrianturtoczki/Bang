@@ -20,7 +20,6 @@ class ExpressServer{
     }))
     app.use(express.json());
 
-    this.clients = [];
     this.rooms = [];
     this.http = http;
     this.io = io;
@@ -77,7 +76,7 @@ class ExpressServer{
     http.listen(config.port, () => console.log('server started'));
 
     io.on('connection', (socket) => {
-      let client = new SocketServer(socket,io,this);
+      new SocketServer(socket,io,this);
     });
   }
 }

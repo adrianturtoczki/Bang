@@ -27,7 +27,7 @@ class SocketServer{
         this.socket.on('sendMessage', this.sendMessage); //public, maybe implement private later
         this.socket.on('disconnect', this.disconnect);
 
-        waitFor(x => this.curRoom && this.curRoom.started).then(()=>{
+        waitFor(() => this.curRoom && this.curRoom.started).then(()=>{
           this.setupAllConnected();
         });
 

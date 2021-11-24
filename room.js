@@ -73,9 +73,8 @@ class Room {
             console.log("teszt:",this.alivePlayers,this.currentPlayerIndex);
             let currentPlayer = this.alivePlayers[this.currentPlayerIndex];
             this.chat.push("Új kör: "+currentPlayer.name);
-            console.log(this.name+": current player: ", currentPlayer);
-            currentPlayer.curTurn = true;
             console.log(this.name+": "+currentPlayer.name+" köre");
+            currentPlayer.curTurn = true;
         } else {
             this.started = false;
         }
@@ -86,6 +85,13 @@ class Room {
         this.players = [];
         let allCharacters = ["paul_regret","el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid","calamity_janet","rose_doolan"];
         let roleAr = ["sheriff","renegade","outlaw","outlaw","deputy","outlaw","deputy","renegade"].slice(0,playerNumber);
+
+        for(let i = roleAr.length - 1; i > 0; i--){
+            const j = Math.floor(Math.random() * i)
+            const temp = roleAr[i]
+            roleAr[i] = roleAr[j]
+            roleAr[j] = temp
+          }
 
         for(var i = 0; i < playerNumber; i++){
             let pRole = roleAr[i];
