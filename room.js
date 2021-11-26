@@ -65,12 +65,11 @@ class Room {
             lastPlayer.rolled = false;
             lastPlayer.curDices = [];
             lastPlayer.selections = [];
-            if (this.currentPlayerIndex==this.alivePlayerCount-1){
+            if (this.currentPlayerIndex>=this.alivePlayers.length-1){
                 this.currentPlayerIndex = 0;
             } else {
                 this.currentPlayerIndex++;
             }
-            console.log("teszt:",this.alivePlayers,this.currentPlayerIndex);
             let currentPlayer = this.alivePlayers[this.currentPlayerIndex];
             this.chat.push("Új kör: "+currentPlayer.name);
             console.log(this.name+": "+currentPlayer.name+" köre");
@@ -87,8 +86,8 @@ class Room {
         let roleAr = ["sheriff","renegade","outlaw","outlaw","deputy","outlaw","deputy","renegade"].slice(0,playerNumber);
 
         for(let i = roleAr.length - 1; i > 0; i--){
-            const j = Math.floor(Math.random() * i)
-            const temp = roleAr[i]
+            let j = Math.floor(Math.random() * i)
+            let temp = roleAr[i]
             roleAr[i] = roleAr[j]
             roleAr[j] = temp
           }
@@ -99,7 +98,6 @@ class Room {
             let pChar = characters.length === playerNames.length ? new Character(characters[i]) : new Character(allCharacters.splice(Math.floor(Math.random()*allCharacters.length), 1)[0]); //can use predefined characters or give random
             this.players.push(new Player(playerNames[i], pRole, pChar));
           }
-        this.alivePlayerCount = playerNumber;
         this.alivePlayers = Array.from(this.players);
     }
 
@@ -143,7 +141,6 @@ class Room {
         }
         for (let p of this.players){
             if (p.life <= 0){
-                this.alivePlayerCount--;
                 switch(this.roles[p.index]){
                     case "sheriff":
                         sheriffAlive--;

@@ -142,11 +142,10 @@ let socket = io();
       }
 
       //refreshes the data of all players
-      function playersDataRefresh(players, arrowsLeft, pAlive, gameChat){
+      function playersDataRefresh(players, arrowsLeft, gameChat){
         updateChat(gameChat);
         playersAr = players;
         player = playersAr[playerIndex];
-        alivePlayerCount = pAlive;
         curPlayerData(players[playerIndex]);
 
           //other players data
