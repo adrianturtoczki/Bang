@@ -33,6 +33,7 @@ let socket = io();
       socket.on('rollResults',rollResults);
       socket.on('gameEnd', gameEnd);
       socket.on('updateChat',updateChat);
+      socket.on('noArrowsLeft',noArrowsLeft);
 
       //updates the number of players while waiting
       function updatePlayerNumber(current, total){
@@ -50,6 +51,10 @@ let socket = io();
             p.classList.add("chatLogP");
             chatId.appendChild(p);
           }
+      }
+
+      function noArrowsLeft(arrows){
+        alert("Elfogytak a nyilak. Jönnek az indiánok! "+arrows+" nyilad volt.");
       }
 
       //returns user to the lobby if somebody exits

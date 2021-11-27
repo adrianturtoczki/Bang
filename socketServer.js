@@ -138,13 +138,14 @@ class SocketServer{
   
       setTimeout(() => {
         console.log(this.curRoom.name+": kör befejezése.. .. ");
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.players.alive, this.curRoom.chat);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
       }, 500);
     }
     
     //check if no arrows are left
     checkArrowsLeft(){
      if (this.curRoom.arrowsLeft <= 0){
+      this.io.to(this.curRoom.name).emit('noArrowsLeft',this.player.arrows);
         for (let p of this.curRoom.players){
           //character check: jourdonnais
           if (p.character.name != 'jourdonnais'){
@@ -200,7 +201,7 @@ class SocketServer{
   
         this.socket.emit('rollResults',this.player.curDices, this.player.selections);
   
-        this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat);
+        this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
   
       }
     }
@@ -243,7 +244,7 @@ class SocketServer{
   
       this.socket.emit('rollResults', this.player.curDices, this.player.selections);
   
-      this.io.to(this.curRoom.name).emit('playersDataRefresh', this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.alivePlayerCount, this.curRoom.chat);
+      this.io.to(this.curRoom.name).emit('playersDataRefresh', this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
   
     }
     
