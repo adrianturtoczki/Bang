@@ -2,7 +2,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const Client = require("socket.io-client");
 const Room = require("../room");
-const socketServer = require("../socketServer");
+const SocketServer = require("../socketserver");
 const {waitFor} = require('../helper');
 
 describe("my awesome project", () => {
