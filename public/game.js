@@ -53,8 +53,8 @@ let socket = io();
           }
       }
 
-      function noArrowsLeft(arrows){
-        alert("Elfogytak a nyilak. Jönnek az indiánok! "+arrows+" nyilad volt.");
+      function noArrowsLeft(){
+        alert("Elfogytak a nyilak. Jönnek az indiánok! ");
       }
 
       //returns user to the lobby if somebody exits
