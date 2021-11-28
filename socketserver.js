@@ -160,12 +160,12 @@ class SocketServer{
     }
     
     //dice roll
-    roll(){
+    roll(types=[-1,-1,-1,-1,-1]){
       if (this.player.rolled === false){
   
         let rollResults = [];
         for (let i = 0; i < 5; i++){
-          let cur_dice = new Dice(i);
+          let cur_dice = new Dice(i,types[i]);
           rollResults.push(cur_dice);
           if (cur_dice.type === 0 || cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1,2
             this.player.selections[i] = cur_dice;
@@ -206,11 +206,11 @@ class SocketServer{
       }
     }
     
-    reroll(rerolledDiceIndex){
+    reroll(rerolledDiceIndex,type=-1){
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
       let originalDice = {...rerolledDice};
   
-      rerolledDice.roll();
+      rerolledDice.roll(type);
       console.log(this.curRoom.name+": "+this.player.name + ' újradobott: '+ rerolledDice.name, rerolledDice.type);
       this.curRoom.chat.push(this.player.name + ' újradobott: '+ '<img class="smallDices" src="'+originalDice.image+'">'+'->'+'<img class="smallDices" src="'+rerolledDice.image+'">');
   

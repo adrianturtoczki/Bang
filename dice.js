@@ -5,10 +5,9 @@ class Dice {
         this.rerollsLeft = 2;
         this.abilityActivated = false;
         this.selection = null;
-        this.setData();
     }
-    roll(){
-      this.type = Math.floor(Math.random() * 6);
+    roll(type=Math.floor(Math.random() * 6)){
+      type === -1 ? this.type = Math.floor(Math.random() * 6) : this.type = type;
       this.setData();
   }
 
