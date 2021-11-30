@@ -53,7 +53,7 @@ function createRoom(event){
               if (data.message == "ok"){
                   window.location.href="/game?room="+create_room__form.elements["roomName"].value;
               } else if (data.message == "room_already_exists"){
-                  alert("Error! A room already exists with that name.");
+                  alert("Hiba: már létezik ilyen szoba.");
               }
           });
           
@@ -75,9 +75,9 @@ function joinRoom(event){
               if (data.message == "ok"){
                   window.location.href="/game?room="+join_room__form.elements["roomName"].value;
               } else if (data.message == "name_already_in_room"){
-                  alert("Error! Name already in room.");
+                  alert("Hiba: van már ilyen név a szobában!");
               } else if (data.message == "bad_password"){
-                  alert("error: bad password!");
+                  alert("Hiba: rossz jelszó!");
               }
           });
           
