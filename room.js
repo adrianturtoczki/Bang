@@ -159,15 +159,15 @@ class Room {
         }
         if (sheriffAlive === 1 && renegadesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
-            return "seriff";
+            return "Seriff";
         }
         else if (sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive > 0){
             this.end = true;
-            return "banditák";
+            return "Banditák";
         }
         else if (renegadesAlive > 1 && sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
-            return "renegát";
+            return "Renegát";
         }
         else{
             return
