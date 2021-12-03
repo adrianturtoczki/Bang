@@ -87,7 +87,7 @@ class SocketServer{
       //resolving
   
       //character check: suzy lafayette
-      if (this.player.name === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
+      if (this.player.character === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
         this.player.life+=2;
       }
       //character check: el gringo 
@@ -226,6 +226,7 @@ class SocketServer{
       }
     }
     
+    //handles the rerolling of the dice
     reroll(rerolledDiceIndex,type=-1){
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
       let originalDice = {...rerolledDice};
