@@ -1,3 +1,5 @@
+'use strict';
+
 const Player = require('./player');
 const Character = require('./character');
 

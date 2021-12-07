@@ -1,8 +1,8 @@
+'use strict';
+
 const {waitFor} = require('./helper');
 const Room = require('./room');
 const Dice = require('./dice');
-
-'use strict';
 
 class SocketServer{
     constructor(socket,io,server){
@@ -64,6 +64,7 @@ class SocketServer{
       this.socket.emit('playersDataSetup',this.curRoom.players,this.playerIndex,this.playerRole,this.curRoom.arrowsLeft);
     }
     
+    //checks if the player's health reached 0, and removes them from the game if yes.
     checkIfKilled(player){
       if (player.life<=0){
         this.curRoom.chat.push(player.name+" meghalt.");
@@ -156,7 +157,7 @@ class SocketServer{
       this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
     }
     
-    //check if no arrows are left
+    //check if no arrows are left, and damages the players if they have arrows
     checkArrowsLeft(){
      if (this.curRoom.arrowsLeft <= 0){
       this.io.to(this.curRoom.name).emit('noArrowsLeft');

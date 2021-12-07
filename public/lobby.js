@@ -1,3 +1,5 @@
+'use strict';
+
 const create_room__btn = document.getElementById("create_room__btn");
 const join_room__btn = document.getElementById("join_room__btn");
 const help__btn = document.getElementById("help__btn");
@@ -16,6 +18,10 @@ help__btn.addEventListener("click",() => help__modal.style.display = "block");
 create_room__form.addEventListener("submit",(event) => createRoom(event));
 join_room__form.addEventListener("submit",(event) => joinRoom(event));
 
+let roomInterval = setInterval(x => getRooms(), 2000);
+let rooms = [];
+let roomDiv = document.getElementById("rooms");
+
 window.addEventListener("click",(event) => {
     if (event.target==create_room__modal){create_room__modal.style.display="none"};
     if (event.target==join_room__modal){
@@ -26,7 +32,7 @@ window.addEventListener("click",(event) => {
     if (event.target==help__modal){help__modal.style.display="none"};
 });
 
-for (span of closes){
+for (let span of closes){
     span.addEventListener("click",() => {
         if (create_room__modal.style.display="block"){create_room__modal.style.display="none"};
         if (join_room__modal.style.display="block"){
@@ -83,10 +89,6 @@ function joinRoom(event){
           
 }
 
-let rooms = [];
-let roomDiv = document.getElementById("rooms");
-
-roomInterval = setInterval(x => getRooms(), 2000);
 function getRooms(){
     fetch('/rooms').then(result=>{
         console.log(result);

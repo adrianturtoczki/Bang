@@ -4,6 +4,7 @@ const Client = require("socket.io-client");
 const Room = require("../room");
 const SocketServer = require("../socketserver");
 const {waitFor} = require('../helper');
+const Dice = require("../dice");
 
 describe("my awesome project", () => {
   let io,clientSocket,room,server,clients;
@@ -13,7 +14,7 @@ describe("my awesome project", () => {
     clients = [];
     const httpServer = createServer();
     io = new Server(httpServer);
-    room = new Room("test_room",4,"",4,playerNames=["player 1","player 2","player 3", "player 4"],characters=["bart_cassidy","black_jack","calamity_janet","el_gringo"]);
+    room = new Room("test_room", 8, "", 8, playerNames=["player 1","player 2","player 3", "player 4", "player 5","player 6","player 7", "player 8"], characters=["el_gringo","jesse_jones","jourdonnais","suzy_lafayette","willy_the_kid","calamity_janet","rose_doolan","paul_regret"]);
     server.rooms.push(room);
     httpServer.listen(() => {
       const port = httpServer.address().port;
@@ -21,6 +22,10 @@ describe("my awesome project", () => {
       clientSocket2 = new Client(`http://localhost:${port}`);
       clientSocket3 = new Client(`http://localhost:${port}`);
       clientSocket4 = new Client(`http://localhost:${port}`);
+      clientSocket5 = new Client(`http://localhost:${port}`);
+      clientSocket6 = new Client(`http://localhost:${port}`);
+      clientSocket7 = new Client(`http://localhost:${port}`);
+      clientSocket8 = new Client(`http://localhost:${port}`);
       io.on("connection", (socket) => {
         let client = new SocketServer(socket,io,server);
         client.addSocket("test_room");
@@ -43,11 +48,11 @@ describe("my awesome project", () => {
     io.close();
   });
 
-  test("just check if testing works in general", () => {
+  test("check if tester runs", () => {
     expect("asd").toBe("asd");
   });
   test("check player names",()=>{
-    expect(room.players.map(x=>x.name)).toEqual(["player 1","player 2","player 3", "player 4"]);
+    expect(room.players.map(x=>x.name)).toEqual(["player 1","player 2","player 3", "player 4", "player 5","player 6","player 7", "player 8"]);
   })
 
   test("checkArrowsLeft", (done) => {
