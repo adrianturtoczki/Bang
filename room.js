@@ -65,10 +65,11 @@ class Room {
             let currentPlayer;
             console.log("lastplayer:",lastPlayer);
             console.log(this.alivePlayers,this.alivePlayers.indexOf(lastPlayer),this.alivePlayers[this.alivePlayers.indexOf(lastPlayer)+1],this.alivePlayers[0]);
-            if (this.alivePlayers[this.alivePlayers.indexOf(lastPlayer)+1]!=undefined){
-                currentPlayer = this.alivePlayers[this.alivePlayers.indexOf(lastPlayer)+1];
-            } else {
-                currentPlayer = this.alivePlayers[0];
+            currentPlayer = this.players[(this.players.indexOf(lastPlayer)+1)%this.playerLimit];
+            let index = this.players.indexOf(lastPlayer);
+            while (currentPlayer.killed){
+                index++;
+                currentPlayer = this.players[(this.players.indexOf(lastPlayer)+index)%this.playerLimit];
             }
             this.chat.push("Új kör: "+currentPlayer.name);
             console.log(this.name+": "+currentPlayer.name+" köre");

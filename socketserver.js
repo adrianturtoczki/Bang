@@ -161,8 +161,8 @@ class SocketServer{
     //check if no arrows are left, and damages the players if they have arrows
     checkArrowsLeft(){
      if (this.curRoom.arrowsLeft <= 0){
-      this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
       this.io.to(this.curRoom.name).emit('noArrowsLeft');
+      console.log("aliveplayers at checkarrowsleft:",this.curRoom.alivePlayers);
         for (let p of this.curRoom.alivePlayers){
           //character check: jourdonnais
           if (p.character.name != 'jourdonnais'){
