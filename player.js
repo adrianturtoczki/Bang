@@ -1,5 +1,3 @@
-'use strict';
-
 class Player {
     constructor(name, role, character){
 
@@ -22,6 +20,7 @@ class Player {
         this.selections = [];
         this.curTurn = false;
         this.turnEnd = false;
+        this.killed = false;
 
     }
 }

@@ -1,5 +1,3 @@
-'use strict';
-
 class Dice {
     constructor(index,type=-1){
         type === -1 ? this.roll() : this.type=type;

@@ -1,11 +1,9 @@
-'use strict';
-
 const Room = require('./room');
 const Dice = require('./dice');
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http,{'pingInterval': 5000, 'pingTimeout': 300000});
 const config = require('./config.js');
 const path = require('path');
 const CircularJSON = require('circular-json');

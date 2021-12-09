@@ -159,7 +159,7 @@ let socket = io();
               pDataDiv.children[0].children[0].children[0].textContent=p.name;
               pDataDiv.children[0].children[1].children[0].textContent=p.life;
               pDataDiv.children[0].children[1].children[2].textContent=p.arrows;
-              if (p.life<=0) pDataDiv.children[1].children[0].src= 'images/r_'+p.role+'.webp';
+              if (p.life<=0) pDataDiv.children[0].children[1].children[4].src= 'images/r_'+p.role+'.webp';
             }
           document.getElementById('arrowsLeft').textContent = 'Maradt '+arrowsLeft+' nyíl';
           
@@ -283,8 +283,10 @@ let socket = io();
                   }  else {
                     nextPlayer = alivePlayers[aliveIndex+shootingDistance];
                   }
-                  selectedPlayers.push(prevPlayer);
-                  selectedPlayers.push(nextPlayer);
+                  if (prevPlayer.name!=player.name && nextPlayer.name!=player.name){
+                    selectedPlayers.push(prevPlayer);
+                    selectedPlayers.push(nextPlayer);
+                  }
     
                 }
                 } else if (dice.type === 4){ //beer
@@ -338,6 +340,7 @@ let socket = io();
         player.selections = [];
         printSelections(player.selections,document.getElementById('selections'));
         player.curDices = [];
+        rerollButton.style.display="none";
         document.getElementById('endTurnButton').disabled = true;
       });
       document.getElementById('resetSelectionsButton').addEventListener('click', function(){

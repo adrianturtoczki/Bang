@@ -1,5 +1,3 @@
-'use strict';
-
 const Player = require('./player');
 const Character = require('./character');
 
@@ -19,8 +17,6 @@ class Room {
         this.end = false;
         this.arrowsLeft = 9;
         this.chat = [];
-
-        this.currentPlayerIndex = 0;
 
         if (connections.length === 0){
             this.connections = new Array(this.playerLimit).fill(null);
@@ -61,18 +57,19 @@ class Room {
     //Sets the next player in the turn as the current one
     nextPlayer(lastPlayer){
         if (!this.end){
-            console.log(this.name+": "+lastPlayer.name+" körének vége!");
             lastPlayer.curTurn = false;
             lastPlayer.turnEnd = false;
             lastPlayer.rolled = false;
             lastPlayer.curDices = [];
             lastPlayer.selections = [];
-            if (this.currentPlayerIndex>=this.alivePlayers.length-1){
-                this.currentPlayerIndex = 0;
+            let currentPlayer;
+            console.log("lastplayer:",lastPlayer);
+            console.log(this.alivePlayers,this.alivePlayers.indexOf(lastPlayer),this.alivePlayers[this.alivePlayers.indexOf(lastPlayer)+1],this.alivePlayers[0]);
+            if (this.alivePlayers[this.alivePlayers.indexOf(lastPlayer)+1]!=undefined){
+                currentPlayer = this.alivePlayers[this.alivePlayers.indexOf(lastPlayer)+1];
             } else {
-                this.currentPlayerIndex++;
+                currentPlayer = this.alivePlayers[0];
             }
-            let currentPlayer = this.alivePlayers[this.currentPlayerIndex];
             this.chat.push("Új kör: "+currentPlayer.name);
             console.log(this.name+": "+currentPlayer.name+" köre");
             currentPlayer.curTurn = true;
