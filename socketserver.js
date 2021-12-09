@@ -207,14 +207,13 @@ class SocketServer{
             d.rerollsLeft = 0;
           }
         }
-        this.checkArrowsLeft();
         if (dynamiteDices.length >= 3){
           this.player.life--;
           this.checkIfKilled(this.player)
           dynamiteDices.forEach(x=>x.abilityActivated = true);
           rollResults.forEach(x=>x.rerollsLeft = 0);
         }
-  
+        this.checkArrowsLeft();
         this.player.rolled = true;
         console.log(this.curRoom.name+": "+this.player.name + ' dobott: '+ rollResults.map(x => x.name));
         this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x => '<img class="smallDices" src="'+x.image+'">'));

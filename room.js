@@ -64,12 +64,12 @@ class Room {
             lastPlayer.selections = [];
             let currentPlayer;
             console.log("lastplayer:",lastPlayer);
-            console.log(this.alivePlayers,this.alivePlayers.indexOf(lastPlayer),this.alivePlayers[this.alivePlayers.indexOf(lastPlayer)+1],this.alivePlayers[0]);
-            currentPlayer = this.players[(this.players.indexOf(lastPlayer)+1)%this.playerLimit];
-            let index = this.players.indexOf(lastPlayer);
+            console.log(this.players);
+            let index = this.players.indexOf(lastPlayer)+1;
+            currentPlayer = this.players[index%this.playerLimit];
             while (currentPlayer.killed){
                 index++;
-                currentPlayer = this.players[(this.players.indexOf(lastPlayer)+index)%this.playerLimit];
+                currentPlayer = this.players[index%this.playerLimit];
             }
             this.chat.push("Új kör: "+currentPlayer.name);
             console.log(this.name+": "+currentPlayer.name+" köre");
