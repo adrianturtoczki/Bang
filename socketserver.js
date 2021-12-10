@@ -79,7 +79,6 @@ class SocketServer{
             this.endTurn([]);
           }
           this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
-          //console.log("checkifkilled:",this.curRoom.alivePlayers);
         }
       }
     }
@@ -98,7 +97,6 @@ class SocketServer{
           this.player.life+=2;
         }
         //character check: el gringo 
-        console.log(this.curRoom.name+": "+this.curRoom.players,selections)
         if (selections.some(x => (x.type === 2 || x.type === 3) && this.curRoom.players[x.selection].character.name === 'el_gringo')){
             this.player.arrows++;
             this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
@@ -115,7 +113,6 @@ class SocketServer{
               this.curRoom.chat.push(selectedPlayer.name + ' kapott egy lövést: '+ '<img class="smallDices" src="'+s.image+'">');
             } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
               //character check: jesse jones
-              console.log("TESZT: ",selectedPlayer.character.name === 'jesse_jones',selectedPlayer === this.player, selectedPlayer.life <= 4)
               if (selectedPlayer.character.name === 'jesse_jones' && selectedPlayer === this.player && selectedPlayer.life <= 4){
                 selectedPlayer.life+=2;
                 this.curRoom.chat.push(selectedPlayer.name + ' kapott két sört: '+ '<img class="smallDices" src="'+s.image+'">');
@@ -147,8 +144,8 @@ class SocketServer{
         }
     
         let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
-        winner!=undefined ? console.log(this.curRoom.name+": a nyertes: "+winner) : console.log("nincs még nyertes");
         if (winner){
+          console.log(this.curRoom.name+": a nyertes: "+winner)
           this.io.to(this.curRoom.name).emit('gameEnd', winner);
           this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
         }

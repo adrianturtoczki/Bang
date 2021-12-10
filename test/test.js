@@ -136,11 +136,10 @@ describe("my awesome project", () => {
       clients[0].endTurn([]);
       //change the player's life to 4, so that they can heal by 2 instead of 1
       clients[1].player.life = 4;
-      clients[1].roll([4,1,1,1,1]);
-      clients[1].player.selections = [new Dice(0,4),new Dice(1,1),new Dice(2,1),new Dice(3,1),new Dice(4,1)];
+      clients[1].roll([4,0,0,0,0]);
+      clients[1].player.selections = [new Dice(0,4),new Dice(1,0),new Dice(2,0),new Dice(3,0),new Dice(4,0)];
       clients[1].player.selections[0].selection = 1;
       clients[1].endTurn(clients[1].player.selections);
-      console.log(clients[1].player.character.name);
       expect(clients[1].player.life).toEqual(6);
       done();
     });

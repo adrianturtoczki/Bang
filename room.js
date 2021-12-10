@@ -64,7 +64,6 @@ class Room {
             lastPlayer.selections = [];
             let currentPlayer;
             console.log("lastplayer:",lastPlayer);
-            console.log(this.players);
             let index = this.players.indexOf(lastPlayer)+1;
             currentPlayer = this.players[index%this.playerLimit];
             while (currentPlayer.killed){
