@@ -79,7 +79,7 @@ class SocketServer{
             this.endTurn([]);
           }
           this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
-          console.log("checkifkilled:",this.curRoom.alivePlayers);
+          //console.log("checkifkilled:",this.curRoom.alivePlayers);
         }
       }
     }
@@ -87,74 +87,75 @@ class SocketServer{
     // ending a turn
     endTurn(selections){
   
-      //resolving
-  
-      //character check: suzy lafayette
-      if (this.player.character.name === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
-        this.player.life+=2;
-      }
-      //character check: el gringo 
-      console.log(this.curRoom.name+": "+this.curRoom.players,selections)
-      if (selections.some(x => (x.type === 2 || x.type === 3) && this.curRoom.players[x.selection].character.name === 'el_gringo')){
-          this.player.arrows++;
-          this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
-          this.curRoom.arrowsLeft--;
-          this.checkArrowsLeft();
-      }
-  
-      for (let s of selections){
-        if (s != null){
-          let dice_type = s.type;
-          let selectedPlayer = this.curRoom.players[s.selection];
-          if (dice_type === 2 || dice_type === 3){
-            selectedPlayer.life--;
-            this.curRoom.chat.push(selectedPlayer.name + ' kapott egy lövést: '+ '<img class="smallDices" src="'+s.image+'">');
-          } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
-            //character check: jesse jones
-            if (selectedPlayer.character.name === 'jesse_jones' && selectedPlayer === this.player && selectedPlayer.life <= 4){
-              selectedPlayer.life+=2;
-              this.curRoom.chat.push(selectedPlayer.name + ' kapott két sört: '+ '<img class="smallDices" src="'+s.image+'">');
-            } else {
-              selectedPlayer.life++;
-              this.curRoom.chat.push(selectedPlayer.name + ' kapott egy sört: '+ '<img class="smallDices" src="'+s.image+'">');
+      //ending turn
+      if (this.player.curTurn){
+          console.log(this.curRoom.name+": "+this.player.name+" körének vége!");
+
+        //resolving
+    
+        //character check: suzy lafayette
+        if (this.player.character.name === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
+          this.player.life+=2;
+        }
+        //character check: el gringo 
+        console.log(this.curRoom.name+": "+this.curRoom.players,selections)
+        if (selections.some(x => (x.type === 2 || x.type === 3) && this.curRoom.players[x.selection].character.name === 'el_gringo')){
+            this.player.arrows++;
+            this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
+            this.curRoom.arrowsLeft--;
+            this.checkArrowsLeft();
+        }
+    
+        for (let s of selections){
+          if (s != null){
+            let dice_type = s.type;
+            let selectedPlayer = this.curRoom.players[s.selection];
+            if (dice_type === 2 || dice_type === 3){
+              selectedPlayer.life--;
+              this.curRoom.chat.push(selectedPlayer.name + ' kapott egy lövést: '+ '<img class="smallDices" src="'+s.image+'">');
+            } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
+              //character check: jesse jones
+              console.log("TESZT: ",selectedPlayer.character.name === 'jesse_jones',selectedPlayer === this.player, selectedPlayer.life <= 4)
+              if (selectedPlayer.character.name === 'jesse_jones' && selectedPlayer === this.player && selectedPlayer.life <= 4){
+                selectedPlayer.life+=2;
+                this.curRoom.chat.push(selectedPlayer.name + ' kapott két sört: '+ '<img class="smallDices" src="'+s.image+'">');
+              } else {
+                selectedPlayer.life++;
+                this.curRoom.chat.push(selectedPlayer.name + ' kapott egy sört: '+ '<img class="smallDices" src="'+s.image+'">');
+              }
             }
           }
         }
-      }
-  
-      let gatlingDices = selections.filter(x => x.type === 5);
-      //character check: willy the kid
-      if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
-        this.curRoom.chat.push(this.player.name + ' gatlingot használt, így eldobja a nyilait.');
-        this.curRoom.arrowsLeft += this.player.arrows;
-        this.player.arrows = 0;
-        for (let p of this.curRoom.alivePlayers){
-          //character check: paul regret
-          if (p != this.player && p.character.name != 'paul_regret'){
-            p.life--;
-            this.curRoom.chat.push(p.name + ' sebezve lett gatling által');
+    
+        let gatlingDices = selections.filter(x => x.type === 5);
+        //character check: willy the kid
+        if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
+          this.curRoom.chat.push(this.player.name + ' gatlingot használt, így eldobja a nyilait.');
+          this.curRoom.arrowsLeft += this.player.arrows;
+          this.player.arrows = 0;
+          for (let p of this.curRoom.alivePlayers){
+            //character check: paul regret
+            if (p != this.player && p.character.name != 'paul_regret'){
+              p.life--;
+              this.curRoom.chat.push(p.name + ' sebezve lett gatling által');
+            }
           }
         }
-      }
-  
-      for (let p of this.curRoom.alivePlayers){
-        this.checkIfKilled(p);
-      }
-  
-      let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
-      winner!=undefined ? console.log(this.curRoom.name+": a nyertes: "+winner) : console.log("nincs még nyertes");
-      if (winner){
-        this.io.to(this.curRoom.name).emit('gameEnd', winner);
-        this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
-      }
-  
-      //ending turn
-      console.log(this.curRoom.name+": "+this.player.name+" körének vége!");
-      if (this.player.curTurn){
+    
+        for (let p of this.curRoom.alivePlayers){
+          this.checkIfKilled(p);
+        }
+    
+        let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
+        winner!=undefined ? console.log(this.curRoom.name+": a nyertes: "+winner) : console.log("nincs még nyertes");
+        if (winner){
+          this.io.to(this.curRoom.name).emit('gameEnd', winner);
+          this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
+        }
+
         this.curRoom.nextPlayer(this.player);
       }
       
-      console.log(this.curRoom.name+": kör befejezése.. .. ");
       this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
     }
     
@@ -162,7 +163,7 @@ class SocketServer{
     checkArrowsLeft(){
      if (this.curRoom.arrowsLeft <= 0){
       this.io.to(this.curRoom.name).emit('noArrowsLeft');
-      console.log("aliveplayers at checkarrowsleft:",this.curRoom.alivePlayers);
+      //console.log("aliveplayers at checkarrowsleft:",this.curRoom.alivePlayers);
         for (let p of this.curRoom.alivePlayers){
           //character check: jourdonnais
           if (p.character.name != 'jourdonnais'){
@@ -188,7 +189,7 @@ class SocketServer{
         for (let i = 0; i < 5; i++){
           let cur_dice = new Dice(i,types[i]);
           rollResults.push(cur_dice);
-          if (cur_dice.type === 0 || cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1,2
+          if (cur_dice.type === 0 || cur_dice.type === 1 || cur_dice.type === 5){ //add all to selections except bullet1/2, beer
             this.player.selections[i] = cur_dice;
             } else {
               this.player.selections[i] = null;
@@ -215,7 +216,7 @@ class SocketServer{
         }
         this.checkArrowsLeft();
         this.player.rolled = true;
-        console.log(this.curRoom.name+": "+this.player.name + ' dobott: '+ rollResults.map(x => x.name));
+        console.log(this.curRoom.name+": "+this.player.name + ' dobott: ',rollResults.map(x => x.name));
         this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x => '<img class="smallDices" src="'+x.image+'">'));
   
         this.player.curDices = rollResults;
