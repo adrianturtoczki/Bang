@@ -148,7 +148,6 @@ class SocketServer{
             }
         
             for (let p of this.curRoom.players){
-              console.log("checkifkilled:",p);
               this.checkIfKilled(p);
             }
           }

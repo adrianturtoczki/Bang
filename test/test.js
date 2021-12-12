@@ -207,4 +207,15 @@ describe("my awesome project", () => {
     });
   });
 
+  test("win", (done) => {
+    waitFor(x=>clients[0].player).then(x=>{
+      clients[0].curRoom.players.map(x=>{
+        if (x.index!=0) x.killed=true;
+      });
+      console.log(clients[0].curRoom.players);
+      expect(clients[0].curRoom.checkWinConditions(8)).toEqual("Banditák");
+      done();
+    });
+  });
+
 });

@@ -137,7 +137,7 @@ class Room {
                 break;
         }
         for (let p of this.players){
-            if (p.life <= 0){
+            if (p.killed){
                 switch(this.roles[p.index]){
                     case "sheriff":
                         sheriffAlive--;
@@ -158,11 +158,11 @@ class Room {
             this.end = true;
             return "Seriff";
         }
-        else if (sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive > 0){
+        else if (sheriffAlive <= 0 && outlawsAlive > 0){
             this.end = true;
             return "Banditák";
         }
-        else if (renegadesAlive > 1 && sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive <= 0){
+        else if (renegadesAlive > 0 && sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
             return "Renegát";
         }
