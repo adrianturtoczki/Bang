@@ -345,7 +345,7 @@ let socket = io();
       });
       document.getElementById('resetSelectionsButton').addEventListener('click', function(){
         for (let i = 0; i < player.selections.length; i++){
-          if (player.selections[i].type != 0 && player.selections[i].type != 1 && player.selections[i].type != 4 && player.selections[i].type != 5){ //add all non-arrows to selections
+          if (player.selections[i] && player.selections[i].type != 0 && player.selections[i].type != 1 && player.selections[i].type != 4 && player.selections[i].type != 5){ //add all non-arrows to selections
             player.selections[i] = null;
             }
         }

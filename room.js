@@ -12,7 +12,6 @@ class Room {
 
         this.started = false;
         this.players = [];
-        this.alivePlayers = [];
         this.roles = []; //separated from players so they don't get sent to everyone
         this.end = false;
         this.arrowsLeft = 9;
@@ -97,7 +96,6 @@ class Room {
             let pChar = characters.length === playerNames.length ? new Character(characters[i]) : new Character(allCharacters.splice(Math.floor(Math.random()*allCharacters.length), 1)[0]); //can use predefined characters or give random
             this.players.push(new Player(playerNames[i], pRole, pChar));
           }
-        this.alivePlayers = Array.from(this.players);
     }
 
     //Checks win conditions.

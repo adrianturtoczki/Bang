@@ -72,13 +72,18 @@ class SocketServer{
           player.arrows = 0;
           player.life = 0;
           player.role = this.curRoom.roles[player.index];
-          this.curRoom.alivePlayers.splice(this.curRoom.alivePlayers.indexOf(player),1);
   
           //checks if the killed player is the current one
           if (player.name==this.player.name){
             this.endTurn([]);
           }
           this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
+          let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
+          if (winner){
+            console.log(this.curRoom.name+": a nyertes: "+winner)
+            this.io.to(this.curRoom.name).emit('gameEnd', winner);
+            this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
+          }
         }
       }
     }
@@ -90,88 +95,96 @@ class SocketServer{
       if (this.player.curTurn){
           console.log(this.curRoom.name+": "+this.player.name+" körének vége!");
 
-        //resolving
-    
-        //character check: suzy lafayette
-        if (this.player.character.name === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
-          this.player.life+=2;
-        }
-        //character check: el gringo 
-        if (selections.some(x => (x.type === 2 || x.type === 3) && this.curRoom.players[x.selection].character.name === 'el_gringo')){
-            this.player.arrows++;
-            this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
-            this.curRoom.arrowsLeft--;
-            this.checkArrowsLeft();
-        }
-    
-        for (let s of selections){
-          if (s != null){
-            let dice_type = s.type;
-            let selectedPlayer = this.curRoom.players[s.selection];
-            if (dice_type === 2 || dice_type === 3){
-              selectedPlayer.life--;
-              this.curRoom.chat.push(selectedPlayer.name + ' kapott egy lövést: '+ '<img class="smallDices" src="'+s.image+'">');
-            } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
-              //character check: jesse jones
-              if (selectedPlayer.character.name === 'jesse_jones' && selectedPlayer === this.player && selectedPlayer.life <= 4){
-                selectedPlayer.life+=2;
-                this.curRoom.chat.push(selectedPlayer.name + ' kapott két sört: '+ '<img class="smallDices" src="'+s.image+'">');
-              } else {
-                selectedPlayer.life++;
-                this.curRoom.chat.push(selectedPlayer.name + ' kapott egy sört: '+ '<img class="smallDices" src="'+s.image+'">');
+          if (!this.player.killed){
+            //resolving
+        
+            //character check: suzy lafayette
+            if (this.player.character.name === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
+              if (this.player.life<this.player.startingLife-2){
+                this.player.life+=2;
+              } else if (this.player.life===this.player.startingLife-1){
+                this.player.life++;
               }
             }
-          }
-        }
-    
-        let gatlingDices = selections.filter(x => x.type === 5);
-        //character check: willy the kid
-        if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
-          this.curRoom.chat.push(this.player.name + ' gatlingot használt, így eldobja a nyilait.');
-          this.curRoom.arrowsLeft += this.player.arrows;
-          this.player.arrows = 0;
-          for (let p of this.curRoom.alivePlayers){
-            //character check: paul regret
-            if (p != this.player && p.character.name != 'paul_regret'){
-              p.life--;
-              this.curRoom.chat.push(p.name + ' sebezve lett gatling által');
+            //character check: el gringo 
+            if (selections.some(x => (x.type === 2 || x.type === 3) && this.curRoom.players[x.selection].character.name === 'el_gringo')){
+                this.addArrows(this.player,1);
+                this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
+            }
+        
+            for (let s of selections){
+              if (s != null){
+                let dice_type = s.type;
+                let selectedPlayer = this.curRoom.players[s.selection];
+                if (dice_type === 2 || dice_type === 3){
+                  selectedPlayer.life--;
+                  this.curRoom.chat.push(selectedPlayer.name + ' kapott egy lövést: '+ '<img class="smallDices" src="'+s.image+'">');
+                } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
+                  //character check: jesse jones
+                  if (selectedPlayer.character.name === 'jesse_jones' && selectedPlayer === this.player && selectedPlayer.life <= 4){
+                    selectedPlayer.life+=2;
+                    this.curRoom.chat.push(selectedPlayer.name + ' kapott két sört: '+ '<img class="smallDices" src="'+s.image+'">');
+                  } else {
+                    if (selectedPlayer.life<selectedPlayer.startingLife) selectedPlayer.life++;
+                    this.curRoom.chat.push(selectedPlayer.name + ' kapott egy sört: '+ '<img class="smallDices" src="'+s.image+'">');
+                  }
+                }
+              }
+            }
+        
+            let gatlingDices = selections.filter(x => x.type === 5);
+            //character check: willy the kid
+            if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
+              this.curRoom.chat.push(this.player.name + ' gatlingot használt, így eldobja a nyilait.');
+              this.curRoom.arrowsLeft += this.player.arrows;
+              this.player.arrows = 0;
+              for (let p of this.curRoom.players){
+                //character check: paul regret
+                if (p != this.player && !p.killed && p.character.name != 'paul_regret'){
+                  p.life--;
+                  this.curRoom.chat.push(p.name + ' sebezve lett gatling által');
+                }
+              }
+            }
+        
+            for (let p of this.curRoom.players){
+              console.log("checkifkilled:",p);
+              this.checkIfKilled(p);
             }
           }
-        }
-    
-        for (let p of this.curRoom.alivePlayers){
-          this.checkIfKilled(p);
-        }
-    
-        let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
-        if (winner){
-          console.log(this.curRoom.name+": a nyertes: "+winner)
-          this.io.to(this.curRoom.name).emit('gameEnd', winner);
-          this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
-        }
 
         this.curRoom.nextPlayer(this.player);
       }
       
       this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
     }
-    
+    //adds arrows to the player
+    addArrows(player,arrows){
+      while (this.curRoom.arrowsLeft>0 && arrows>0){
+          player.arrows++;
+          this.curRoom.arrowsLeft--;
+          arrows--;
+      }
+      this.checkArrowsLeft();
+  }
     //check if no arrows are left, and damages the players if they have arrows
     checkArrowsLeft(){
      if (this.curRoom.arrowsLeft <= 0){
       this.io.to(this.curRoom.name).emit('noArrowsLeft');
-      //console.log("aliveplayers at checkarrowsleft:",this.curRoom.alivePlayers);
-        for (let p of this.curRoom.alivePlayers){
-          //character check: jourdonnais
-          if (p.character.name != 'jourdonnais'){
-            p.life -= p.arrows;
-            this.curRoom.chat.push(p.name+' kapott ' + p.arrows +' sebzést a nyilaktól.');
-          } else {
-            p.life--;
-            this.curRoom.chat.push(p.name+' kapott egy sebzést a nyilaktól.');
+        for (let p of this.curRoom.players){
+          if (!p.killed){
+            //character check: jourdonnais
+            if (p.character.name != 'jourdonnais'){
+              p.life -= p.arrows;
+              this.curRoom.chat.push(p.name+' kapott ' + p.arrows +' sebzést a nyilaktól.');
+            } else {
+              p.life--;
+              this.curRoom.chat.push(p.name+' kapott 1 sebzést a nyilaktól.');
+            }
+
+            p.arrows = 0;
+            this.checkIfKilled(p)
           }
-          p.arrows = 0;
-          this.checkIfKilled(p)
         }
         this.curRoom.arrowsLeft = 9;
       }
@@ -197,9 +210,7 @@ class SocketServer{
         for (let d of rollResults){
   
           if (d.type === 0){
-            this.player.arrows++;
-            this.curRoom.arrowsLeft--;
-    
+            this.addArrows(this.player,1);
           }
           else if (d.type === 1){
             d.rerollsLeft = 0;
@@ -211,7 +222,6 @@ class SocketServer{
           dynamiteDices.forEach(x=>x.abilityActivated = true);
           rollResults.forEach(x=>x.rerollsLeft = 0);
         }
-        this.checkArrowsLeft();
         this.player.rolled = true;
         console.log(this.curRoom.name+": "+this.player.name + ' dobott: ',rollResults.map(x => x.name));
         this.curRoom.chat.push(this.player.name + ' dobott: '+ rollResults.map(x => '<img class="smallDices" src="'+x.image+'">'));
@@ -246,10 +256,7 @@ class SocketServer{
   
       if (rerolledDice.type === 0){
         this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
-        this.player.arrows++;
-        this.curRoom.arrowsLeft--;
-  
-        this.checkArrowsLeft();
+        this.addArrows(this.player,1);
       }
       else if (rerolledDice.type === 1){
         rerolledDice.rerollsLeft = 0;
@@ -277,7 +284,7 @@ class SocketServer{
     
     //disconnect
     disconnect(reason){
-      console.log("disconnect reason: ",reason);
+      //console.log("disconnect reason: ",reason);
       this.curRoom.connections[this.playerIndex] = null;
       this.io.to(this.curRoom.name).emit("aPlayerDisconnected");
       if (this.server.rooms.indexOf(this.curRoom) != -1){

@@ -82,6 +82,15 @@ describe("my awesome project", () => {
       done();
     });
   });
+  test("addArrows", (done) => {
+    waitFor(x=>clients[0].player).then(x=>{
+      let life_before = clients[0].player.life;
+      clients[0].curRoom.arrowsLeft=3
+      clients[0].roll([0,0,0,0,0]);
+      expect(clients[0].player.life).toEqual(life_before-3);
+      done();
+    });
+  });
   test("roll", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
       expect(clients[0].player.curDices).toEqual([]);
@@ -181,30 +190,7 @@ describe("my awesome project", () => {
       done();
     });
   });
-  /*
-  test("calamity_janet", (done) => {
-    waitFor(x=>clients[0].player).then(x=>{
-      clients[0].endTurn([]);
-      clients[1].endTurn([]);
-      clients[2].endTurn([]);
-      clients[3].endTurn([]);
-      clients[4].endTurn([]);
-      done();
-    });
-  });
-  /*
-  test("rose_doolan", (done) => {
-    waitFor(x=>clients[0].player).then(x=>{
-      clients[0].endTurn([]);
-      clients[1].endTurn([]);
-      clients[2].endTurn([]);
-      clients[3].endTurn([]);
-      clients[4].endTurn([]);
-      clients[5].endTurn([]);
-      done();
-    });
-  });
-  */
+  
   test("paul_regret", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
       clients[0].endTurn([]);
