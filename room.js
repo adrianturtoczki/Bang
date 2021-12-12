@@ -154,17 +154,18 @@ class Room {
                 }
             }
         }
+        console.log("TESZT:",sheriffAlive,deputiesAlive,renegadesAlive,outlawsAlive);
         if (sheriffAlive === 1 && renegadesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
             return "Seriff";
         }
-        else if (sheriffAlive <= 0 && outlawsAlive > 0){
-            this.end = true;
-            return "Banditák";
-        }
         else if (renegadesAlive > 0 && sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
             return "Renegát";
+        }
+        else if (sheriffAlive <= 0 ){
+            this.end = true;
+            return "Banditák";
         }
         else{
             return
