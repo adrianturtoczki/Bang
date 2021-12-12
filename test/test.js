@@ -6,7 +6,7 @@ const SocketServer = require("../socketserver");
 const {waitFor} = require('../helper');
 const Dice = require("../dice");
 
-describe("my awesome project", () => {
+describe("bang", () => {
   let io,clientSocket,room,server,clients;
 
   beforeEach((done) => {
@@ -213,7 +213,7 @@ describe("my awesome project", () => {
         if (x.index!=0) x.killed=true;
       });
       console.log(clients[0].curRoom.players);
-      expect(clients[0].curRoom.checkWinConditions(8)).toEqual("Banditák");
+      expect(clients[0].curRoom.checkWinConditions(8)).not.toEqual(undefined);
       done();
     });
   });
