@@ -48,7 +48,9 @@ class ExpressServer{
       if (room.playerNames.includes(req.body.playerName)){
         console.log("error: name already in room!");
         res.send({"message":"name_already_in_room"});
-      } else if (room.password!=req.body.password) {
+      } else if(req.body.playerName.length>=30) {
+        res.send({"message":"long_name"});
+      }else if (room.password!=req.body.password) {
         console.log("error: bad password!");
         res.send({"message":"bad_password"});
       } else {
@@ -61,6 +63,8 @@ class ExpressServer{
       console.log('/create_room');
       if (this.rooms.find(x=>x.name===req.body.roomName)){
         res.send({"message":"room_already_exists"});
+      } else if(req.body.playerName.length>=30) {
+        res.send({"message":"long_name"});
       } else {
         let new_room = new Room(req.body.roomName,parseInt(req.body.playerLimit),req.body.password);
         new_room.addPlayer(req.body.playerName);

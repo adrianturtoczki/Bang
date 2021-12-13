@@ -60,7 +60,9 @@ function createRoom(event){
                   window.location.href="/game?room="+create_room__form.elements["roomName"].value;
               } else if (data.message == "room_already_exists"){
                   alert("Hiba: már létezik ilyen szoba.");
-              }
+              } else if (data.message == "long_name"){
+                alert("Hiba: A játékos neve nem lehet hosszabb 30 karakternél!");
+            }
           });
           
 }
@@ -85,6 +87,9 @@ function joinRoom(event){
               } else if (data.message == "bad_password"){
                   alert("Hiba: rossz jelszó!");
               }
+              else if (data.message == "long_name"){
+                alert("Hiba: A játékos neve nem lehet hosszabb 30 karakternél!");
+            }
           });
           
 }
