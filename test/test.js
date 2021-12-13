@@ -206,7 +206,6 @@ describe("bang", () => {
       done();
     });
   });
-
   test("win", (done) => {
     waitFor(x=>clients[0].player).then(x=>{
       clients[0].curRoom.players.map(x=>{
