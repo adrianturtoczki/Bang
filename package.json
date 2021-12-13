@@ -1,6 +1,7 @@
 {
   "name": "bang",
   "version": "1.0.0",
+  "private": true,
   "description": "Javascript implementation of Bang: the Dice Game",
   "main": "expressserver.js",
   "dependencies": {
