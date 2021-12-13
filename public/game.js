@@ -52,7 +52,7 @@ let socket = io();
             chatId.appendChild(p);
           }
       }
-
+      //shows an alert if there are no more arrows
       function noArrowsLeft(){
         alert("Elfogytak a nyilak. Jönnek az indiánok! ");
       }
@@ -302,12 +302,13 @@ let socket = io();
               }
         }
         }
-
+        //highlights selectable players
         function highlightPlayer(dice, playerToHighlight){
           let playerNameDiv = document.getElementById("player_"+playerToHighlight.name);
           playerNameDiv.classList.add('highlighted');
           playerNameDiv.onclick = () => selectTarget(dice,playerToHighlight);
         }
+        //reverts highlighting of selectable players
         function revertHighlightPlayers(){
           let highlightedDivs = document.getElementsByClassName("highlighted");
           while(highlightedDivs.length){
@@ -316,7 +317,7 @@ let socket = io();
           }
         }
 
-
+      //displays the dices
       function drawDices(dices){
         document.getElementById('dices').style.display = 'block';
         for (let i = 0; i < 5;i++){
@@ -357,6 +358,7 @@ let socket = io();
       document.getElementById('chatInput').addEventListener('submit', function(event){
         event.preventDefault();
         socket.emit("sendMessage", document.getElementById('chatInputText').value);
+        document.getElementById('chatInputText').value="";
       });
 
     rerollButton.addEventListener('click', function(event){

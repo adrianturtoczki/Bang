@@ -78,17 +78,20 @@ class SocketServer{
             this.endTurn([]);
           }
           this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
-          let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
-          if (winner){
-            console.log(this.curRoom.name+": a nyertes: "+winner)
-            this.io.to(this.curRoom.name).emit('gameEnd', winner);
-            this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
-          }
         }
       }
     }
 
-    // ending a turn
+    checkForWinner(){
+      let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
+      if (winner){
+        console.log(this.curRoom.name+": a nyertes: "+winner)
+        this.io.to(this.curRoom.name).emit('gameEnd', winner);
+        this.server.rooms.splice(this.server.rooms.indexOf(this.curRoom), 1);
+      }
+    }
+
+    //handles the ending of turns, performs the actions on the dices
     endTurn(selections){
   
       //ending turn
@@ -150,6 +153,7 @@ class SocketServer{
             for (let p of this.curRoom.players){
               this.checkIfKilled(p);
             }
+            this.checkForWinner();
           }
 
         this.curRoom.nextPlayer(this.player);
@@ -185,6 +189,7 @@ class SocketServer{
             this.checkIfKilled(p)
           }
         }
+        this.checkForWinner();
         this.curRoom.arrowsLeft = 9;
       }
       this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
@@ -218,6 +223,7 @@ class SocketServer{
         if (dynamiteDices.length >= 3){
           this.player.life--;
           this.checkIfKilled(this.player)
+          this.checkForWinner();
           dynamiteDices.forEach(x=>x.abilityActivated = true);
           rollResults.forEach(x=>x.rerollsLeft = 0);
         }
@@ -264,7 +270,8 @@ class SocketServer{
       if (dynamiteDices.length >= 3){
         this.curRoom.chat.push(this.player.name + ' 3 dinamitot dobott.');
         this.player.life--;
-        this.checkIfKilled(this.player)
+        this.checkIfKilled(this.player);
+        this.checkForWinner();
         dynamiteDices.forEach(x => x.abilityActivated = true);
         this.player.curDices.forEach(x => x.rerollsLeft = 0);
       }

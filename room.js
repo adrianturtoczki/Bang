@@ -159,7 +159,7 @@ class Room {
             this.end = true;
             return "Seriff";
         }
-        else if (renegadesAlive > 0 && sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive <= 0){
+        else if (renegadesAlive === 1 && sheriffAlive <= 0 && deputiesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
             return "Renegát";
         }
