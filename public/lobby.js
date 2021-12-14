@@ -43,6 +43,7 @@ for (let span of closes){
         if (help__modal.style.display="block"){help__modal.style.display="none"};
     });
 }
+//Creates a room
 function createRoom(event){
     event.preventDefault();
     console.log(create_room__form.elements);
@@ -54,7 +55,7 @@ function createRoom(event){
               },
             body: JSON.stringify({playerName:create_room__form.elements["playerName"].value,roomName:create_room__form.elements["roomName"].value,password:create_room__form.elements["password"].value,playerLimit:create_room__form.elements["playerLimit"].value})
           }).then(res => res.json()).then(data=>{
-              //checks if room exists already and if the password is good
+              //Checks if room exists already and if the password is good
               console.log(data.accepted);
               if (data.message == "ok"){
                   window.location.href="/game?room="+create_room__form.elements["roomName"].value;
@@ -66,7 +67,7 @@ function createRoom(event){
           });
           
 }
-
+//Handles the connection to a room
 function joinRoom(event){
     event.preventDefault();
     console.log(join_room__form.elements);
@@ -78,7 +79,7 @@ function joinRoom(event){
               },
             body: JSON.stringify({playerName:join_room__form.elements["playerName"].value,roomName:join_room__form.elements["roomName"].value,password:join_room__form.elements["password"].value})
           }).then(res => res.json()).then(data=>{
-              //checks if room exists already and if the password is good
+              //Checks if room exists already and if the password is good
               console.log(data.accepted);
               if (data.message == "ok"){
                   window.location.href="/game?room="+join_room__form.elements["roomName"].value;
@@ -93,7 +94,7 @@ function joinRoom(event){
           });
           
 }
-
+//Gets the current rooms and shows them
 function getRooms(){
     fetch('/rooms').then(result=>{
         console.log(result);
@@ -116,12 +117,12 @@ function getRooms(){
     
     });
 }
-
+//Updates the room div
 function updateRoomDiv(room){
     let rDiv = document.getElementById(room.name);
     rDiv.children[2].textContent = room.playersLeft;
 }
-
+//Creates the room div
 function createRoomDiv(room){
     let rName = document.createElement('p');
     rName.textContent = room.name;

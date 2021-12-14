@@ -62,7 +62,7 @@ class SocketServer{
       this.socket.emit('playersDataSetup',this.curRoom.players,this.playerIndex,this.playerRole,this.curRoom.arrowsLeft);
     }
     
-    //checks if the player's health reached 0, and removes them from the game if yes.
+    //Checks if the player's health reached 0, and removes them from the game if yes.
     checkIfKilled(player){
       if (player.life<=0){
         if (!player.killed){
@@ -73,7 +73,7 @@ class SocketServer{
           player.life = 0;
           player.role = this.curRoom.roles[player.index];
   
-          //checks if the killed player is the current one
+          //Checks if the killed player is the current one
           if (player.name==this.player.name){
             this.endTurn([]);
           }
@@ -81,7 +81,7 @@ class SocketServer{
         }
       }
     }
-
+    //Checks if there is a winner, and ends the game if so
     checkForWinner(){
       let winner = this.curRoom.checkWinConditions(this.curRoom.playerLimit)
       if (winner){
@@ -91,17 +91,17 @@ class SocketServer{
       }
     }
 
-    //handles the ending of turns, performs the actions on the dices
+    //Handles the ending of turns, performs the actions on the dices
     endTurn(selections){
   
-      //ending turn
+      //Ending turn
       if (this.player.curTurn){
           console.log(this.curRoom.name+": "+this.player.name+" körének vége!");
 
           if (!this.player.killed){
-            //resolving
+            //Resolving the dices
         
-            //character check: suzy lafayette
+            //Character check: suzy lafayette
             if (this.player.character.name === 'suzy_lafayette' && selections.filter(x => x.type === 2 || x.type === 3).length === 0){
               if (this.player.life<this.player.startingLife-2){
                 this.player.life+=2;
@@ -109,7 +109,7 @@ class SocketServer{
                 this.player.life++;
               }
             }
-            //character check: el gringo 
+            //Character check: el gringo 
             if (selections.some(x => (x.type === 2 || x.type === 3) && this.curRoom.players[x.selection].character.name === 'el_gringo')){
                 this.addArrows(this.player,1);
                 this.curRoom.chat.push(this.player.name+' kapott egy nyilat.');
@@ -123,7 +123,7 @@ class SocketServer{
                   selectedPlayer.life--;
                   this.curRoom.chat.push(selectedPlayer.name + ' kapott egy lövést: '+ '<img class="smallDices" src="'+s.image+'">');
                 } else if (dice_type === 4 && selectedPlayer.life < selectedPlayer.startingLife){
-                  //character check: jesse jones
+                  //Character check: jesse jones
                   if (selectedPlayer.character.name === 'jesse_jones' && selectedPlayer === this.player && selectedPlayer.life <= 4){
                     selectedPlayer.life+=2;
                     this.curRoom.chat.push(selectedPlayer.name + ' kapott két sört: '+ '<img class="smallDices" src="'+s.image+'">');
@@ -136,13 +136,13 @@ class SocketServer{
             }
         
             let gatlingDices = selections.filter(x => x.type === 5);
-            //character check: willy the kid
+            //Character check: willy the kid
             if (gatlingDices.length >= 3 || (gatlingDices.length === 2 && this.player.character.name === 'willy_the_kid')){
               this.curRoom.chat.push(this.player.name + ' gatlingot használt, így eldobja a nyilait.');
               this.curRoom.arrowsLeft += this.player.arrows;
               this.player.arrows = 0;
               for (let p of this.curRoom.players){
-                //character check: paul regret
+                //Character check: paul regret
                 if (p != this.player && !p.killed && p.character.name != 'paul_regret'){
                   p.life--;
                   this.curRoom.chat.push(p.name + ' sebezve lett gatling által');
@@ -170,13 +170,13 @@ class SocketServer{
       }
       this.checkArrowsLeft();
   }
-    //check if no arrows are left, and damages the players if they have arrows
+    //Check if no arrows are left, and damages the players if they have arrows
     checkArrowsLeft(){
      if (this.curRoom.arrowsLeft <= 0){
       this.io.to(this.curRoom.name).emit('noArrowsLeft');
         for (let p of this.curRoom.players){
           if (!p.killed){
-            //character check: jourdonnais
+            //Character check: jourdonnais
             if (p.character.name != 'jourdonnais'){
               p.life -= p.arrows;
               this.curRoom.chat.push(p.name+' kapott ' + p.arrows +' sebzést a nyilaktól.');
@@ -197,7 +197,7 @@ class SocketServer{
       this.io.to(this.curRoom.name).emit('playersDataRefresh',this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
     }
     
-    //dice roll
+    //Dice roll
     roll(types=[-1,-1,-1,-1,-1]){
       if (this.player.rolled === false){
   
@@ -242,7 +242,7 @@ class SocketServer{
       }
     }
     
-    //handles the rerolling of the dice
+    //Handles the rerolling of the dice
     reroll(rerolledDiceIndex,type=-1){
       let rerolledDice = this.player.curDices[rerolledDiceIndex];
       let originalDice = {...rerolledDice};
@@ -283,16 +283,15 @@ class SocketServer{
       this.io.to(this.curRoom.name).emit('playersDataRefresh', this.curRoom.players, this.curRoom.arrowsLeft, this.curRoom.chat);
   
     }
-    
+    //Send a message to the chat
     sendMessage(message){
       console.log(this.curRoom.name+": "+this.player.name+" küldött egy üzenetet: "+message);
       this.curRoom.chat.push(this.player.name+": "+message);
       this.io.to(this.curRoom.name).emit('updateChat', this.curRoom.chat);
     }
     
-    //disconnect
-    disconnect(reason){
-      //console.log("disconnect reason: ",reason);
+    //Disconnect from the game, and remove the room from the server
+    disconnect(){
       this.curRoom.connections[this.playerIndex] = null;
       this.io.to(this.curRoom.name).emit("aPlayerDisconnected");
       if (this.server.rooms.indexOf(this.curRoom) != -1){
