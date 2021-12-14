@@ -46,7 +46,6 @@ for (let span of closes){
 //Creates a room
 function createRoom(event){
     event.preventDefault();
-    console.log(create_room__form.elements);
     
         fetch("/create_room", {
             method: "POST", 
@@ -56,7 +55,6 @@ function createRoom(event){
             body: JSON.stringify({playerName:create_room__form.elements["playerName"].value,roomName:create_room__form.elements["roomName"].value,password:create_room__form.elements["password"].value,playerLimit:create_room__form.elements["playerLimit"].value})
           }).then(res => res.json()).then(data=>{
               //Checks if room exists already and if the password is good
-              console.log(data.accepted);
               if (data.message == "ok"){
                   window.location.href="/game?room="+create_room__form.elements["roomName"].value;
               } else if (data.message == "room_already_exists"){
@@ -70,7 +68,6 @@ function createRoom(event){
 //Handles the connection to a room
 function joinRoom(event){
     event.preventDefault();
-    console.log(join_room__form.elements);
     
         fetch("/join_room", {
             method: "POST", 
@@ -80,7 +77,6 @@ function joinRoom(event){
             body: JSON.stringify({playerName:join_room__form.elements["playerName"].value,roomName:join_room__form.elements["roomName"].value,password:join_room__form.elements["password"].value})
           }).then(res => res.json()).then(data=>{
               //Checks if room exists already and if the password is good
-              console.log(data.accepted);
               if (data.message == "ok"){
                   window.location.href="/game?room="+join_room__form.elements["roomName"].value;
               } else if (data.message == "name_already_in_room"){
@@ -97,7 +93,6 @@ function joinRoom(event){
 //Gets the current rooms and shows them
 function getRooms(){
     fetch('/rooms').then(result=>{
-        console.log(result);
         return result.json();
     }).then(r=>{
         if (r.length){

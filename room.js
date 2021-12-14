@@ -62,7 +62,6 @@ class Room {
             lastPlayer.curDices = [];
             lastPlayer.selections = [];
             let currentPlayer;
-            console.log("lastplayer:",lastPlayer);
             let index = this.players.indexOf(lastPlayer)+1;
             currentPlayer = this.players[index%this.playerLimit];
             while (currentPlayer.killed){
@@ -154,7 +153,6 @@ class Room {
                 }
             }
         }
-        console.log("TESZT:",sheriffAlive,deputiesAlive,renegadesAlive,outlawsAlive);
         if (sheriffAlive === 1 && renegadesAlive <= 0 && outlawsAlive <= 0){
             this.end = true;
             return "Seriff";

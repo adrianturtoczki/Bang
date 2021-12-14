@@ -182,7 +182,6 @@ let socket = io();
 
       //if all possible selections have been set, then shows the button for ending the turn
       function checkSelections(selections, endTurnButton){
-        console.log(selections.filter(x=>x!=null).length===5);
         if (selections.filter(x=>x!=null).length===5){
           endTurnButton.disabled = false;
         } else {
