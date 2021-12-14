@@ -189,3 +189,7 @@ button {
 .selectedDice {
   filter: brightness(0.6);
 }
+
+.guideImages {
+  max-width: 100%;
+}

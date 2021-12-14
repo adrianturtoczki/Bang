@@ -83,14 +83,14 @@
                 <p>Ez a "Bang! Kockajáték" implementációja. A játékban szereplő 16 karakterből 8 van implementálva, és 4-8 játékos játszhat. Az eredeti játékszabály megtalálható <a href="szabalyok.pdf" target="_blank">itt</a>.</p>
                 <h3>A játék célja</h3>
                 <p>Minden játékost más-más cél vezérel, a szerepkártyájától függően:</p>
-                <ul>
+                <ul style="list-style-type:none;">
                     <li>Seriff: le kell számolnia a banditákkal és a renegátokkal</li>
                     <li>Banditák: le akarják lőni a seriffet</li>
                     <li>Seriffhelyettesek: a seriffet segítik és védik</li>
                     <li>Renegát: célja a játékban utolsóként életben maradni</li>
                 </ul>
                 <h3>Kockák</h3>
-                <ul id="dices">
+                <ul id="dices" style="list-style-type:none;">
                     <li><img src="images/d0.webp"><p>Ad egy nyilat. (amikor elfogynak a nyilak, mindenki annyi életet veszít, amennyi nyila van.)</p></li>
                     <li><img src="images/d1.webp"><p>Ha három dinamitot dobsz, akkor vesztesz egy életet és nem dobhatsz többször.</p></li>
                     <li><img src="images/d2.webp"><p>Lőhetsz egy játékosra, aki tőled 1 távolságra van.</p></li>
@@ -100,14 +100,14 @@
                 </ul>
                 <h3>A játék menete</h3>
                 <p>Először hozzunk létre egy szobát, vagy csatlakozzunk egyhez.</p>
-                <p>Felül látható a karakterünk, alul a többi játékos. Ha ez a mi körünk, akkor megjelenik a dobás gomb a karakterünk alatt:</p>
-                <!--<img src="images/gallery/game_overview.webp">-->
-                <p>A dobás gombra rányomva láthatjuk a kockákat. Ahhoz, hogy újradobjuk őket vagy kiválasszunk egy műveletet, nyomjunk rá (a reset gombra kattintva el tudjuk törölni ezeket):</p>
-                <!--<img src="images/gallery/dobas.webp">-->
+                <p>Csatlakozás után felül látható a karakterünk, alul a többi játékos. Ha ez a mi körünk, akkor megjelenik a dobás gomb a karakterünk mellett.</p>
+                <img src="images/guide/game_overview.png" class="guideImages">
+                <p>A dobás gombra rányomva láthatjuk a kockákat. Ahhoz, hogy újradobjuk őket vagy kiválasszunk egy műveletet, nyomjunk rá (a "Törlés" gombra kattintva, vagy egy kocka újradobásával el tudjuk törölni a kijelöléseket).</p>
+                <img src="images/guide/dobas.png" class="guideImages">
                 <p>Ha kiválasztottuk az összes műveletet, akkor nyomjunk a "Kör befejezése" gombra.</p>
                 <h3>A játék vége</h3>
                 <p>A játék véget ér, ha:</p>
-                <ul>
+                <ul style="list-style-type:none;">
                     <li>A seriff kiesik a játékból. Ha ekkor már csak a Renegát van életben, akkor ő a győztes, egyébként a Banditák nyerték a játékot.</li>
                     <li>Minden Bandita és Renegát kiesik a játékból. Ekkor a seriff és a seriffhelyettesek nyertek.</li>
                 </ul>
