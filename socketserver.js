@@ -181,8 +181,10 @@ class SocketServer{
               p.life -= p.arrows;
               this.curRoom.chat.push(p.name+' kapott ' + p.arrows +' sebzést a nyilaktól.');
             } else {
-              p.life--;
-              this.curRoom.chat.push(p.name+' kapott 1 sebzést a nyilaktól.');
+              if (p.arrows!=0) {
+                p.life--;
+                this.curRoom.chat.push(p.name+' kapott 1 sebzést a nyilaktól.');
+              }
             }
 
             p.arrows = 0;
